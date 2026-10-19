@@ -20,6 +20,15 @@ use super::{Aabb, Candidate, Kind, SnapGrid, SnapOptions, Targets};
 pub struct PointCache {
     by_shape: RefCell<HashMap<u64, Entry>>,
     builds: Cell<usize>,
+    crossings: RefCell<Option<Crossings>>,
+    crossing_builds: Cell<usize>,
+}
+
+/// The intersections of one set of in-view shapes. `shapes` is the key: each shape's id and the geometry
+/// `Rc` it was computed from, so an edit to any of them (a fresh `Rc`) or a change of the set misses.
+struct Crossings {
+    shapes: Vec<(u64, Rc<Geometry>)>,
+    points: Rc<Vec<Pt>>,
 }
 
 struct Entry {
@@ -42,6 +51,22 @@ impl PointCache {
         points
     }
 
+    /// The crossings between `shapes`, recomputed only when one of them or the set changes. Computing them
+    /// is quadratic in the shapes and their segments, so a drag that leaves them alone reuses one result.
+    fn crossings(&self, design: &Design, shapes: &[&Shape]) -> Rc<Vec<Pt>> {
+        let key: Vec<(u64, Rc<Geometry>)> = shapes.iter().map(|s| (s.id, design.geometry(s))).collect();
+        if let Some(hit) = self.crossings.borrow().as_ref()
+            && hit.shapes.len() == key.len()
+            && hit.shapes.iter().zip(&key).all(|((a, ga), (b, gb))| a == b && Rc::ptr_eq(ga, gb))
+        {
+            return hit.points.clone();
+        }
+        let points = Rc::new(intersections(design, shapes));
+        self.crossing_builds.set(self.crossing_builds.get() + 1);
+        *self.crossings.borrow_mut() = Some(Crossings { shapes: key, points: points.clone() });
+        points
+    }
+
     /// Drops cached points for shapes no longer in the design, so a long session does not keep dead
     /// geometry alive. Called when a drag begins.
     pub fn retain(&self, live: &std::collections::HashSet<u64>) {
@@ -52,6 +77,12 @@ impl PointCache {
     #[cfg(test)]
     pub fn builds(&self) -> usize {
         self.builds.get()
+    }
+
+    /// How many times the crossings have been computed, for tests.
+    #[cfg(test)]
+    pub fn crossing_builds(&self) -> usize {
+        self.crossing_builds.get()
     }
 }
 
@@ -88,7 +119,7 @@ pub fn point_shapes(design: &Design, exclude: &[u64], viewport: Aabb, threshold:
         .collect()
 }
 
-/// Everything in reach to snap to, gathered once per drag. `exclude` is the moving selection; `mat` is
+/// Everything in reach to snap to, gathered each frame of a drag from what `cache` already holds. `exclude` is the moving selection; `mat` is
 /// the artboard box; `viewport` and `threshold` cull the point targets.
 #[allow(clippy::too_many_arguments)]
 pub fn targets(
@@ -148,7 +179,7 @@ pub fn targets(
             }
         }
         if options.intersections {
-            t.points.extend(intersections(design, &in_view).into_iter().map(|p| (p, Kind::Intersection)));
+            t.points.extend(cache.crossings(design, &in_view).iter().map(|&p| (p, Kind::Intersection)));
         }
     }
     t
@@ -284,5 +315,33 @@ mod tests {
         let edited = design.shapes.iter().find(|s| s.id == id).unwrap().clone();
         let _ = cache.points(&design, &edited);
         assert_eq!(cache.builds(), 2, "rebuilt after the edit");
+    }
+
+    #[test]
+    fn crossings_are_computed_once_while_the_shapes_they_cross_stay_put() {
+        let mut design = Design::default();
+        let a = square_at(&mut design, 0.0, 0.0);
+        let b = square_at(&mut design, 0.5, 0.5);
+        let mover = square_at(&mut design, 5.0, 5.0);
+        let (mat, view) = (viewport(0.0, 0.0, 12.0, 12.0), viewport(0.0, 0.0, 12.0, 12.0));
+        let cache = PointCache::default();
+        let crossings = |design: &Design| {
+            targets(design, &[mover], &[], None, mat, view, 0.1, &SnapOptions::default(), &cache).points.iter().filter(|(_, k)| *k == Kind::Intersection).count()
+        };
+        let first = crossings(&design);
+        assert_eq!(first, 2, "two overlapping squares cross twice");
+        assert_eq!(cache.crossing_builds(), 1);
+        // The dragged shape moves every frame; the crossings of the others do not change.
+        for step in 1..=5 {
+            design.shape_mut(mover).unwrap().x_in = 5.0 + step as f32 * 0.1;
+            assert_eq!(crossings(&design), first);
+        }
+        assert_eq!(cache.crossing_builds(), 1, "dragging an excluded shape never recomputes them");
+        design.shape_mut(a).unwrap().width_in = 3.0;
+        assert_eq!(crossings(&design), 2);
+        assert_eq!(cache.crossing_builds(), 2, "editing a crossed shape recomputes them");
+        design.shape_mut(b).unwrap().hidden = true;
+        assert_eq!(crossings(&design), 0);
+        assert_eq!(cache.crossing_builds(), 3, "a change of the set recomputes them");
     }
 }
