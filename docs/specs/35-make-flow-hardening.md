@@ -1,5 +1,7 @@
 # 35 Make flow hardening
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec35.rs` pass.
+
 **Wave 5. Depends on 09, 16. Size M. Land before spec 21 phase 1.** Source: `docs/audit/2026-10-12-audit.md` AUDIT-010, 014, 020, 027.
 
 ## Goal

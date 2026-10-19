@@ -1,5 +1,7 @@
 # 16 Make flow matches the canvas identity
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec16.rs` pass.
+
 **Wave 3. Depends on 09 (which owns prepare.rs and edits set_load_go.rs). Size M.** Requested directly by the user: "fix the next steps (mac) because the ui does not match the canvas".
 
 ## Problem

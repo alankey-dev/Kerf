@@ -1,6 +1,8 @@
 # Feature specs
 
-These specs build out Kerf's own canvas, using the layouts collected in `reference/`. Each spec is one unit of work for one agent. The waves below set the order. Specs in the same wave can run in parallel because they own different files.
+These specs built out Kerf's own canvas, using the layouts collected in `reference/`. Each spec was one unit of work for one agent. The waves below set the order. Specs in the same wave could run in parallel because they owned different files.
+
+**Every spec here is implemented on `main`** (checked 2026-10-19, and shipped in v0.0.1). Each spec file carries a `Status` line under its title. Numbers 36 and 40 were never written. The specs are now a design record. New bugs, features and follow-up work go in [GitHub issues](https://github.com/alankey-dev/Kerf/issues), not in new spec files.
 
 ## Waves
 
@@ -46,6 +48,7 @@ These specs build out Kerf's own canvas, using the layouts collected in `referen
 | 13 | [55 Corner tool](55-corner-tool.md) | 17, 21, 49 | M |
 | 13 | [56 Swatches, recent colours and the eyedropper](56-swatches-and-eyedropper.md) | 22, 23, 44 | M |
 | 13 | [57 Shape Builder and Knife](57-shape-builder-and-knife.md) | 04, 17, 21, 47 | L |
+| 14 | [58 USB machine detection](58-usb-machine-detection.md) | 24 | M |
 | 3 | [12 Text: ungroup, curve, edit in place](12-text-advanced.md) | 02, 05, 08, 10 | L |
 | 5 | [22 Engineering foundation](22-foundation.md) | 00-20 | XL |
 | 5 | [23 One command model](23-one-command-model.md) | 00-20 | L |
@@ -81,4 +84,4 @@ These specs build out Kerf's own canvas, using the layouts collected in `referen
 2. New behaviour has tests. Pure logic gets unit tests next to the code. UI behaviour gets an `egui_kittest` test in the spec's own `src/ui/tests_specNN.rs` that drives the real app, using the `click_at`, `drag_along` and `snapshot_harness` helpers in `src/ui/test_harness.rs`.
 3. Each visible change is pinned by a committed baseline (`assert_snapshot`, written with `UPDATE_SNAPSHOTS=1`) or by a pixel assertion. Look at the new baseline before calling the work done.
 4. `docs/guide.md` describes the new behaviour in the matching section. `README.md` stays short: touch it only to add a line to Features.
-5. The work reaches `main` through a pull request on GitHub (`alankey-dev/kerf`), never a local merge. The PR description checks off the spec's acceptance list, and the PR carries the `docs/guide.md` and `README.md` changes from item 4.
+5. The work reaches `main` through a pull request on GitHub (`alankey-dev/Kerf`), never a local merge. The PR links its issue with `Closes #N`, its description checks off the issue's acceptance list, and the PR carries the `docs/guide.md` and `README.md` changes from item 4.

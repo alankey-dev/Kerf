@@ -1,5 +1,7 @@
 # 22 Engineering foundation
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec22.rs` pass.
+
 **Wave 5. Depends on everything merged (00-20). Size XL; land in the order below.** Source: `docs/audit/2026-10-12-audit.md`. Each item names its AUDIT finding, which holds the evidence, locations and validation; read the finding before working on its item.
 
 ## Goal

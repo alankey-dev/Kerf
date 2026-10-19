@@ -1,5 +1,7 @@
 # 51 Text on a path
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec51b.rs`, `src/ui/tests_spec51.rs` pass.
+
 **Wave 12. Depends on 12, 17, 21, 29, 47. Size L.** Illustrator's Type on a Path and Affinity's Path Text run text along any curve, keep it editable, and let you slide it, flip it to the other side and set where it starts. Kerf's Curve bends one line onto a circle and nothing else.
 
 ## Problem

@@ -1,5 +1,7 @@
 # 12 Text: ungroup, curve and editing in place
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec12.rs` pass.
+
 **Wave 3. Depends on 02, 05, 08 and 10. Size L.**
 
 Reference: `reference/format-text.png` (Select Ungrouping), `reference/selection-text.png`.

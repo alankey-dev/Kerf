@@ -1,5 +1,7 @@
 # 57 Shape Builder and Knife
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec57.rs` pass.
+
 **Wave 13. Depends on 04, 17, 21, 47. Size L.** Illustrator's Shape Builder merges and deletes the regions where shapes overlap by dragging across them, and Affinity's Knife and Illustrator's Scissors cut a path where you draw. Kerf's Combine tiles do the booleans on whole shapes and Slice cuts two shapes by each other; neither takes a gesture, and nothing cuts a single path.
 
 ## Problem

@@ -1,5 +1,7 @@
 # 58 USB machine detection
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec58.rs` pass.
+
 **Wave 14. Depends on 24. Size M.** Kerf lists serial ports by their OS description but
 recognises nothing, so a maker who plugs in a cutter has to know which `/dev/cu.*` node is
 theirs and fill in a profile by hand. This spec gives Kerf plug-in recognition at the

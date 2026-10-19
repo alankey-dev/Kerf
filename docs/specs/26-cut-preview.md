@@ -1,5 +1,7 @@
 # 26 Cut preview
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec26.rs` pass.
+
 **Wave 6. Depends on 24 (toolpath and ordering), 09, 16. Size M.**
 
 ## Problem

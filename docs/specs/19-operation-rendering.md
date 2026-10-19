@@ -1,5 +1,7 @@
 # 19 Operation-specific canvas rendering
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec19.rs` pass.
+
 **Wave 3. Depends on 06, 07. Size M.** Requested directly by the user: "different operations should show different borders on the canvas, can we add that?" The product's goal is to make each operation read clearly on the canvas and the canvas easy to use.
 
 ## Problem

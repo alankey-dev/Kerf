@@ -1,5 +1,7 @@
 # 32 Command palette (Cmd+K)
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec32.rs` pass.
+
 **Wave 6. Depends on 22, 23, 14, 15. Size M.** Kerf hides actions in toolbars that change with the selection, and has no keyboard route to most of them. A command palette makes every action one keystroke and a few letters away.
 
 ## Problem

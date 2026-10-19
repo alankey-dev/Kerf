@@ -1,5 +1,7 @@
 # 21 Live, editable effects on layers
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec21_groups.rs`, `src/ui/tests_spec21.rs` pass.
+
 **Wave 4. Depends on 04, 05, 12, 17, 18, 19, 20, and on 22 and 35 (phase 1a) and 23 (phase 1b). Size XL; run as three phases.** Design: `docs/specs/21-design.md`. Review: `docs/specs/21-review.md`. Also absorbs AUDIT-007, 015 and 021 from `docs/audit/2026-10-12-audit.md`. Requested directly by the user: "any modifying action (such as effects) should be visible on the layer so they can be edited after the fact".
 
 ## Problem

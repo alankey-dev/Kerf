@@ -1,5 +1,7 @@
 # 23 One command model
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec23.rs` pass.
+
 **Wave 5. Depends on everything merged (00-20); parallel with 22. Size L.** Source: `docs/audit/2026-10-12-audit.md` AUDIT-005 (root), 006, 013, 018, 023, 026, and the UI rows of 016.
 
 ## Problem

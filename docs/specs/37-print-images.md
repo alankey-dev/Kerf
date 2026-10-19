@@ -1,5 +1,7 @@
 # 37 Images print, thumbnail and flatten as pictures
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec37.rs` pass.
+
 **Wave 7. Depends on 25, 27, 28. Size S.** Follow-up from spec 28.
 
 ## Problem

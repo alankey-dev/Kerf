@@ -1,0 +1,29 @@
+name: Feature or follow-up
+description: A new feature, an improvement, or a follow-up task.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What a maker cannot do today, or what is slow, unclear or fragile.
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Proposed behaviour
+      description: What should happen instead. Name the specs it touches, for example "builds on spec 47".
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance list
+      description: A task list the pull request checks off.
+      placeholder: |
+        - [ ] Behaviour
+        - [ ] Tests, with an `egui_kittest` case for any UI change
+        - [ ] `docs/guide.md` updated
+    validations:
+      required: true

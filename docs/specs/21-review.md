@@ -1,5 +1,7 @@
 # 21 Live effects: design review
 
+**Status: Companion to spec 21, which is implemented.** Kept as the design record.
+
 Adversarial review of `docs/specs/21-design.md` against `docs/specs/21-live-effects.md`, run with the interrogate skill. Three reviewers on different models (Opus, Fable, Sonnet) read the same brief and attacked seven angles: the data model, migration, the evaluation cache, undo, interactions with links, containers, node editing, text and warp, composition and the bridge, and whether phase 1 ships alone. The lead re-traced every finding kept below against the code.
 
 Main was at 1a9a6d9 when the review started. Spec 18 merged during it (0d3903f, "Merge spec 18"), so `Shape.parent`, `settle` and `src/containers.rs` are now on main. The design's risk "Spec 18 is in flight" no longer applies, and its line numbers (grounded at 33667ae) are a few lines stale throughout. Line references below are to main at 0d3903f.

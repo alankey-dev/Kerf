@@ -1,5 +1,7 @@
 # 27 Print Then Cut
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec27.rs` pass.
+
 **Wave 6. Depends on 09, 25 (PDF writer). Size L.** Runs in parallel with 26.
 
 ## Problem

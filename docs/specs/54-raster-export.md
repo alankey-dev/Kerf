@@ -1,5 +1,7 @@
 # 54 Raster export: PNG and JPEG
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec54.rs` pass.
+
 **Wave 12. Depends on 25, 37, 44. Size S.** Every editor exports a PNG. Kerf exports SVG, DXF and PDF and renders PNG thumbnails for Home, but a maker who wants to show a design in a shop listing, a message or a forum has no picture to send.
 
 ## Problem

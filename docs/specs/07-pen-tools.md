@@ -1,5 +1,7 @@
 # 07 Pen sizes and colours
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec07.rs` pass.
+
 **Wave 1. Depends on 01. Size M.**
 
 Reference: `reference/pen-colours.png`.

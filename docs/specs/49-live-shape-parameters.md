@@ -1,5 +1,7 @@
 # 49 Live shape parameters
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec49.rs` pass.
+
 **Wave 11. Depends on 22, 23, 17, 21, 34. Size L.** In Affinity a star keeps its point count and inner radius as fields, a rectangle its corner radius per corner, a polygon its side count, after it is placed. In Kerf every Shapes panel shape is a fixed outline from `shape_library.rs`; a five point star stays five points for life and rounding a rectangle means Offset tricks.
 
 ## Problem

@@ -1,5 +1,7 @@
 # 04 Combine: Slice and Flatten
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its module unit tests in `src/` pass.
+
 **Wave 1. Depends on 01. Size M.**
 
 Reference: `reference/combine.png`.

@@ -1,0 +1,31 @@
+name: Bug report
+description: Something in Kerf does not work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what Kerf did instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The smallest design and steps that show it. Attach a project file or SVG if it helps.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Kerf version and platform
+      description: For example 0.0.1 on macOS 15 (arm64).
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Run with `KERF_LOG=debug` and paste the relevant lines, if any.
+      render: text

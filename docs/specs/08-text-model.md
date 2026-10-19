@@ -1,5 +1,7 @@
 # 08 Text model
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its module unit tests in `src/` pass.
+
 **Wave 1. Depends on 00. Size M.**
 
 ## Problem

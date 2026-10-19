@@ -1,5 +1,7 @@
 # 44 Clipboard: Cut, Copy, Paste
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec44.rs` pass.
+
 **Wave 10. Depends on 22, 23, 33. Size M.** Every vector editor has Cmd+C and Cmd+V. Kerf has Duplicate only, so moving a shape between tabs, or bringing a path in from Affinity or Illustrator, means export and Upload. The guide says it plainly: "Kerf has no clipboard yet, so the menus have no Cut, Copy or Paste."
 
 ## Problem
