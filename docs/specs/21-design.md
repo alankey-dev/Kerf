@@ -1,5 +1,7 @@
 # 21 Live effects: type and module design
 
+**Status: Companion to spec 21, which is implemented.** Kept as the design record.
+
 Design for `docs/specs/21-live-effects.md`, produced with the architect skill and revised after the adversarial review in `docs/specs/21-review.md` and the audit in `docs/audit/2026-10-12-audit.md` (section 10, "Then: spec 21"). No code was written.
 
 Grounded against `main` at 70492ab, whose `src/` matches 0d3903f ("Merge spec 18"). Spec 18's `Shape.parent`, `settle` and `src/containers.rs` are on main. The design also builds on three specs in progress, and names the interface it needs from each.

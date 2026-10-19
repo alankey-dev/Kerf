@@ -1,5 +1,7 @@
 # 17 Node editing: add, remove, convert and smooth
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec17.rs` pass.
+
 **Wave 3. Depends on 01, 06. Size L.** Requested directly by the user: "pen should be able to add in control points or remove control points, switch between straight, sym, curve, etc and smooth options".
 
 ## Problem

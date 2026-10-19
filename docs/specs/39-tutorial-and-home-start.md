@@ -1,5 +1,7 @@
 # 39 Interactive tutorial, and starting on Home
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec39.rs` pass.
+
 **Wave 8. Depends on everything merged. Size L.** Requested directly by the user: "a tutorial that runs through everything in an interactive form (with popups/tooltips, that also darken the screen and focus themselves); tutorial should be run only when asked for in the menu. Also when loading, starting in the home screen rather than the canvas."
 
 ## Part A: start on Home

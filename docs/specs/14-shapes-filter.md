@@ -1,5 +1,7 @@
 # 14 Shapes panel header: search and filter
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec14.rs` pass.
+
 **Wave 2b. Depends on 01. Size S.** Requested directly by the user (screenshot: the filter icon floats past the panel's right edge, above the grid, and clicking it does nothing).
 
 ## Problem

@@ -1,5 +1,7 @@
 # 29 Single-line fonts for Pen and Foil
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec29.rs` pass.
+
 **Wave 6. Depends on 22, 23, 07, 08, 10, 12, 15. Size L.** Writing fonts draw letters with one pen stroke. Every Kerf font is an outline font, so text drawn with a pen traces each letter twice, round both sides of the stroke.
 
 ## Problem

@@ -1,5 +1,7 @@
 # 06 Selection chrome
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec06.rs` pass.
+
 **Wave 1. Depends on 00, 01 and 02. Size M.**
 
 Reference: `reference/selection-shape.png`, `reference/selection-text.png`.

@@ -1,5 +1,7 @@
 # 53 SVG import fidelity
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec53b.rs`, `src/ui/tests_spec53.rs` pass.
+
 **Wave 12. Depends on 22, 23, 02, 18, 19, 28, 44. Size L.** Affinity and Illustrator open an SVG with its strokes, groups, layer names, clip paths, text and images intact. `shape_library::import_svg` keeps each path's geometry and solid fill and nothing else, so a stroked line drawing arrives filled black and a layered file arrives as a flat list.
 
 ## Problem

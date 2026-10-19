@@ -1,5 +1,7 @@
 # 41 Build and release on Windows, macOS and Linux
 
+**Status: Implemented.** v0.0.1 was released from the tag-triggered `Release` workflow on 2026-10-19; the installers are in the GitHub Release.
+
 **Wave 9. Depends on everything merged. Size L.** Requested directly by the user: "building and releasing on multiple platforms (windows, Mac, Linux)".
 
 ## Goal

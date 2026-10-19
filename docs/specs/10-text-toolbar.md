@@ -1,5 +1,7 @@
 # 10 Text toolbar and Format
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec10.rs` pass.
+
 **Wave 2. Depends on 01 and 08. Size M.**
 
 Reference: `reference/text-toolbar.png`, `reference/format-text.png`.

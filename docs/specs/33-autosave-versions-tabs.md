@@ -1,5 +1,7 @@
 # 33 Autosave, version history, crash recovery and tabs
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec33.rs` pass.
+
 **Wave 6. Depends on 22, 23. Size XL; run as two phases (storage, autosave and recovery first, then tabs).** Kerf today saves only when asked, loses work on a crash, and opens one project at a time. It should never lose work and should let a crafter keep several projects open.
 
 ## Problem

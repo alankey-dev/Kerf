@@ -1,5 +1,7 @@
 # 30 Nesting: Optimise layout on mats
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec30.rs` pass.
+
 **Wave 7. Depends on 22, 23, 09, 18, 21. Size L.** Kerf packs pieces in a fixed grid and leaves the user to drag them closer on each mat. Users ask for true nesting so expensive material (vinyl, foil, leather) is not wasted.
 
 ## Problem

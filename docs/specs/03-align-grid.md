@@ -1,5 +1,7 @@
 # 03 Align grid
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its module unit tests in `src/` pass.
+
 **Wave 1. Depends on 01. Size S.**
 
 Reference: `reference/align.png`.

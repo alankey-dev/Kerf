@@ -1,5 +1,7 @@
 # 43 Create AI: generate cut-ready designs from a prompt
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec43.rs` pass.
+
 **Wave 9. Depends on 22, 23, 25, 28. Size XL.** Requested directly by the user.
 
 ## Background

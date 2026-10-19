@@ -1,5 +1,7 @@
 # 34 Precision tools
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its module unit tests in `src/` pass.
+
 **Wave 7. Depends on 22, 23, 21, 28. Size XL; run as three phases (fields and locks, inset and corners, then pattern fill and measure).** Kerf today accepts only plain numbers in its size fields, has no inset, no measure tool and no live distances. Crafters building boxes, cards and fitted parts measure on paper and calculate by hand.
 
 ## Problem

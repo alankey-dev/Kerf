@@ -1,5 +1,7 @@
 # 25 Export and Design Space handoff
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec25.rs` pass.
+
 **Wave 5. Depends on 09, 18, 19. Size L.** Runs in parallel with 24.
 
 ## Problem

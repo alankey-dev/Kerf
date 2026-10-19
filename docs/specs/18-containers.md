@@ -1,5 +1,7 @@
 # 18 Containers
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec18.rs` pass.
+
 **Wave 3. Depends on 02, 03, 06, 09, 11, 13. Size L.** Requested directly by the user: "can we have containers? so distribution etc works with objects within the containers?"
 
 ## Problem

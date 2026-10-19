@@ -1,5 +1,7 @@
 # 31 Components: reusable masters and instances
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec31.rs` pass.
+
 **Wave 7. Depends on 22, 23, 02, 18, 21. Size XL; run as two phases (model and Make first, then the panel and overrides).** Kerf has no reusable symbols; to change a repeated tag or a wedding place card you edit every copy. Figma components solve this, and Kerf can do the same.
 
 ## Problem

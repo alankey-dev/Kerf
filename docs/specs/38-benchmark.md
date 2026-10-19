@@ -1,5 +1,7 @@
 # 38 Heavy-design benchmark
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec38.rs` pass.
+
 **Wave 8. Depends on everything merged. Size M.** Requested directly by the user: "can we add a test for both? to load in 100+ shapes / layers / etc".
 
 ## Goal

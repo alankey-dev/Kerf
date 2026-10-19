@@ -1,5 +1,7 @@
 # 47 Snap points
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec47.rs` pass.
+
 **Wave 11. Depends on 45, 46, 17, 34. Size M.** Affinity's snapping manager and Illustrator's Smart Guides snap to nodes, midpoints, intersections and angles, and let you choose which. Kerf snaps a moving box's edges and centre to other boxes, the grid and the mat centre. Nothing snaps to a path's corner, a segment's middle or a 45 degree line.
 
 ## Problem

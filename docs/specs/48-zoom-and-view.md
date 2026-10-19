@@ -1,5 +1,7 @@
 # 48 Zoom to fit, zoom to selection and view navigation
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec48.rs` pass.
+
 **Wave 11. Depends on 22, 23. Size S.** Every editor has Fit (Cmd+0), Zoom to selection and 100 % a key away, and a hand tool for panning. Kerf has Zoom In, Zoom Out and Reset Zoom, and pans by scroll only.
 
 ## Problem

@@ -1,5 +1,7 @@
 # 11 Layers panel actions
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec11.rs` pass.
+
 **Wave 2. Depends on 01, 02 and 04. Size S.**
 
 Reference: `reference/attach-tooltip.png`.

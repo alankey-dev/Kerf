@@ -1,5 +1,7 @@
 # 09 Mat composition
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec09.rs` pass.
+
 **Wave 2. Depends on 00, 02 and 07. Size L.**
 
 Reference: `reference/project-preview.png`.

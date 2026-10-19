@@ -1,5 +1,7 @@
 # 45 Ruler guides
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec45.rs` pass.
+
 **Wave 10. Depends on 22, 23, 34. Size M.** Affinity and Illustrator let you drag a guide line out of a ruler, snap to it, lock it and type its position. Kerf has rulers and smart guides that appear during a drag, but no guide you can place and keep.
 
 ## Problem

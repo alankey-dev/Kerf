@@ -1,5 +1,7 @@
 # 15 System fonts for text
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec15.rs` pass.
+
 **Wave 2b. Depends on 08, 10. Size M.** Requested directly by the user: "text should also include system text", meaning the fonts installed on the machine.
 
 ## Problem

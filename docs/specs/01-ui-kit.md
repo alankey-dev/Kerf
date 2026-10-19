@@ -1,5 +1,7 @@
 # 01 UI kit: popovers, tiles and icons
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its module unit tests in `src/` pass.
+
 **Wave 0b. Depends on 00. Size M.**
 
 ## Problem

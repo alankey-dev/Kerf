@@ -1,5 +1,7 @@
 # 52 Step and repeat, rotate copies, skew and pivot
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec52b.rs`, `src/ui/tests_spec52.rs` pass.
+
 **Wave 12. Depends on 18, 22, 23, 31, 34. Size M.** Illustrator's Transform Each, Transform Again and Rotate with Copy, and Affinity's Power Duplicate, make forty tags in a grid or twelve petals round a centre in two actions. Kerf has Duplicate (0.25 in right and down), containers with Row, Column and Grid layouts, and no skew, no movable pivot and no way to repeat a transform.
 
 ## Problem

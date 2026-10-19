@@ -1,5 +1,7 @@
 # 28 Image trace: upload a bitmap and cut it
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec28.rs` pass.
+
 **Wave 6. Depends on 22, 23, 02, 09, 19. Size XL; run as two phases (asset store and Bitmap shape first, then the trace panel).** Kerf imports SVG only. A PNG or JPG cannot be turned into a cut image with background removal and a single-layer or Print Then Cut result.
 
 ## Problem

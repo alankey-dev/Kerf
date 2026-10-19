@@ -1,5 +1,7 @@
 # 05 Effects: Sticker and Warp
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec05.rs` pass.
+
 **Wave 2. Depends on 01 and 04 (Sticker builds a flattened shape). Size L.**
 
 Reference: `reference/effects.png`.

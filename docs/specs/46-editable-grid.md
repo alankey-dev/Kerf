@@ -1,5 +1,7 @@
 # 46 Editable grid
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec46.rs` pass.
+
 **Wave 10. Depends on 22, 23, 34. Size S.** The grid is fixed at 1 in with eight subdivisions (10 cm with ten in metric) and shapes snap to the 1/8 in minor line. A quilter works in 1/4 in seams, a laser user in 5 mm, a sticker maker in 1/2 in columns. None of them can set it.
 
 ## Problem

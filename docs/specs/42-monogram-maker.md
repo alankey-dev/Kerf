@@ -1,5 +1,7 @@
 # 42 Monogram Maker
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec42.rs` pass.
+
 **Wave 9. Depends on 08, 10, 12, 15, 18, 21, 29, 31. Size L.** Requested directly by the user.
 
 ## What Monogram Maker does

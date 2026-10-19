@@ -1,5 +1,7 @@
 # 24 Open cutters
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec24.rs` pass.
+
 **Wave 5. Depends on 09, 16, 18. Size XL.** Requested directly by the user: cut on real machines without a proprietary cloud key.
 
 ## Problem

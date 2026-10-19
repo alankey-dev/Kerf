@@ -1,5 +1,7 @@
 # 55 Corner tool
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec55.rs` pass.
+
 **Wave 13. Depends on 17, 21, 49. Size M.** Illustrator's Live Corners and Affinity's Corner tool round, chamfer or scoop any corner of any path by dragging a widget or typing a radius, and the rounding stays editable. Kerf rounds nothing after the fact; Offset's Round join is the only curve a corner can get, and it moves the whole outline.
 
 ## Problem

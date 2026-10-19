@@ -1,5 +1,7 @@
 # 20 Layers drag and drop
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec20.rs` pass.
+
 **Wave 3. Depends on 02, 11, 13; integrates with 18. Size M.** Requested directly by the user: "dragging and dropping in the layers panel should also work".
 
 ## Problem

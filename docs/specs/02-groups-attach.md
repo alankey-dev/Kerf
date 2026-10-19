@@ -1,5 +1,7 @@
 # 02 Groups and Attach
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its module unit tests in `src/` pass.
+
 **Wave 0. Depends on nothing. Size L.**
 
 Reference: `reference/attach-tooltip.png`, `reference/selection-text.png` (the paperclip in the action bar).

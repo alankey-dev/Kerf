@@ -1,5 +1,7 @@
 # 50 Select Same, Select Inverse and lasso
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec50.rs` pass.
+
 **Wave 11. Depends on 22, 23, 19, 34. Size M.** Illustrator's Select > Same and Affinity's Select Same pick every object that shares a fill, a stroke or a font, and a lasso picks the awkward ones a marquee cannot. Kerf has click, Shift-click, marquee, Select All and the operation legend.
 
 ## Problem

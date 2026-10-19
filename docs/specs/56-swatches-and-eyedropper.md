@@ -1,5 +1,7 @@
 # 56 Swatches, recent colours and the eyedropper
 
+**Status: Implemented.** Checked against `main` on 2026-10-19: the feature is in the app and its tests in `src/ui/tests_spec56.rs`, `src/ui/tests_spec56b.rs` pass.
+
 **Wave 13. Depends on 22, 23, 44. Size M.** Affinity and Illustrator keep a swatch panel per document, show recent colours, and have an eyedropper that lifts a colour and style from one object onto another. Kerf's colour swatch opens egui's picker with a hex read-out and nothing is remembered.
 
 ## Problem

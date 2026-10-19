@@ -70,11 +70,11 @@ UI tests drive the real app with `egui_kittest` and save snapshots to `target/sn
 ## Documentation
 
 - [Guide](docs/guide.md): architecture, every screen and how it works.
-- [Feature specs](docs/specs/README.md): the roadmap, one spec per unit of work.
+- [Feature specs](docs/specs/README.md): the design record, one spec per unit of work. All are implemented.
 
 ## Contributing
 
-Pick a spec from [docs/specs](docs/specs/README.md), follow its conventions, and open a pull request with the acceptance list checked off.
+Bugs, features and follow-up work are tracked in [GitHub issues](https://github.com/alankey-dev/Kerf/issues). Pick an issue, follow the conventions in [docs/specs](docs/specs/README.md), and open a pull request that closes it with the acceptance list checked off.
 
 ## License
 
