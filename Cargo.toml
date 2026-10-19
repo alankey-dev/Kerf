@@ -1,0 +1,95 @@
+[package]
+name = "kerf"
+version = "0.0.1"
+edition = "2024"
+# Verified with `cargo +1.89 check --all-targets --locked`; 1.88 rejects const destructors.
+rust-version = "1.89"
+description = "A fast, offline desktop editor for cutting machines"
+repository = "https://github.com/alankey-dev/kerf"
+license = "MIT"
+
+[dependencies]
+base64 = "0.23.1"
+blake3 = { version = "1", features = ["pure"] }
+directories = "6"
+earcutr = "0.5.0"
+eframe = "0.31"
+egui = "0.31"
+egui_extras = { version = "0.31", features = ["image", "svg"] }
+fontdb = "0.23"
+i_overlay = "9"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+jiff = { version = "0.2", default-features = false, features = ["std", "tz-system", "tzdb-zoneinfo"] }
+# Create AI (spec 43): the API key in the OS keychain, and the Messages API over HTTPS.
+keyring = { version = "3.6", features = ["apple-native", "windows-native", "linux-native"] }
+miniz_oxide = "0.8"
+pdf-writer = "0.12"
+rfd = "0.15"
+roxmltree = "0.20"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+serialport = { version = "4", default-features = false }
+svgtypes = "0.13"
+tiny-skia = { version = "0.11", default-features = false, features = ["std", "png-format"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["env-filter", "fmt", "std"] }
+ttf-parser = { version = "0.25", default-features = false, features = ["std", "opentype-layout", "glyph-names", "variable-fonts"] }
+ureq = { version = "3.4", default-features = false, features = ["rustls"] }
+usvg = { version = "0.37", default-features = false }
+visioncortex = "0.8"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_System_Console"] }
+
+[target.'cfg(windows)'.build-dependencies]
+# Embeds the icon and version information into kerf.exe (build.rs).
+winresource = "0.1.31"
+
+[[example]]
+name = "stroke_font"
+path = "tools/stroke_font/main.rs"
+
+[[example]]
+name = "icons"
+path = "tools/release/icons.rs"
+
+[dev-dependencies]
+egui_kittest = { version = "0.31", features = ["eframe", "wgpu", "snapshot"] }
+resvg = { version = "0.37", default-features = false }
+tempfile = "3.27.0"
+
+# `cargo deb`, run by tools/release/package-linux.sh, which writes the files under target/linux-package.
+[package.metadata.deb]
+name = "kerf"
+maintainer = "Kerf <noreply@github.com>"
+copyright = "Kerf contributors"
+section = "graphics"
+priority = "optional"
+extended-description = "Kerf is an offline editor for cutting machines: design, lay out mats and cut on a simulated Cricut or a real HPGL or G-code cutter."
+# $auto covers the libraries the binary links. winit and glow load the windowing, keyboard and OpenGL
+# libraries at run time instead, so they are named here.
+depends = "$auto, libx11-6, libx11-xcb1, libxcursor1, libxi6, libxrandr2, libxkbcommon0, libxkbcommon-x11-0, libwayland-client0, libwayland-cursor0, libwayland-egl1, libgl1, libegl1"
+assets = [
+    ["target/release/kerf", "usr/bin/", "755"],
+    ["target/linux-package/kerf.desktop", "usr/share/applications/", "644"],
+    ["target/linux-package/icons/16x16/apps/kerf.png", "usr/share/icons/hicolor/16x16/apps/", "644"],
+    ["target/linux-package/icons/24x24/apps/kerf.png", "usr/share/icons/hicolor/24x24/apps/", "644"],
+    ["target/linux-package/icons/32x32/apps/kerf.png", "usr/share/icons/hicolor/32x32/apps/", "644"],
+    ["target/linux-package/icons/48x48/apps/kerf.png", "usr/share/icons/hicolor/48x48/apps/", "644"],
+    ["target/linux-package/icons/64x64/apps/kerf.png", "usr/share/icons/hicolor/64x64/apps/", "644"],
+    ["target/linux-package/icons/128x128/apps/kerf.png", "usr/share/icons/hicolor/128x128/apps/", "644"],
+    ["target/linux-package/icons/256x256/apps/kerf.png", "usr/share/icons/hicolor/256x256/apps/", "644"],
+    ["target/linux-package/icons/512x512/apps/kerf.png", "usr/share/icons/hicolor/512x512/apps/", "644"],
+]
+
+# `cargo wix`, run by tools/release/package-windows.ps1.
+[package.metadata.wix]
+include = ["tools/release/wix/main.wxs"]
+
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+dbg_macro = "warn"
+todo = "warn"

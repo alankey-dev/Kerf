@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="200" height="200" viewBox="0 0 200 200">
+  <g id="Background" inkscape:groupmode="layer">
+    <path id="sky" d="M10 10 L190 10 L190 110 L10 110 Z" fill="#88bbff"/>
+    <path id="hill" d="M10 110 L190 110 L100 60 Z" fill="#66cc66"/>
+  </g>
+  <g id="Foreground" inkscape:groupmode="layer">
+    <g id="tree">
+      <path id="trunk" d="M90 120 L110 120 L110 180 L90 180 Z" fill="#884400"/>
+      <path id="leaves" d="M70 70 L130 70 L100 130 Z" fill="#228822"/>
+    </g>
+  </g>
+</svg>

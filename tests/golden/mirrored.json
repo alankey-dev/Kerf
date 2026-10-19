@@ -1,0 +1,55 @@
+[
+  {
+    "status": "riMATCUTSetPathData",
+    "matPathData": {
+      "materialSize": {
+        "width": 864.0,
+        "height": 864.0
+      },
+      "imageData": [
+        {
+          "pathData": "M72.034 15.891 C63.964 3.998 51.971 0 38.978 0 C16.99 0 0 15.991 0 37.979 C0 61.965 17.99 81.954 72.034 127.303 C126.079 81.954 144.069 61.965 144.069 37.979 C144.069 15.991 127.078 0 105.091 0 C92.098 0 80.105 3.998 72.034 15.891 Z",
+          "transform": {
+            "a": 0.70710677,
+            "b": -0.70710677,
+            "c": 0.70710677,
+            "d": 0.70710677,
+            "e": 701.7151,
+            "f": 104.3244
+          },
+          "actualPathType": "CUT_ART_TYPE",
+          "artTool": "DRAG_KNIFE_TT",
+          "pathColor": "NONE",
+          "contourActiveFlags": [
+            1
+          ],
+          "imageId": "1",
+          "pathId": "1-0",
+          "fiducialId": 0
+        },
+        {
+          "pathData": "M72 0 C111.765 0 144 32.235 144 72 C144 111.765 111.765 144 72 144 C32.235 144 0 111.765 0 72 C0 32.235 32.235 0 72 0 Z",
+          "transform": {
+            "a": 0.70710677,
+            "b": -0.70710677,
+            "c": 0.70710677,
+            "d": 0.70710677,
+            "e": 515.87054,
+            "f": 142.7453
+          },
+          "actualPathType": "CUT_ART_TYPE",
+          "artTool": "DRAG_KNIFE_TT",
+          "pathColor": "NONE",
+          "contourActiveFlags": [
+            1
+          ],
+          "imageId": "2",
+          "pathId": "2-0",
+          "fiducialId": 0
+        }
+      ],
+      "pathEncrypted": false,
+      "fiducialId": 0
+    }
+  }
+]

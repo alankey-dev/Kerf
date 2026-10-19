@@ -1,0 +1,7 @@
+# Debian/Ubuntu packages the Linux build needs, one per line. CI and the release job both install
+# these with `grep -v '^#' tools/release/linux-deps.txt | xargs sudo apt-get install -y`.
+# rfd's file dialog links GTK 3.
+libgtk-3-dev
+# winit's keyboard and Wayland support.
+libxkbcommon-dev
+libwayland-dev

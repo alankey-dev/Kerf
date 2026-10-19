@@ -1,0 +1,404 @@
+//======================================================================
+// file: cricut-plugin-vulcan/proto/vulcan.proto
+package cricut.plugin_vulcan.proto;
+message DeviceId {
+  string name = 1;
+  string serial_number = 2;
+  string path = 3;
+}
+message ConnectionInfo {
+  .cricut.plugin_vulcan.proto.DeviceId device_id = 1;
+  float timeout_seconds = 2;
+  .cricut.plugin_vulcan.proto.ConnectionType connection_type = 3;
+}
+message Progress {
+  int32 sent_bytes = 1;
+  int32 total_bytes = 2;
+}
+message FindDevicesRequest {
+  repeated .cricut.plugin_vulcan.proto.ConnectionType connection_types = 1;
+}
+message FindDevicesResponse {
+  repeated .cricut.plugin_vulcan.proto.FindDevicesResponse.Device devices = 1;
+  message Device {
+    .cricut.plugin_vulcan.proto.DeviceId device_id = 1;
+    .cricut.plugin_vulcan.proto.ConnectionType connection_type = 2;
+  }
+}
+message GetPodInfoRequest {
+  .cricut.plugin_vulcan.proto.ConnectionInfo connection = 1;
+}
+message GetPodInfoResponse {
+  .cricut.plugin_vulcan.proto.DeviceId device_id = 1;
+  .cricut.plugin_vulcan.proto.GetPodInfoResponse.Result result = 2;
+  .cricut.plugin_vulcan.proto.GetPodInfoResponse.Info info = 3;
+  message Info {
+    string serial_number = 1;
+    uint32 firmware_version = 2;
+    uint32 hardware_version = 3;
+    uint32 main_unit_firmware_version = 4;
+    string main_unit_serial_number = 5;
+    bool activated = 6;
+  }
+  enum Result {
+    UNKNOWN = 0;
+    SUCCESS = 1;
+    ERROR_NO_DEVICE = 2;
+    ERROR_DEVICE_AUTH_FAILED = 3;
+  }
+}
+message UpdatePodFirmwareRequest {
+  // oneofs: #0=firmware
+  .cricut.plugin_vulcan.proto.ConnectionInfo connection = 1;
+  string firmware_path = 2;  // oneof#0
+  bytes firmware_data = 3;  // oneof#0
+}
+message UpdatePodFirmwareResponse {
+  // oneofs: #0=status
+  .cricut.plugin_vulcan.proto.DeviceId device_id = 1;
+  .cricut.plugin_vulcan.proto.UpdatePodFirmwareResponse.Result result = 2;  // oneof#0
+  .cricut.plugin_vulcan.proto.Progress progress = 3;  // oneof#0
+  enum Result {
+    UNKNOWN = 0;
+    SUCCESS = 1;
+    ERROR_NO_DEVICE = 2;
+    ERROR_INVALID_FIRMWARE = 3;
+    ERROR_BOOTLOADER_FAILED = 4;
+  }
+}
+message UploadMainUnitFirmwareRequest {
+  // oneofs: #0=firmware
+  .cricut.plugin_vulcan.proto.ConnectionInfo connection = 1;
+  string firmware_path = 2;  // oneof#0
+  bytes firmware_data = 3;  // oneof#0
+  uint32 firmware_version = 4;
+}
+message UploadMainUnitFirmwareResponse {
+  // oneofs: #0=status
+  .cricut.plugin_vulcan.proto.DeviceId device_id = 1;
+  .cricut.plugin_vulcan.proto.UploadMainUnitFirmwareResponse.Result result = 2;  // oneof#0
+  .cricut.plugin_vulcan.proto.Progress progress = 3;  // oneof#0
+  enum Result {
+    UNKNOWN = 0;
+    SUCCESS = 1;
+    ERROR_NO_DEVICE = 2;
+    ERROR_INVALID_FIRMWARE = 3;
+    ERROR_UPLOAD_FAILED = 4;
+    ERROR_DEVICE_AUTH_FAILED = 5;
+  }
+}
+message ActivatePodRequest {
+  .cricut.plugin_vulcan.proto.ConnectionInfo connection = 1;
+  .cricut.plugin_vulcan.proto.ActivatePodRequest.Action action = 2;
+  enum Action {
+    ACTIVATE = 0;
+    DEACTIVATE = 1;
+  }
+}
+message ActivatePodResponse {
+  .cricut.plugin_vulcan.proto.DeviceId device_id = 1;
+  .cricut.plugin_vulcan.proto.ActivatePodResponse.Result result = 2;
+  enum Result {
+    UNKNOWN = 0;
+    SUCCESS = 1;
+    ERROR_NO_DEVICE = 2;
+    ERROR_DEVICE_AUTH_FAILED = 3;
+  }
+}
+message GetDeviceErrorsRequest {
+  .cricut.plugin_vulcan.proto.ConnectionInfo connection = 1;
+}
+message GetDeviceErrorsResponse {
+  .cricut.plugin_vulcan.proto.DeviceId device_id = 1;
+  .cricut.plugin_vulcan.proto.GetDeviceErrorsResponse.Result result = 2;
+  repeated uint32 pod_errors = 3;  // opts: 3=1
+  repeated uint32 main_unit_errors = 4;  // opts: 3=1
+  repeated .cricut.plugin_vulcan.proto.GetDeviceErrorsResponse.ErrorInfo pod_error_stack = 5;
+  repeated .cricut.plugin_vulcan.proto.GetDeviceErrorsResponse.ErrorInfo main_unit_error_stack = 6;
+  message ErrorInfo {
+    uint32 error = 1;
+    uint32 count = 2;
+  }
+  enum Result {
+    UNKNOWN = 0;
+    SUCCESS = 1;
+    ERROR_NO_DEVICE = 2;
+    ERROR_DEVICE_AUTH_FAILED = 3;
+  }
+}
+message SetSerialNumberRequest {
+  .cricut.plugin_vulcan.proto.ConnectionInfo connection = 1;
+  string serial_number = 2;
+}
+message SetSerialNumberResponse {
+  .cricut.plugin_vulcan.proto.DeviceId device_id = 1;
+  .cricut.plugin_vulcan.proto.SetSerialNumberResponse.Result result = 2;
+  enum Result {
+    UNKNOWN = 0;
+    SUCCESS = 1;
+    ERROR_NO_DEVICE = 2;
+    ERROR_SERIAL_NOT_SET = 3;
+    ERROR_DEVICE_AUTH_FAILED = 4;
+  }
+}
+message InvalidRequestResponse {
+  string request = 1;
+}
+message Request {
+  // oneofs: #0=type
+  .cricut.plugin_vulcan.proto.FindDevicesRequest find_devices = 1;  // oneof#0
+  .cricut.plugin_vulcan.proto.GetPodInfoRequest get_pod_info = 2;  // oneof#0
+  .cricut.plugin_vulcan.proto.UpdatePodFirmwareRequest update_pod_firmware = 3;  // oneof#0
+  .cricut.plugin_vulcan.proto.UploadMainUnitFirmwareRequest upload_main_unit_firmware = 4;  // oneof#0
+  .cricut.plugin_vulcan.proto.ActivatePodRequest activate_pod = 5;  // oneof#0
+  .cricut.plugin_vulcan.proto.GetDeviceErrorsRequest get_device_errors = 6;  // oneof#0
+  .cricut.plugin_vulcan.proto.SetSerialNumberRequest set_device_serial_number = 7;  // oneof#0
+}
+message Response {
+  // oneofs: #0=type
+  .cricut.plugin_vulcan.proto.FindDevicesResponse find_devices = 1;  // oneof#0
+  .cricut.plugin_vulcan.proto.GetPodInfoResponse get_pod_info = 2;  // oneof#0
+  .cricut.plugin_vulcan.proto.UpdatePodFirmwareResponse update_pod_firmware = 3;  // oneof#0
+  .cricut.plugin_vulcan.proto.UploadMainUnitFirmwareResponse upload_main_unit_firmware = 4;  // oneof#0
+  .cricut.plugin_vulcan.proto.ActivatePodResponse activate_pod = 5;  // oneof#0
+  .cricut.plugin_vulcan.proto.GetDeviceErrorsResponse get_device_errors = 6;  // oneof#0
+  .cricut.plugin_vulcan.proto.SetSerialNumberResponse set_device_serial_number = 7;  // oneof#0
+  .cricut.plugin_vulcan.proto.InvalidRequestResponse invalid_request = 100;  // oneof#0
+}
+enum ConnectionType {
+  NONE = 0;
+  USB = 1;
+  BLUETOOTH = 2;
+  UNIT_DEVICE = 10;
+}
+// file options: 1='com.cricut.pluginvulcan.models'
+syntax = "proto3";
+
+//======================================================================
+// file: google/protobuf/descriptor.proto
+package google.protobuf;
+message FileDescriptorSet {
+  repeated .google.protobuf.FileDescriptorProto file = 1;
+}
+message FileDescriptorProto {
+  string name = 1;
+  string package = 2;
+  repeated string dependency = 3;
+  repeated int32 public_dependency = 10;
+  repeated int32 weak_dependency = 11;
+  repeated .google.protobuf.DescriptorProto message_type = 4;
+  repeated .google.protobuf.EnumDescriptorProto enum_type = 5;
+  repeated .google.protobuf.ServiceDescriptorProto service = 6;
+  repeated .google.protobuf.FieldDescriptorProto extension = 7;
+  .google.protobuf.FileOptions options = 8;
+  .google.protobuf.SourceCodeInfo source_code_info = 9;
+  string syntax = 12;
+}
+message DescriptorProto {
+  string name = 1;
+  repeated .google.protobuf.FieldDescriptorProto field = 2;
+  repeated .google.protobuf.FieldDescriptorProto extension = 6;
+  repeated .google.protobuf.DescriptorProto nested_type = 3;
+  repeated .google.protobuf.EnumDescriptorProto enum_type = 4;
+  repeated .google.protobuf.DescriptorProto.ExtensionRange extension_range = 5;
+  repeated .google.protobuf.OneofDescriptorProto oneof_decl = 8;
+  .google.protobuf.MessageOptions options = 7;
+  repeated .google.protobuf.DescriptorProto.ReservedRange reserved_range = 9;
+  repeated string reserved_name = 10;
+  message ExtensionRange {
+    int32 start = 1;
+    int32 end = 2;
+    .google.protobuf.ExtensionRangeOptions options = 3;
+  }
+  message ReservedRange {
+    int32 start = 1;
+    int32 end = 2;
+  }
+}
+message ExtensionRangeOptions {
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+}
+message FieldDescriptorProto {
+  string name = 1;
+  int32 number = 3;
+  .google.protobuf.FieldDescriptorProto.Label label = 4;
+  .google.protobuf.FieldDescriptorProto.Type type = 5;
+  string type_name = 6;
+  string extendee = 2;
+  string default_value = 7;
+  int32 oneof_index = 9;
+  string json_name = 10;
+  .google.protobuf.FieldOptions options = 8;
+  bool proto3_optional = 17;
+  enum Type {
+    TYPE_DOUBLE = 1;
+    TYPE_FLOAT = 2;
+    TYPE_INT64 = 3;
+    TYPE_UINT64 = 4;
+    TYPE_INT32 = 5;
+    TYPE_FIXED64 = 6;
+    TYPE_FIXED32 = 7;
+    TYPE_BOOL = 8;
+    TYPE_STRING = 9;
+    TYPE_GROUP = 10;
+    TYPE_MESSAGE = 11;
+    TYPE_BYTES = 12;
+    TYPE_UINT32 = 13;
+    TYPE_ENUM = 14;
+    TYPE_SFIXED32 = 15;
+    TYPE_SFIXED64 = 16;
+    TYPE_SINT32 = 17;
+    TYPE_SINT64 = 18;
+  }
+  enum Label {
+    LABEL_OPTIONAL = 1;
+    LABEL_REQUIRED = 2;
+    LABEL_REPEATED = 3;
+  }
+}
+message OneofDescriptorProto {
+  string name = 1;
+  .google.protobuf.OneofOptions options = 2;
+}
+message EnumDescriptorProto {
+  string name = 1;
+  repeated .google.protobuf.EnumValueDescriptorProto value = 2;
+  .google.protobuf.EnumOptions options = 3;
+  repeated .google.protobuf.EnumDescriptorProto.EnumReservedRange reserved_range = 4;
+  repeated string reserved_name = 5;
+  message EnumReservedRange {
+    int32 start = 1;
+    int32 end = 2;
+  }
+}
+message EnumValueDescriptorProto {
+  string name = 1;
+  int32 number = 2;
+  .google.protobuf.EnumValueOptions options = 3;
+}
+message ServiceDescriptorProto {
+  string name = 1;
+  repeated .google.protobuf.MethodDescriptorProto method = 2;
+  .google.protobuf.ServiceOptions options = 3;
+}
+message MethodDescriptorProto {
+  string name = 1;
+  string input_type = 2;
+  string output_type = 3;
+  .google.protobuf.MethodOptions options = 4;
+  bool client_streaming = 5;
+  bool server_streaming = 6;
+}
+message FileOptions {
+  string java_package = 1;
+  string java_outer_classname = 8;
+  bool java_multiple_files = 10;
+  bool java_generate_equals_and_hash = 20;  // opts: 3=1
+  bool java_string_check_utf8 = 27;
+  .google.protobuf.FileOptions.OptimizeMode optimize_for = 9;
+  string go_package = 11;
+  bool cc_generic_services = 16;
+  bool java_generic_services = 17;
+  bool py_generic_services = 18;
+  bool php_generic_services = 42;
+  bool deprecated = 23;
+  bool cc_enable_arenas = 31;
+  string objc_class_prefix = 36;
+  string csharp_namespace = 37;
+  string swift_prefix = 39;
+  string php_class_prefix = 40;
+  string php_namespace = 41;
+  string php_metadata_namespace = 44;
+  string ruby_package = 45;
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+  enum OptimizeMode {
+    SPEED = 1;
+    CODE_SIZE = 2;
+    LITE_RUNTIME = 3;
+  }
+}
+message MessageOptions {
+  bool message_set_wire_format = 1;
+  bool no_standard_descriptor_accessor = 2;
+  bool deprecated = 3;
+  bool map_entry = 7;
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+}
+message FieldOptions {
+  .google.protobuf.FieldOptions.CType ctype = 1;
+  bool packed = 2;
+  .google.protobuf.FieldOptions.JSType jstype = 6;
+  bool lazy = 5;
+  bool deprecated = 3;
+  bool weak = 10;
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+  enum CType {
+    STRING = 0;
+    CORD = 1;
+    STRING_PIECE = 2;
+  }
+  enum JSType {
+    JS_NORMAL = 0;
+    JS_STRING = 1;
+    JS_NUMBER = 2;
+  }
+}
+message OneofOptions {
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+}
+message EnumOptions {
+  bool allow_alias = 2;
+  bool deprecated = 3;
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+}
+message EnumValueOptions {
+  bool deprecated = 1;
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+}
+message ServiceOptions {
+  bool deprecated = 33;
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+}
+message MethodOptions {
+  bool deprecated = 33;
+  .google.protobuf.MethodOptions.IdempotencyLevel idempotency_level = 34;
+  repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
+  enum IdempotencyLevel {
+    IDEMPOTENCY_UNKNOWN = 0;
+    NO_SIDE_EFFECTS = 1;
+    IDEMPOTENT = 2;
+  }
+}
+message UninterpretedOption {
+  repeated .google.protobuf.UninterpretedOption.NamePart name = 2;
+  string identifier_value = 3;
+  uint64 positive_int_value = 4;
+  int64 negative_int_value = 5;
+  double double_value = 6;
+  bytes string_value = 7;
+  string aggregate_value = 8;
+  message NamePart {
+    required string name_part = 1;
+    required bool is_extension = 2;
+  }
+}
+message SourceCodeInfo {
+  repeated .google.protobuf.SourceCodeInfo.Location location = 1;
+  message Location {
+    repeated int32 path = 1;  // opts: 2=1
+    repeated int32 span = 2;  // opts: 2=1
+    string leading_comments = 3;
+    string trailing_comments = 4;
+    repeated string leading_detached_comments = 6;
+  }
+}
+message GeneratedCodeInfo {
+  repeated .google.protobuf.GeneratedCodeInfo.Annotation annotation = 1;
+  message Annotation {
+    repeated int32 path = 1;  // opts: 2=1
+    string source_file = 2;
+    int32 begin = 3;
+    int32 end = 4;
+  }
+}
+// file options: 1='com.google.protobuf', 8='DescriptorProtos', 9=1, 11='github.com/golang/protobuf/protoc-gen-go/descriptor;descriptor', 31=1, 36='GPB', 37='Google.Protobuf.Reflection'

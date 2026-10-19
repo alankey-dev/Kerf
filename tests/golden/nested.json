@@ -1,0 +1,75 @@
+[
+  {
+    "status": "riMATCUTSetPathData",
+    "matPathData": {
+      "materialSize": {
+        "width": 864.0,
+        "height": 1728.0
+      },
+      "imageData": [
+        {
+          "pathData": "M0 0 L849.6 0 L849.6 36 L0 36 Z",
+          "transform": {
+            "a": -4.371139e-8,
+            "b": 1.0,
+            "c": -1.0,
+            "d": -4.371139e-8,
+            "e": 54.000034,
+            "f": 18.0
+          },
+          "actualPathType": "CUT_ART_TYPE",
+          "artTool": "DRAG_KNIFE_TT",
+          "pathColor": "NONE",
+          "contourActiveFlags": [
+            1
+          ],
+          "imageId": "4",
+          "pathId": "4-0",
+          "fiducialId": 0
+        },
+        {
+          "pathData": "M72.034 15.891 C63.964 3.998 51.971 0 38.978 0 C16.99 0 0 15.991 0 37.979 C0 61.965 17.99 81.954 72.034 127.303 C126.079 81.954 144.069 61.965 144.069 37.979 C144.069 15.991 127.078 0 105.091 0 C92.098 0 80.105 3.998 72.034 15.891 Z",
+          "transform": {
+            "a": 1.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 1.0,
+            "e": 68.39998,
+            "f": 17.999996
+          },
+          "actualPathType": "CUT_ART_TYPE",
+          "artTool": "DRAG_KNIFE_TT",
+          "pathColor": "NONE",
+          "contourActiveFlags": [
+            1
+          ],
+          "imageId": "1",
+          "pathId": "1-0",
+          "fiducialId": 0
+        },
+        {
+          "pathData": "M72 0 C111.765 0 144 32.235 144 72 C144 111.765 111.765 144 72 144 C32.235 144 0 111.765 0 72 C0 32.235 32.235 0 72 0 Z",
+          "transform": {
+            "a": 1.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 1.0,
+            "e": 248.4,
+            "f": 54.0
+          },
+          "actualPathType": "CUT_ART_TYPE",
+          "artTool": "DRAG_KNIFE_TT",
+          "pathColor": "NONE",
+          "contourActiveFlags": [
+            1
+          ],
+          "imageId": "2",
+          "pathId": "2-0",
+          "fiducialId": 0
+        }
+      ],
+      "pathEncrypted": false,
+      "fiducialId": 0
+    }
+  }
+]

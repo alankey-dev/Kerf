@@ -1,0 +1,104 @@
+# Design Space web front end: the Make flow (evidence)
+
+Line numbers refer to pretty-printed copies of the bundle (`design-space-app/main.js` and `chunk-JVMBAEXI.js`) produced with prettier. Regenerate with `npx @electron/asar extract app.asar` then `npx prettier --parser babel`.
+
+## Step sequence and routes
+
+- Canvas "Make" runs `makeItNow()` (main.js:264742): `router.navigate(["mat","preview",canvasId])`. Route table at main.js:417678 and 402360-402410: `mat/preview/:canvasId` is "Mat Preview" (tab label "Prepare"), `mat/machine/:canvasId` is "Set Load Go" (tab label "Make").
+- Prepare screen. `mat-type-flow-modal` (main.js:366501) asks "How will you load your materials?" with "On Mat", "Without Mat", "On Card Mat", "Multiple Ways". Sidebar (`mat-sidebar`, main.js:365859) has "Material Load Type", "Material Size", project copies, "Mirror" On/Off. Footer (main.js:360480) has "Continue" (test id `MatFooter-Continue-Button`).
+- `goToSetLoadGo()` (main.js:360130-360218): run machine required actions (firmware), then if no machine is connected `openMachineConnectionModal()`, else `proceedToSLG()` navigates to `mat/machine/:canvasId`.
+- Machine connection modal (chunk-JVMBAEXI.js:246647, 245300, 244892, 242210, 271364). Strings: "Select Machine", "My Machine", "Other Machines", "New Machines", "Connect with Bluetooth", "Connect with USB", "Connecting...", "Machine connected", "Yay! Your machine is connected and ready to make!". Connection type enum (chunk:140990): `UNKNOWN_CT=0, BLUETOOTH_CT=1, USB_CT=2, HID_CT=3, BLE_CT=4, IP_TCP_CT=5`. USB wins when both are present (main.js:323929-323935).
+- Make screen (`set-load-go`, main.js:384618). Step enum `ma` (main.js:352839): `PRINT=0, SET=1, LOAD=2, GO=3`.
+  - Set: "Set Base Material", "Browse All Materials", "Search All Materials", "Bookmarked", "Compatible", pressure "Default" / "More" / "Less" (enum `ig`: LESS=-1, DEFAULT=0, MORE=1).
+  - Load: "Load tools and material" becoming "Tools and material loaded", "Load {{tool}} in Clamp A / Clamp B / Pen Holder", "Load mat and press Load/Unload button", "Edit Tools". Tools: "Fine-Point Blade", "Pen", "Scoring Tool", "Scoring Tip", "Foil Transfer Tool", "Engraving Tool".
+  - Go: "Press Go" / "Press flashing Go button.", "Fast Mode", "Pause", "Resume", "Unload", "Cancel".
+  - Cutting (`machine-cutting`, main.js:381371): "Connecting", "Preparing", "Scanning", "Finalizing", "Detecting", "Cutting", "Drawing", "Scoring", progress "x of y passes, remaining", "Install {{$1}}", "IMPORTANT: Do NOT unload the mat.".
+  - Done: "Complete", "Unload mat", "Check your cut" with "Looks good" / "Cut more" / "Rerun".
+- Virtual buttons: `simulateButton("LOAD"|"GO"|"PAUSE")` (main.js:356118) sends status 719/720/721.
+
+## Renderer cut state machine
+
+Store `matCutInteraction` (`M9t()`, main.js:352846), setters in `matCutManager` (main.js:355135-355370). `deviceState` values:
+
+```
+SELECT_DEVICE, DEVICE_CONNECTED, WAITING_ON_MATERIAL, RETRIEVING_PRESSURE_SETTINGS,
+DETECTING_TOOL, WAITING_ON_LOAD, MEASURING_MAT, PREFEED, LOADED, READY_TO_GO, GO_PRESSED,
+SCANNING_FIDUCIALS, NEED_TOOL, INCORRECT_TOOL_DETECTED, TOOL_CHANGED, PAUSED, PREFEED_PAUSED,
+WAIT_FOR_END_MOVE_PROGRESS, WAITING_ON_UNLOAD, UNLOADED, MACHINE_LOST_CONNECTION
+```
+
+Bridge status enum (chunk:140561), cut subset:
+
+```
+riError=0 riComplete=1 riStartSuccess=2 riNoDeviceConnected=101 riSingleDeviceConnected=103
+riDeviceOpenSuccess=105 riSelectDevice=109 riWaitOnMatLoad=110 riMatLoaded=111 riMatUnloaded=112
+riWaitOnMatUnload=113 riWaitOnGo=115 riGoPressed=117 riPausePressed=118 riDevicePaused=122
+riDeviceResumed=123 riWaitingOnMaterialSelected=133 riMaterialSelected=134 riSendToolArray=135
+riToolInfoReceived=136 riDetectingTool=137 riMATCUT=700 riMATCUTNeedPathData=701
+riMATCUTSetPathData=703 riMATCUTNeedAccessoryChange=706 riMATCUTSetProgress=710
+riMATCUTAbortCut=717 riMATCUTSimulateLoad/Go/PauseButtonPressed=719/720/721
+riMATCUTGettingDevicePressureSettings=726 riMATCUTCompleteSuccess=727
+```
+
+`convertMessageFromDevice` (chunk:163407-163870) maps statuses to typed events, e.g. `riMATCUTSetProgress` -> `CUT_PROGRESS{currentOperation,currentPass,totalPasses,percent,estimatedSecondsLeft,elapsedSeconds}`.
+
+Happy path (inferred from handlers): start riMATCUT -> devices listed -> riSelectDevice -> open success -> waiting on material -> riMaterialSelected -> retrieving pressure -> riToolInfoReceived -> riMATCUTSetPathData -> wait load -> mat loaded -> wait go -> go pressed -> progress (tool change as needed) -> wait unload -> unloaded.
+
+## Payloads (protobuf `NativeModel.Bridge.PBCommonBridge`, encode at chunk:18944)
+
+Fields: `handle=2, interaction=3, status=6, device=9, deviceList=10, toolInfo=14, progress=16, authData=17, matPathData=22, matcutExecutionPlan=103, materialSelectedPayload=111`.
+
+1. Material (chunk:165917): `{materialSelectedPayload: PBMaterialSelected{selected, matHeight, matWidth, matless, skipMatMeasure, matMode, machineMargins{matMargin,matPadding,matlessMargin,matlessPadding each {top,bottom,left,right}}, prescribedMatHeightInches}, status: riMaterialSelected}`. `matMode`: NORMAL_MAT=0, MAT_LESS=1, CARD_MAT=2.
+2. Tools (`getToolDataForInteraction`, main.js:358655): `{toolInfo: PBBridgeSelectedTools{firstPen, tools[]: PBToolInfo{tool, line, toolFromApi: PBTool, pathToPointsAlgorithm, customOffset}, isMatless, useWalkAwayCutting, matMode, performAutoCutoff, machineMargins, pathSortingConfig}, status: riToolInfoReceived}`. `PBTool` has `precisionMode/draftMode/matlessMode: PBModeApi{pressure, multiPass, cutSpeed, cutAccel, moveToSpeed, zSpeed, deltaAdjustment[] ...}`. More/Less pressure applied in the renderer (main.js:358727): `MORE ? p + delta[2] : LESS ? p + delta[0] : p`. Tool enum (chunk:140347): ROLLING_BLADE_TT=1, DRAG_KNIFE_TT=2, TANGENTIAL_BLADE_TT=3, PEN_DT_TT=4, STYLUS_TT=5, SCORING_WHEEL_TT=6, PERFORATION_WHEEL_TT=9, DEBOSSING_TOOL_TT=10, WAVE_TOOL_TT=11, ENGRAVE_TOOL_TT=12.
+3. Paths (`mapPathDataForMachine`, main.js:353106): `{matPathData: PBMatPathData{materialSize{width,height}, imageData[]: {pathData (SVG d string, encrypted by default), transform: PBMatrix{a..f}, actualPathType, artTool, pathColor, contourActiveFlags[], imageId, pathId, fiducialId}, pathEncrypted, fiducialId, fiducialData[]}, status: riMATCUTSetPathData}`. Units are points (72 per inch).
+
+## Transport from renderer
+
+`window.ipcBridge.plugins` (main.js:282942), channels enum `Ja` (main.js:282944): `PluginDeviceCommonStart/Stop/Request/OnResponse/OnClose/Version/ClearMatCutExecutionPlan`. Service `srvcNativeDevice` (main.js:323425-323960): `DeviceStartProcess` sends `{interaction: riMATCUT, logId:"DEVICE", authData}`; `DeviceSendUpdate` adds `handle`. Verbs (chunk:165879-166000): startInteraction, closeInteraction, selectDevice, selectMaterial, selectPath, selectTool, virtualLoad, virtualGo, virtualPause, makeAgain, restartMatCut.
+
+## Materials and machines
+
+No material data ships locally. REST: `GET /materials/Machines/{serial}/materials?matchTools=...` (main.js:289136), `GET /materials/Tools` (main.js:384435), `/materials/v1/MaterialSizes`, `/materials/v2/MachineFamilies`. Pressure settings fetched per device via `getDevicePressureSettings` (main.js:384479).
+
+Codenames (from i18n strings): Scamander = Maker 3, Voldemort = Explore 3, Cupid = Joy, Morpheus = Venture, Vulcan = Autopress, Rootbeer = Mug Press.
+
+Mat table (`static-asset/design3/machines.2.json`, units points, Maker/Explore padding 18 pt, margins L/R 50 pt, T/B 100 pt): 4x6, A5, 6x6, 8.25x10, A4, Letter, Legal, 9x12, 11x11, Tabloid, A3, 12x12 (preferred), 12x19, 12x24 in. Joy: 4.5x6.5, 4.5x12, Smart Material 5.45 in wide. Venture: 24x12, 24x28, Smart Material 13 and 25 in wide.
+
+## Freeze candidates (static reading, not profiled)
+
+1. Device path data is built one layer at a time with native weld and decrypt round trips over IPC (main.js:353443-353500, 353595, 283232) and SVG re-parsing on the main thread (353230-353280).
+2. The whole mat ships as one IPC message of SVG strings; `fromObject` runs on every inbound message.
+3. Thirty `JSON.parse(JSON.stringify(...))` deep copies in main.js.
+4. One worker per kind (path, geo, render, raster, trace, cricanvas, composition), each a single thread with a queue (chunk:176046-176075).
+5. 38 of 63 make-page components use default change detection, so each streamed CUT_PROGRESS re-checks large trees.
+
+## SVG upload
+
+Line numbers refer to the prettier copy of `design-space-app/main.js`.
+
+- The client never reads an uploaded SVG's physical size. Both upload paths POST the original file unchanged as multipart `file` to the server: legacy `uploadVectorFile` (main.js:201659, FormData at 201670, sent via `getConvertToFxgMethod` at 201702 and 203154) and model-based `Wz`/`SK` preload (main.js:195868-195871). Endpoint `POST /content/Images/ConvertToFxgV2` (main.js:287458-287462), wrapped in `requestOnline` so vector upload needs a network connection (main.js:288154-288156).
+- The server returns `{fxg, imageGUID, fileName, layerCount, preview, errorMessage}` (`fromFxgResult`, main.js:195173-195179). The client stores `fxg` and shows `preview` as a PNG (main.js:195877-195883, 202970-202980). Save goes back to the server via `/Images/PutMy` (main.js:287428) with `toSaveRequest` (main.js:195181-195193: `fxg`, `layerCount`, `outputType: "SVG"`, no width or height field).
+- So unit handling (`in`, `mm`, `cm`, `pt`, `px`), the DPI for unitless or `px` sizes, and `viewBox` scaling all happen server-side in ConvertToFxgV2 and cannot be read from this bundle. There is no SVG unit parser in the JS: no `"mm"`/`"cm"`/`"pt"` unit cases or unit regex in any bundle file, and the only `25.4` conversions are for display and mat sizing (main.js:353952, 366919).
+- Insertion onto the canvas uses a server-built binary `renderable` passed to the CriCanvas worker `ADD_IMAGE` (chunk-JVMBAEXI.js:209559-209563), not the SVG. Native/WASM (`static-asset/wasm/CriCanvas.wasm`) has its own SVG importer (`IMPORT_SVG`/`INSERT_SVG`, chunk-JVMBAEXI.js:204122-204126), but in main.js that is only reached by employee-only clipboard paste (main.js:257176-257184) and AI-generated images (`addSVGToCanvas`, main.js:402890), not by upload.
+- Client-side checks before the POST (validation only, the payload is the original file): XML must parse with root `<svg>` (`bK.validate`, main.js:195552-195575); `<pattern>` and `<clipPath>` are rejected as unsupported (`Vz`, main.js:195498; `Mje`, main.js:195529; toast at 201684-201687). Undeclared namespace prefixes such as `inkscape:` get a dummy `xmlns` added for the parse only (`Sje`/`Cje`, main.js:195466-195497). The server can also return "The uploaded SVG contained the following items that are not supported:" with an "import anyway" choice (main.js:202258-202270).
+- Layers: the server reports `layerCount` and a `layerCount === 0` result is logged as a failed open (main.js:202252-202257). Nothing in the client reads `inkscape:label`, `inkscape:groupmode` or `<g id>`. Whether layers split by `<g>` or by fill colour is server behaviour (inferred: the client's own layered-SVG builder writes one `<path fill=...>` per layer with no groups, main.js:202930-202942, which suggests per-fill layers survive).
+- Not the upload path, but easy to confuse: the photo-print flow (`yG`, main.js:413416-413443) reads `width`/`height` with `parseFloat` (units stripped, main.js:413445-413449), falls back to `viewBox` w/h, and fits the art to a fixed 1200x1800/2100 px canvas, so absolute size is discarded. `Gei` (main.js:465026-465046) does the same for SVG to JPEG conversion.
+- Size cap or rounding: none applied to vector uploads in the client. Any cap is server-side (unknown).
+- DPI for unitless or `px` sizes: not in the bundle. Community reports say Design Space treats `px` and unitless as 72 per inch (inferred, unverified; needs a live upload of a known square in each unit).
+
+Rule for ODS export: write `width`/`height` with explicit `in` (or `mm`) units and a `viewBox` in points at 72 per inch so the unit and the 72 dpi readings agree, use one solid `fill` per path, and never emit `clipPath` or `pattern`; confirm with one live upload of a 1 in square before relying on it.
+
+## Print Then Cut composition
+
+Paths are relative to the research scratchpad (`pretty/` is the prettier copy of `design-space-app`). Units are points (72 per inch) unless stated. Mark geometry is deliberately not recorded; only the resulting margins and max image sizes are.
+
+Verdict on the hypothesis: confirmed. Print mats are built from every print group in one pass with a fixed colour key `"#ffffff"`, so colour plays no part; cut mats alone are split by fill colour. Placement is shape-aware row packing, not a sort by size.
+
+1. **Page sizes.** PTC pages are the material sizes flagged `isPrintThenCut` on the machine family's MATTED mat type, sorted by area (`pretty/chunk-JVMBAEXI.js:163328-163334`, `vp(i, (e) => (t ? e.isPrintThenCut : e.isLayoutContainer))`). The list comes from the server: the client requests machine families with `includeA4PTC: !0` and `includeAdditionalPTC: !0` (`pretty/main.js:307473-307480`). Names the client recognises: `A4`, `Letter`, `Legal`, `Tabloid`, `A3` (`pretty/main.js:142968-142976`). The bundled offline table (`asar/static-asset/design3/machines.2.json`) flags only `8.5" x 11" (Letter)`, 612 x 792, for `MAKER_FAMILY` and `EXPLORE_FAMILY`, and none for `CUPID_FAMILY` or `MORPHEUS_FAMILY`. Default page: the user's saved `ptcMaterialSizeId` if set (`pretty/chunk-JVMBAEXI.js:225673-225684`), else the size flagged `isPrintImperialPreferred` (imperial) or the 595 x 841 size (metric) (`pretty/chunk-JVMBAEXI.js:226595-226606`). Family dependence: `CUPID_FAMILY` (Joy) is never given `"PRINT"` in `supportedArtTypes` (`pretty/main.js:307492-307494`, `307526-307528`), so `groupNeedsPrintMat` returns false and Joy has no PTC (`pretty/chunk-JVMBAEXI.js:226093-226096`). `PSYCHE_FAMILY` prints two mats side by side on one sheet, page width doubled (`pretty/main.js:367289`, `368255-368262`). `GANDALF_FAMILY` and `DUMBLEDORE_FAMILY` print A4 landscape (`pretty/main.js:367965-367976`, `368157-368160`).
+2. **Printable area.** One rectangle per page, page minus a margin per side. Margins are `printThenCutPadding`. Without server PTC data the client sets top/left 58.25 and bottom/right 67.75, so 126 pt (1.75 in) is lost per axis (`pretty/main.js:307531-307538`, `printThenCutPadding.bottom = 126 - (54 + FIDUCIAL_STROKE)`). When the MATTED mat type carries a server `printThenCut` block, all four sides become one server-defined value that includes `bleedRadius` (`pretty/main.js:307540-307552`). The size check shrinks the rectangle by a further 0.1 pt per side (`pretty/chunk-JVMBAEXI.js:226014-226021`, `bottom: n.printThenCutPadding.bottom + 0.1`). Letter therefore gives 485.8 x 665.8 pt, 6.75 x 9.25 in, matching the legacy string "reduce size to less than 9.25 x 6.75" (`i18n/global-en_US.txt:429`, key unused in the bundle). The same formula on 595 x 841 gives about 6.51 x 9.93 in (derived, not stated in code). The max is taken from the largest PTC size (or the preferred PTC size) the family offers (`pretty/chunk-JVMBAEXI.js:225999-226012`). A second, outline-based check lets a non-rectangular shape pass when its outline fits the mark-free region even if its box does not (`pretty/chunk-JVMBAEXI.js:225927-225960`, `226552-226570`).
+3. **Bleed.** On by default (`pretty/main.js:367351`, `this.bleedEnabled = !0`). Width is `BLEED_DISTANCE_NON_PREVIEW = 9` pixels on the 300 dpi print image, so 0.03 in (`pretty/main.js:82440`, `367103`, `367160-367169`). The worker dilates the art by stamping it at every offset within 9 px, then draws the art on top (`asar/design-space-app/canvas-webw-render.js`, minified line 2, `bleed({distance,...})` and `generatePTCBitmapWithCornerFiducials`). The toggle only changes the printed bitmap. The layout reserve for bleed is the server `bleedRadius`, which is always subtracted from the usable area, in the padding (`pretty/main.js:307541-307547`), in packing (`pretty/chunk-JVMBAEXI.js:227847-227849`, `inFiducialPadding: ve.innerFiducialToSafeZone + ve.bleedRadius`) and in the size check (`pretty/chunk-JVMBAEXI.js:226558-226562`). Its value is server data, not in the bundle.
+4. **Grouping key.** `generateMats` splits top-level groups three ways (`pretty/chunk-JVMBAEXI.js:228279-228286`, `227481-227492`). A group is a print group if it is a `FLATTEN` group (`ic`, `pretty/chunk-JVMBAEXI.js:169774-169776`) or any layer inside it has `layerOutputType` `PRINTCUT` or `PRINT` (`pretty/chunk-JVMBAEXI.js:226093-226109`). All print groups go to `createPrintMats` with the fixed colour `"#ffffff"` and `isPrint = !0` (`pretty/chunk-JVMBAEXI.js:228301-228315`). Only cut groups are split by lower-cased `fillSolidColor` (`pretty/chunk-JVMBAEXI.js:228353`, `227494-227509`). So colour plays no part for PTC, and material type is not a key: every print mat uses the family's MATTED PTC sizes. An `ATTACH`, `GROUP` or `TEXT` group that contains one print layer goes whole onto the print mat with its cut layers. A plain cut group never shares a page with a print image, and draw/score-only groups go to orphan mats.
+5. **Fit and spill.** For print mats the CriGeo WASM layout always runs (`pretty/chunk-JVMBAEXI.js:227807-227870`, `asar/static-asset/wasm/CriGeo.wasm`). Region: page inset by the server `materialEdgeToOuterFiducial` (`pretty/chunk-JVMBAEXI.js:227813-227834`). Strategy defaults to `"rows"`, item padding to 5 pt (`pretty/chunk-JVMBAEXI.js:225652-225653`). Both are changeable only in a sidebar behind `DH_MACHINES_CRI_GEO_LAYOUT_SELECT` (`pretty/main.js:365597-365609`, `362524-362531`). Items are each group's outer boundary path with that padding, not its box (`pretty/chunk-JVMBAEXI.js:225236-225250`, `225605-225625`). Whatever does not fit comes back as `unableToLayoutGroups` and starts the next page; the loop repeats until none remain (`pretty/chunk-JVMBAEXI.js:228530-228548`). Page size is re-chosen per page by `printMatMaterialSizeEvaluator`: saved PTC preference, else the smallest PTC size from the preferred one upward that fits (`pretty/chunk-JVMBAEXI.js:228144-228160`, `163313-163326`). Not settled by the code: whether the gap between two items is 5 or 10 pt, and the exact row-fill rule; both live inside `CriGeo.wasm` `Layout.layoutItems`.
+6. **Order.** Mats are returned as print, then matless cut, then orphan, then matted cut (`pretty/chunk-JVMBAEXI.js:228298`, `return [...d, ...s.matless, ...c, ...s.matted]`). Print groups are passed to CriGeo in canvas order with no sort; `sortGroupsByHeight` is used only by the legacy cut packer (`pretty/chunk-JVMBAEXI.js:227579`). Cut mats follow first-seen colour order (`Object.keys` reduce, `pretty/chunk-JVMBAEXI.js:228354`). Whether CriGeo `rows` reorders items internally is not settled by the code.
+7. **Oversize.** Size validation flags `ptcSizeError` per group (`pretty/chunk-JVMBAEXI.js:226183-226212`). The layer gets "Image is too large for {{paperName}} paper. We have detected that the max size for this shape is {{reducedMatSize}}" (`pretty/main.js:147307-147330`, `i18n/global-en_US.txt:1632`). Make It is blocked. On `MORPHEUS_FAMILY` it shows "Check Layers"; elsewhere, when all errors are size errors, "Image(s) Too Large" (`pretty/main.js:264618-264627`, `423109-423113`, `263944-263956`). `makeItNow` is reached only in the final else branch. If an oversize group still reaches layout, the infinite-loop guard throws `ValidationSizeErrorTooLarge` (`pretty/chunk-JVMBAEXI.js:228549-228570`).
+8. **Print step.** Each unprinted print mat opens on step `PRINT` instead of `LOAD` (`pretty/main.js:376291`, step enum `PRINT = 0` at `pretty/main.js:352841`). The dialog pages are `ADD_SENSOR_MARKS`, `PRINT`, `VERIFY_PRINT_QUALITY`, `A4_ROTATION` (`pretty/main.js:351094-351101`); the first is skipped once its tooltip has been seen (`pretty/main.js:368106-368113`). Print controls: printer select, "Copies" 1 to 10 (`pretty/main.js:367333`), disabled while the system dialog is on (`pretty/main.js:367664-367673`); "Add Bleed" toggle, default on; "Use System Dialog" toggle, default off (`pretty/main.js:367352`). With it on, a warning says to match the paper size in the OS dialog (`pretty/main.js:367566`, `367694`). Print is enabled when a printer is selected, or with the system dialog on under `DH_MACHINES_ALLOW_SYSTEM_PRINTING_WHEN_NO_PRINTERS_FOUND` (`pretty/main.js:367988-367999`). Print sends a 300 dpi PNG named "Cricut: Mat Composite" with the page matched to a printer paper size within tolerance, falling back to the mat's own size (`pretty/main.js:368118-368196`, `368255-368290`). After printing, `printComplete` marks the mat printed and moves to Load or Go (`pretty/main.js:376068-376082`).

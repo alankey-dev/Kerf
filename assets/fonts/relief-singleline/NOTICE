@@ -1,0 +1,19 @@
+Relief SingleLine, version 2.000
+Copyright 2021 The Relief SingleLine Project Authors (https://github.com/isdat-type/Relief-SingleLine)
+Designed at isdaT (institut supérieur des arts et du design de Toulouse) by François Chastanet, Noélie Dayma and Élisa Garzelli.
+
+Licensed under the SIL Open Font License, Version 1.1. The full licence is in OFL.txt.
+
+Source: https://github.com/isdat-type/Relief-SingleLine
+Commit: 01dfc5779ec1e9e4b288d96c6c96c23bfccbaf9d
+Files:
+  fonts/open_svg/ReliefSingleLineSVG-Regular.svg (unchanged here as ReliefSingleLineSVG-Regular.svg)
+  OFL.txt (unchanged)
+
+The SVG font carries no version field. Version 2.000 is the name table version of the OTF-SVG and
+CAD TTF builds in the same commit (fonts/open_otf-svg/ReliefSingleLineOTF-SVG-Regular.otf,
+fonts/open_ttf/ReliefSingleLineCAD-Regular.ttf); the SVG font was built by FontForge on 14 February 2025.
+
+relief-singleline.odsstroke.json is converted from the SVG font by tools/stroke_font, with the
+family name "Relief SingleLine". It is a Modified Version under the OFL and keeps the same licence.
+OFL.txt declares no Reserved Font Name, so the converted font may keep the name.

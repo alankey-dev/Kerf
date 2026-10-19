@@ -1,0 +1,107 @@
+name: CI
+
+# Runs on every pull request, on GitHub-hosted runners (free and unlimited for a public repository). Format,
+# Clippy, the tests and cargo-deny on Linux, macOS and Windows, plus the heavy-design timing gates on macOS.
+# See docs/ci.md.
+on:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            runs_on: ubuntu-latest
+          - platform: macos
+            runs_on: macos-latest
+          - platform: windows
+            runs_on: windows-latest
+    name: check (${{ matrix.platform }})
+    runs-on: ${{ matrix.runs_on }}
+    timeout-minutes: 60
+    steps:
+      # Windows runners convert line endings on checkout by default, which changes the bytes of the
+      # text fixtures the tests read with include_str!.
+      - name: Keep line endings as committed
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
+
+      # The build links GTK for the file dialog, and the kittests render through wgpu. Linux runners have
+      # no GPU, so Mesa's lavapipe gives Vulkan a software adapter, and xvfb gives winit a display.
+      - name: Linux system packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          grep -v '^#' tools/release/linux-deps.txt | xargs sudo apt-get install -y --no-install-recommends
+          sudo apt-get install -y --no-install-recommends mesa-vulkan-drivers xvfb
+
+      # macOS renders the kittests through Metal. Windows runners have no GPU either, but DX12 exposes
+      # the WARP software adapter, which egui_kittest prefers, so no setup is needed there.
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: ${{ runner.os }}
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets --locked -- -D warnings
+
+      - name: Test
+        if: runner.os != 'Linux'
+        run: cargo test --locked
+
+      - name: Test
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum cargo test --locked
+
+      - name: Upload snapshot diffs
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: snapshot-diffs-${{ runner.os }}
+          path: |
+            tests/snapshots/*.diff.png
+            tests/snapshots/*.new.png
+          if-no-files-found: ignore
+
+      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+        with:
+          tool: cargo-deny
+
+      - name: Advisories
+        run: cargo deny check advisories
+
+  timing:
+    # Its own job, so check stays fast. The ceilings are multiples of a reference workload timed in the same
+    # run (docs/specs/38-benchmark.md), so a slower runner does not fail them. On macOS, where they were set.
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+
+      - name: Heavy-design timing
+        run: cargo test --release --locked -- --ignored --nocapture --test-threads=1 heavy_design_frame_times a_frame_of_200

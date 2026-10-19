@@ -1,0 +1,35 @@
+{project}: cutting this project in Design Space
+==============================================
+
+This folder holds one SVG per mat. Each file is sized in inches, so it uploads at the size it has
+on the Kerf canvas. Nothing here talks to Design Space or Cricut's servers: Kerf only wrote these
+files, and you upload them yourself.
+
+Upload each file
+----------------
+1. In Design Space, open a new project and choose Upload, then Upload Image.
+2. Browse to one SVG in this folder, then choose Upload.
+3. Select the uploaded image and choose Add to Canvas.
+4. Repeat for every SVG. Each file is one mat, so its file name tells you the mat's material colour
+   and what it makes ("Mat 1 - Black - Score, Basic Cut").
+
+Set each layer back
+-------------------
+Every layer arrives as Basic Cut. Layer names may not survive the upload, so match each layer by its
+colour and position against the list below.
+
+- For a layer listed as "Score - Heart", change its Operation to Score. Do the same for Pen, Deboss,
+  Engrave, Foil, Perforate and Wavy Cut layers.
+- A layer listed under "Attached - ..." belongs with the cut layer named there. Select the layer and
+  its cut layer, then choose Attach, so it lands in the right place on the cut.
+
+Check the size before Make
+--------------------------
+Before you choose Make, check each image's size against the mat's ruler in Design Space. If it
+differs, set the image's width and height to the size it has on the Kerf canvas.
+
+Layers in each file
+-------------------
+Each line reads: group / layer name, colour.
+
+{files}

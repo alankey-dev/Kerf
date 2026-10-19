@@ -1,0 +1,16 @@
+{
+  "themes": [
+    { "name": "Classic", "style": "ClassicThree", "frame": "Circle", "centre": "DM Serif Display", "sides": "DM Serif Display", "frame_colour": "#1F2A44", "letter_colour": "#1F2A44" },
+    { "name": "Modern", "style": "EvenThree", "frame": "Square", "centre": "SpaceGrotesk", "sides": "SpaceGrotesk", "frame_colour": "#2B2B2B", "letter_colour": "#C2410C" },
+    { "name": "Script", "style": "Interlocking", "frame": "ScallopedCircle", "centre": "Great Vibes", "sides": "Great Vibes", "frame_colour": "#9D174D", "letter_colour": "#9D174D" },
+    { "name": "Sports", "style": "Stacked", "frame": "Shield", "centre": "Oswald", "sides": "Oswald", "frame_colour": "#1E3A8A", "letter_colour": "#B91C1C" },
+    { "name": "Botanical", "style": "ClassicThree", "frame": "LeafWreath", "centre": "Great Vibes", "sides": "DM Serif Display", "frame_colour": "#3F6212", "letter_colour": "#1F2937" }
+  ],
+  "writing": {
+    "Inter": "relief-singleline",
+    "SpaceGrotesk": "relief-singleline",
+    "DM Serif Display": "hershey-duplex",
+    "Great Vibes": "hershey-script-complex",
+    "Oswald": "hershey-duplex"
+  }
+}

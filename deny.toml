@@ -1,0 +1,21 @@
+# cargo-deny checks the dependency graph against the RustSec advisory database. CI runs
+# `cargo deny check advisories`. Licence checks are off: Kerf is for personal use and is not
+# published (spec 22, item 6 dropped).
+#
+# Known, accepted: building the tests prints a rustc future-incompatibility warning for
+# `block v0.1.6`. It reaches the build only through the dev-only path
+# egui_kittest -> wgpu -> metal -> block, so it never ships in the app binary
+# (`cargo tree -e normal -i block` is empty). The pinned toolchain in rust-toolchain.toml means the
+# warning can only become an error on a deliberate toolchain upgrade. See AUDIT-025.
+
+# Kerf is a macOS app; Linux-only crates in the graph (atspi, wayland) never build here.
+[graph]
+all-features = false
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin"]
+
+[advisories]
+# Unmaintained, not vulnerable. Each needs an upstream move to drop, tracked rather than blocking CI.
+ignore = [
+    { id = "RUSTSEC-2024-0436", reason = "paste is a build-time proc macro reached only through wgpu -> metal; goes when egui moves off metal 0.31" },
+    { id = "RUSTSEC-2026-0192", reason = "ttf-parser outlines the bundled and system fonts; replacing it (skrifa) is its own change" },
+]

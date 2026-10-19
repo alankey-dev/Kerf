@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  The Kerf installer, built by `cargo wix` from tools/release/package-windows.ps1. It installs for the
+  current user only, into %LOCALAPPDATA%\Programs\Kerf, so it needs no administrator rights.
+
+  Never change the UpgradeCode: every version shares it, which is how a newer .msi finds and replaces an
+  older one. The component GUIDs stay fixed for the same reason.
+
+  cargo wix sets Version, CargoTargetBinDir and the architecture from the build it packages.
+-->
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product
+        Id='*'
+        Name='Kerf'
+        UpgradeCode='935B8C3F-78A8-4D87-8692-43287CA83C24'
+        Manufacturer='Kerf'
+        Language='1033'
+        Codepage='1252'
+        Version='$(var.Version)'>
+
+        <!-- Windows Installer 5.0 is the first that knows arm64. -->
+        <Package
+            Id='*'
+            Description='Kerf $(var.Version)'
+            Manufacturer='Kerf'
+            InstallerVersion='500'
+            Languages='1033'
+            Compressed='yes'
+            InstallScope='perUser'
+            InstallPrivileges='limited'
+            SummaryCodepage='1252'/>
+
+        <MajorUpgrade
+            Schedule='afterInstallInitialize'
+            DowngradeErrorMessage='A newer version of Kerf is already installed.'/>
+        <MediaTemplate EmbedCab='yes'/>
+
+        <Icon Id='KerfIcon' SourceFile='tools\release\icons\kerf.ico'/>
+        <Property Id='ARPPRODUCTICON' Value='KerfIcon'/>
+
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <Directory Id='LocalAppDataFolder'>
+                <Directory Id='UserPrograms' Name='Programs'>
+                    <Directory Id='INSTALLDIR' Name='Kerf'>
+                        <!-- A per-user component keys on a registry value under HKCU, not on its file. -->
+                        <Component Id='Binary' Guid='FBCC9E13-062A-48CC-91F5-E227006FDA07'>
+                            <RegistryValue Root='HKCU' Key='Software\Kerf' Name='InstallDir' Type='string' Value='[INSTALLDIR]' KeyPath='yes'/>
+                            <File Id='KerfExe' Name='kerf.exe' Source='$(var.CargoTargetBinDir)\kerf.exe'/>
+                            <RemoveFolder Id='RemoveInstallDir' On='uninstall'/>
+                            <RemoveFolder Id='RemoveUserPrograms' Directory='UserPrograms' On='uninstall'/>
+                        </Component>
+                    </Directory>
+                </Directory>
+            </Directory>
+            <Directory Id='ProgramMenuFolder'>
+                <Component Id='StartMenuShortcut' Guid='66259A97-3C73-4CC9-835C-8AAAF218069D'>
+                    <Shortcut
+                        Id='KerfShortcut'
+                        Name='Kerf'
+                        Description='Design and cut'
+                        Target='[INSTALLDIR]kerf.exe'
+                        WorkingDirectory='INSTALLDIR'
+                        Icon='KerfIcon'/>
+                    <RegistryValue Root='HKCU' Key='Software\Kerf' Name='StartMenuShortcut' Type='integer' Value='1' KeyPath='yes'/>
+                </Component>
+            </Directory>
+        </Directory>
+
+        <Feature Id='Kerf' Title='Kerf' Level='1' Absent='disallow'>
+            <ComponentRef Id='Binary'/>
+            <ComponentRef Id='StartMenuShortcut'/>
+        </Feature>
+    </Product>
+</Wix>

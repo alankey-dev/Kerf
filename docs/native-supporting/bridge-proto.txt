@@ -1,0 +1,2732 @@
+message PBMachineMaterialsSettingsV2 {  // encode @ line 1708
+  int32 machineID = 1;
+  repeated PBMaterialSettingV2 customMaterials = 2;
+  repeated PBMaterialSettingV2 customMaterialDefault = 3;
+  repeated PBMaterialSettingV2 dialSettings = 4;
+}
+message PBMaterialSettingV2 {  // encode @ line 2408
+  int32 materialSettingsID = 1;
+  string type = 2;
+  int32 userMachineID = 3;
+  int32 machineID = 4;
+  string materialName = 5;
+  int32 dialPosition = 6;
+  int32 calibrationDialPosition = 7;
+  double modifiedByPercentage = 8;
+  int32 overrideID = 9;
+  int32 multiCut = 10;
+  int32 cutSpeed = 11;
+  int32 cutSpeedCalibration = 12;
+  int32 cutSpeedMin = 13;
+  int32 cutSpeedMax = 14;
+  int32 cutPressure = 15;
+  int32 cutPressureCalibration = 16;
+  int32 cutPressureMin = 17;
+  int32 cutPressureMax = 18;
+  int32 drawFeltSpeed = 19;
+  int32 drawFeltSpeedCalibration = 20;
+  int32 drawFeltSpeedMin = 21;
+  int32 drawFeltSpeedMax = 22;
+  int32 drawFeltPressure = 23;
+  int32 drawFeltPressureCalibration = 24;
+  int32 drawFeltPressureMin = 25;
+  int32 drawFeltPressureMax = 26;
+  int32 drawRollerSpeed = 27;
+  int32 drawRollerSpeedCalibration = 28;
+  int32 drawRollerSpeedMin = 29;
+  int32 drawRollerSpeedMax = 30;
+  int32 drawRollerPressure = 31;
+  int32 drawRollerPressureCalibration = 32;
+  int32 drawRollerPressureMin = 33;
+  int32 drawRollerPressureMax = 34;
+  int32 scoreSpeed = 35;
+  int32 scoreSpeedCalibration = 36;
+  int32 scoreSpeedMin = 37;
+  int32 scoreSpeedMax = 38;
+  int32 scorePressure = 39;
+  int32 scorePressureCalibration = 40;
+  int32 scorePressureMin = 41;
+  int32 scorePressureMax = 42;
+  int32 cutterStepper = 43;
+  int32 rollerPenStepper = 44;
+  int32 feltPenStepper = 45;
+  int32 scoreStepper = 46;
+  string uid = 47;
+  bool isCustom = 48;
+  bool isEditEnabled = 49;
+  int32 bladeType = 50;
+}
+message PBMachineFirmwareValuesApi {  // encode @ line 4139
+  int32 cutterStepper01 = 1;
+  int32 cutterStepper02 = 2;
+  int32 cutterStepper03 = 3;
+  int32 cutterStepper04 = 4;
+  int32 cutterStepper05 = 5;
+  int32 cutterStepper06 = 6;
+  int32 cutterStepper07 = 7;
+  int32 cutterStepper08 = 8;
+  int32 cutterStepper09 = 9;
+  int32 cutterStepper10 = 10;
+  int32 cutterStepper11 = 11;
+  int32 cutterStepper12 = 12;
+  int32 cutterStepper13 = 13;
+  int32 cutterStepper14 = 14;
+  int32 cutterStepper15 = 15;
+  int32 cutterStepper16 = 16;
+  int32 rollerPenStepper01 = 17;
+  int32 rollerPenStepper02 = 18;
+  int32 rollerPenStepper03 = 19;
+  int32 rollerPenStepper04 = 20;
+  int32 rollerPenStepper05 = 21;
+  int32 rollerPenStepper06 = 22;
+  int32 rollerPenStepper07 = 23;
+  int32 rollerPenStepper08 = 24;
+  int32 rollerPenStepper09 = 25;
+  int32 rollerPenStepper10 = 26;
+  int32 rollerPenStepper11 = 27;
+  int32 rollerPenStepper12 = 28;
+  int32 rollerPenStepper13 = 29;
+  int32 rollerPenStepper14 = 30;
+  int32 rollerPenStepper15 = 31;
+  int32 rollerPenStepper16 = 32;
+  int32 feltPenStepper01 = 33;
+  int32 feltPenStepper02 = 34;
+  int32 feltPenStepper03 = 35;
+  int32 feltPenStepper04 = 36;
+  int32 feltPenStepper05 = 37;
+  int32 feltPenStepper06 = 38;
+  int32 feltPenStepper07 = 39;
+  int32 feltPenStepper08 = 40;
+  int32 feltPenStepper09 = 41;
+  int32 feltPenStepper10 = 42;
+  int32 feltPenStepper11 = 43;
+  int32 feltPenStepper12 = 44;
+  int32 feltPenStepper13 = 45;
+  int32 feltPenStepper14 = 46;
+  int32 feltPenStepper15 = 47;
+  int32 feltPenStepper16 = 48;
+  int32 scoreStepper01 = 49;
+  int32 scoreStepper02 = 50;
+  int32 scoreStepper03 = 51;
+  int32 scoreStepper04 = 52;
+  int32 scoreStepper05 = 53;
+  int32 scoreStepper06 = 54;
+  int32 scoreStepper07 = 55;
+  int32 scoreStepper08 = 56;
+  int32 scoreStepper09 = 57;
+  int32 scoreStepper10 = 58;
+  int32 scoreStepper11 = 59;
+  int32 scoreStepper12 = 60;
+  int32 scoreStepper13 = 61;
+  int32 scoreStepper14 = 62;
+  int32 scoreStepper15 = 63;
+  int32 scoreStepper16 = 64;
+  int32 auxStepper01 = 65;
+  int32 auxStepper02 = 66;
+  int32 auxStepper03 = 67;
+  int32 auxStepper04 = 68;
+  int32 auxStepper05 = 69;
+  int32 auxStepper06 = 70;
+  int32 auxStepper07 = 71;
+  int32 auxStepper08 = 72;
+  int32 auxStepper09 = 73;
+  int32 auxStepper10 = 74;
+  int32 auxStepper11 = 75;
+  int32 auxStepper12 = 76;
+  int32 auxStepper13 = 77;
+  int32 auxStepper14 = 78;
+  int32 auxStepper15 = 79;
+  int32 auxStepper16 = 80;
+  int32 serialNum1 = 81;
+  int32 serialNum2 = 82;
+  int32 serialNum3 = 83;
+  int32 serialNum4 = 84;
+  int32 eraseCount = 85;
+  int32 xBladeBacklash = 86;
+  int32 yBladeBacklash = 87;
+  int32 xPenBacklash = 88;
+  int32 yPenBacklash = 89;
+  int32 xBacklashThresh = 90;
+  int32 yBacklashThresh = 91;
+  int32 intretechTestFlags = 92;
+  int32 xProportional = 93;
+  int32 xIntegral = 94;
+  int32 xDerivative = 95;
+  int32 yProportional = 96;
+  int32 yIntegral = 97;
+  int32 yDerivative = 98;
+  int32 bladeToPenX = 99;
+  int32 bladeToPenY = 100;
+  int32 bladeToSensorX = 101;
+  int32 bladeToSensorY = 102;
+  int32 keplerCoordConversion = 103;
+  int32 homePositionX = 104;
+  int32 homePositionY = 105;
+  int32 xGearRatio = 106;
+  int32 yGearRatio = 107;
+  int32 factoryXBladeBacklash = 108;
+  int32 factoryYBladeBacklash = 109;
+  int32 factoryXPenBacklash = 110;
+  int32 factoryYPenBacklash = 111;
+  int32 factoryXBacklashThresh = 112;
+  int32 factoryYBacklashThresh = 113;
+  int32 factoryXProportional = 114;
+  int32 factoryXIntegral = 115;
+  int32 factoryXDerivative = 116;
+  int32 factoryYProportional = 117;
+  int32 factoryYIntegral = 118;
+  int32 factoryYDerivative = 119;
+  int32 factoryBladeToPenX = 120;
+  int32 factoryBladeToPenY = 121;
+  int32 factoryBladeToSensorX = 122;
+  int32 factoryBladeToSensorY = 123;
+  int32 factoryXPenProportional = 124;
+  int32 factoryXPenDerivative = 126;
+  int32 factoryYPenProportional = 127;
+  int32 factoryYPenIntegral = 128;
+  int32 factoryYPenDerivative = 129;
+  int32 xPenProportional = 130;
+  int32 xPenIntegral = 131;
+  int32 xPenDerivative = 132;
+  int32 yPenProportional = 133;
+  int32 yPenIntegral = 134;
+  int32 yPenDerivative = 135;
+  int32 machineIdleTimeout = 136;
+  int32 buttonBrdVer = 137;
+  int32 xScoreBacklash = 138;
+  int32 yScoreBacklash = 139;
+  int32 factoryXScoreBacklash = 140;
+  int32 factoryYScoreBacklash = 141;
+  int32 loadMatDistance = 142;
+  int32 loadMatSpeedIps = 143;
+  int32 cutOverlap = 144;
+  int32 rollerPenOverlap = 145;
+  int32 feltPenOverlap = 146;
+  int32 scoreOverlap = 147;
+  int32 unloadSpeedIps = 148;
+  int32 maxXYMotorSpeedIps = 149;
+  int32 scanMinSignal = 150;
+  int32 machineColorStyle = 151;
+  int32 zBSideProportional = 152;
+  int32 zBSideIntegral = 153;
+  int32 zBSideDerivative = 154;
+  int32 zBSideGearRatio = 155;
+  int32 tGearRatio = 156;
+  int32 tProportional = 157;
+  int32 tIntegral = 158;
+  int32 tDerivative = 159;
+  int32 zAsideProportional = 160;
+  int32 zAsideIntegral = 161;
+  int32 zAsideDerivative = 162;
+  int32 zAsideGearRatio = 163;
+  int32 zASideBacklash = 164;
+  int32 zBSideBacklash = 165;
+  int32 tUnloadedBacklash = 166;
+  int32 tLoadedBacklash = 167;
+  int32 tBias = 168;
+  int32 toolParallelOffset0 = 169;
+  int32 toolLaggingOffset0 = 170;
+  int32 tHomeCalibration = 171;
+  int32 tProportionalHoming = 172;
+  int32 tIntegral_Homing = 173;
+  int32 tDerivativeHoming = 174;
+  int32 zDropForTHome = 175;
+  int32 rotaryBladeLiftThresholdAngle = 176;
+  int32 tBiasApplicationSteps = 177;
+  int32 fourInchDiaTBias = 178;
+  int32 firmwareVersionMachine = 179;
+  int32 tBias1 = 180;
+  int32 tBias1Diameter = 181;
+  int32 tBias2 = 182;
+  int32 tBias2Diameter = 183;
+  int32 dropZHoldTimeUs = 184;
+  int32 toolIdPos4 = 185;
+  int32 zaHomeOffset = 186;
+  int32 tBias3 = 187;
+  int32 tBias3Diameter = 188;
+  int32 thetaHomeStdDev = 189;
+  int32 carriageHomeMaxPwmFactor = 190;
+  int32 exceptionCauseCode = 191;
+  int32 exceptionAddress = 192;
+  int32 homeZMaxPwmFactor = 193;
+  int32 homeZBStdDev = 194;
+  int32 adjustXCutDrawMargins = 195;
+  int32 adjustYCutDrawMargins = 196;
+  int32 rconValues = 197;
+  int32 ccwThetaBiasScaleFactor = 198;
+  int32 thetaFeatureMinRadians = 199;
+  int32 thetaFeatureMaxRadians = 200;
+  int32 maxZAPosMm = 201;
+  int32 maxZBPosMm = 202;
+  int32 badVirtualAddrCp0 = 203;
+  int32 statusRegCp0 = 204;
+  int32 regShadowCtrl = 205;
+  int32 regStackPtr = 206;
+  int32 regGlobalPtr = 207;
+  int32 toolParallelOffset1 = 208;
+  int32 toolLaggingOffset1 = 209;
+  int32 toolParallelOffset2 = 210;
+  int32 toolLaggingOffset2 = 211;
+  int32 toolParallelOffset3 = 212;
+  int32 toolLaggingOffset3 = 213;
+  int32 toolParallelOffset4 = 214;
+  int32 toolLaggingOffset4 = 215;
+  int32 toolParallelOffset5 = 216;
+  int32 toolLaggingOffset5 = 217;
+  int32 toolParallelOffset6 = 218;
+  int32 toolLaggingOffset6 = 219;
+  int32 toolParallelOffset7 = 220;
+  int32 toolLaggingOffset7 = 221;
+  int32 frontMatSensorADCThresh = 222;
+  int32 rearMatSensorADCThresh = 223;
+  int32 homeZUnwindSpeed = 224;
+  int32 frontAndBackDigiPots = 225;
+  int32 leftAndRightDigiPots = 226;
+  int32 thetaHomeDigiPot = 227;
+  int32 leftMatSensorADCThresh = 228;
+  int32 rightMatSensorADCThresh = 229;
+  int32 thetaHomeSensorADCThresh = 230;
+  int32 placeHolder7 = 231;
+  int32 placeHolder8 = 232;
+  int32 specOperations = 233;
+  int32 yGearRatioMatless = 234;
+  int32 yEjectSpeed = 235;
+  int32 carriageHomeSpeed = 236;
+  int32 onStartEjectDistance = 237;
+  int32 sensorIgnoreFlags = 238;
+  int32 maxPwmYConstantRoll = 239;
+  int32 homeZaOffset = 240;
+  int32 homeZbOffset = 241;
+  int32 homeZaErrorLimit = 242;
+  int32 homeZbErrorLimit = 243;
+  int32 homeZaVelocity = 244;
+  int32 homeZbVelocity = 245;
+  int32 homeZaAccel = 246;
+  int32 homeZbAccel = 247;
+  int32 homeZaMaxPwmFactor = 248;
+  int32 matrSnsXmitPwmFreq = 249;
+  int32 xDecJerkLimIpsc = 251;
+  int32 yAccJerkLimIpsc = 252;
+  int32 yDecJerkLimIpsc = 253;
+  int32 zAccJerkLimIpsc = 254;
+  int32 zDecJerkLimIpsc = 255;
+  int32 btFactoryDefaultOccurrences = 256;
+  int32 btInactivityResets = 257;
+  int32 xRelaxedProportional = 258;
+  int32 xRelaxedIntegral = 259;
+  int32 xRelaxedDerivative = 260;
+  int32 yRelaxedProportional = 261;
+  int32 yRelaxedIntegral = 262;
+  int32 yRelaxedDerivative = 263;
+  int32 hwRevBits1 = 264;
+  int32 hwRevBits2 = 265;
+  int32 hwRevBits3 = 266;
+  int32 hwRevBits4 = 267;
+  int32 loadDelayMs = 268;
+  int32 zbCstrRegStartPos = 269;
+  int32 zbCstrRegEndPos = 270;
+  int32 zbCstrRegVelLimit = 271;
+  int32 zaCstrRegStartPos = 272;
+  int32 zaCstrRegEndPos = 273;
+  int32 zaCstrRegVelLimit = 274;
+  int32 btPeriodicCheckTimeoutMs = 275;
+  int32 btInactivityResetTimeoutMs = 276;
+  int32 btErrorIndicationEnable = 277;
+  string firmwareVersion = 996;
+  string pluginVersion = 997;
+  int32 oOBCheck = 998;
+  int32 maxValue = 999;
+}
+message PBAnalyticMachineSummary {  // encode @ line 10296
+  int32 analyticMachineID = 1;
+  string firmwareValuesStored = 2;
+  int32 companyID = 3;
+  string companyName = 4;
+  string entitlementDescription = 5;
+  bool primaryUserSet = 6;
+  bool calibrationValuesStored = 7;
+  int32 countryID = 8;
+  string entitlementExpiration = 9;
+  string machineType = 10;
+  int32 machineTypeID = 11;
+  bool bypassIPCheck = 12;
+  int32 bluetoothVersion = 13;
+  int32 duration = 15;
+  string durationType = 16;
+  int32 durationTypeID = 17;
+  string entitlementUrl = 18;
+}
+message PBAllMaterialSettings {  // encode @ line 10806
+  repeated PBMaterialSettingsApi all = 1;
+}
+message PBMaterialSettingsApi {  // encode @ line 10955
+  string id = 1;
+  string materialName = 2;
+  int32 dialPosition = 3;
+  int32 globalId = 4;
+  bool isOverwrite = 5;
+  bool isCustom = 6;
+  bool isApproved = 7;
+  string tag = 9;
+  bool isPopular = 10;
+  bool isFavorite = 11;
+  bool isCricutProduct = 12;
+  bool isSoftDeleted = 13;
+  repeated PBMachineMaterial machineMaterials = 15;
+  repeated PBKeyValue additionalProperties = 16;
+  PBMaterialSettingsMessage message = 17;
+  string favoriteOrder = 18;
+  bool allowsMatless = 19;
+}
+message PBMachineMaterial {  // encode @ line 11489
+  string name = 1;
+  int32 machineTypeId = 2;
+  string id = 3;
+  bool hasCustomValues = 4;
+  repeated PBTool tools = 5;
+  repeated PBKeyValue additionalProperties = 8;
+  bool isFavorite = 9;
+  int32 popularOrder = 10;
+  bool isPopular = 11;
+  int32 machineMaxPressure = 12;
+  int32 machineMinPressure = 13;
+  repeated PBTool bladeTypes = 14;
+  repeated PBTool accessories = 15;
+}
+message PBToolTypeState {  // encode @ line 12324
+  int32 toolType = 1;
+  int32 headType = 2;
+  int32 artType = 3;
+  string api2Name = 4;
+  bool isDefaultForArtType = 5;
+  string id = 6;
+  bool fastModeCapable = 7;
+}
+message PBMachineDefaultState {  // encode @ line 12757
+  string id = 1;
+  int32 machineType = 2;
+  int32 availableHeads = 3;
+  repeated PBToolTypeState availableTools = 4;
+  repeated int32 availableArtTypes = 5;
+}
+message PBMachineDefaultStates {  // encode @ line 13481
+  string id = 1;
+  repeated PBMachineDefaultState availableMachines = 2;
+}
+message PBTool {  // encode @ line 13656
+  string displayName = 1;
+  string name = 2;
+  PBModeApi precisionMode = 3;
+  PBModeApi draftMode = 4;
+  bool isPreferred = 5;
+  bool isSelected = 6;
+  string id = 7;
+  repeated string toolType = 8;
+  int32 preferredOrder = 9;
+  repeated int32 deltaSettings = 10;
+  int32 maxRangePressure = 11;
+  int32 minRangePressure = 12;
+  repeated PBKeyValue additionalProperties = 13;
+  PBToolSettings settings = 14;
+  bool useMachine = 15;
+  bool useDraftMode = 16;
+  int32 toolTypeEnum = 17;
+  PBModeApi matlessMode = 18;
+  PBModeApi cardMatMode = 19;
+}
+message PBToolSettings {  // encode @ line 14365
+  int32 flags = 1;
+  double lOffset = 2;
+  double liftThresh = 3;
+  int32 pOffset = 4;
+  string pressureBias = 5;
+}
+message PBModeApi {  // encode @ line 14575
+  int32 adjustedPressure = 1;
+  repeated int32 deltaAdjustment = 2;
+  int32 closestDialPressure = 3;
+  int32 selectPressure = 4;
+  int32 machinePressure = 5;
+  float cutSpeed = 6;
+  float cutAccel = 7;
+  float moveToSpeed = 8;
+  float moveToAccel = 9;
+  int32 minPressure = 10;
+  int32 maxPressure = 11;
+  int32 pressure = 12;
+  int32 multiPass = 13;
+  repeated int32 multiPressure = 14;
+  string id = 15;
+  repeated PBKeyValue additionalProperties = 16;
+  int32 originalPressure = 17;
+  float zSpeed = 18;
+  float zAccel = 19;
+  float posMM = 20;
+  float yCutSpeed = 21;
+  float yCutAccel = 22;
+  float yMoveToSpeed = 23;
+  float yMoveToAccel = 24;
+  repeated int32 pressures = 25;
+  int32 kissCutPressure = 26;
+  int32 dieCutPressure = 27;
+  int32 dieCutMultiPass = 28;
+  repeated int32 dieCutMultiPressure = 29;
+  repeated int32 kissCutMultiPressure = 30;
+  int32 kissCutMultiPass = 31;
+}
+message PBKeyValue {  // encode @ line 15423
+  string key = 1;
+  string value = 2;
+}
+message PBMatSize {  // encode @ line 15543
+  string id = 1;
+  string name = 2;
+  double width = 3;
+  double height = 4;
+  bool isMatless = 5;
+  double maxHeight = 6;
+  PBMaterialInset inset = 7;
+  bool isPtc = 8;
+}
+message PBMaterialInset {  // encode @ line 15784
+  string id = 1;
+  string name = 2;
+  double left = 3;
+  double top = 4;
+  double right = 5;
+  double bottom = 6;
+}
+message PBMachineMode {  // encode @ line 15977
+  string id = 1;
+  string name = 2;
+  repeated int32 machineTypes = 3;
+  repeated int32 artTypes = 4;
+  bool supportsSnapMat = 5;
+  bool supportsMatlessCutting = 6;
+  bool canAutoloadMaterial = 7;
+  repeated PBMatSize matSizes = 9;
+  bool supportsPtcCalibration = 12;
+  bool supportsParallelOffsetCalibration = 13;
+  bool supportsCartridges = 14;
+}
+message PBMaterialSettingsMessage {  // encode @ line 16822
+  string text = 1;
+  string title = 2;
+  string url = 3;
+}
+message PBMaterialTags {  // encode @ line 16948
+  repeated PBMaterialTag all = 1;
+}
+message PBMaterialTag {  // encode @ line 17077
+  string id = 1;
+  bool isHomePage = 2;
+  bool isActive = 3;
+  string colorHex = 4;
+  string name = 5;
+  string createdOn = 7;
+}
+message Bridge.PBBacklashExecution {  // encode @ line 17277
+  string id = 1;
+  int32 type = 2;
+  PBPoint cutSettings = 3;
+  PBPoint drawSettings = 4;
+  Bridge.PBBacklashSettings settings = 5;
+  float currentXBladeBacklash = 6;
+  float currentYBladeBacklash = 7;
+  float currentXPenBacklash = 8;
+  float currentYPenBacklash = 9;
+  Bridge.PBBacklashSaveValues saveValues = 10;
+}
+message Bridge.PBBacklashSettings {  // encode @ line 17689
+  string id = 1;
+  double bladeOffset = 2;
+  double bezierDivisions = 3;
+  uint32 stepsX = 4;
+  uint32 stepsY = 5;
+  PBPoint scale = 6;
+  float xBacklashStart = 7;
+  float xBacklashStop = 8;
+  float yBacklashStart = 9;
+  float yBacklashStop = 10;
+  uint32 zMotorSpeed = 11;
+  bool packDrawVectorCommands = 12;
+  bool enableTangentialCutting = 13;
+  bool honorBladeAngleOverStartPosition = 14;
+}
+message Bridge.PBBacklashSaveValues {  // encode @ line 18081
+  string id = 1;
+  int32 type = 2;
+  repeated uint32 cutHorizontalChoices = 3;
+  repeated uint32 cutVerticalChoices = 4;
+  repeated uint32 drawHorizontalChoices = 5;
+  repeated uint32 drawVerticalChoices = 6;
+  uint32 cutHorizontalChoice = 7;
+  uint32 cutVerticalChoice = 8;
+  uint32 drawHorizontalChoice = 9;
+  uint32 drawVerticalChoice = 10;
+  bool saveAsFactoryDefaults = 11;
+  repeated float cutHorizontalChoicesIncrement = 12;
+  repeated float cutVerticalChoicesIncrement = 13;
+  repeated float drawHorizontalChoicesIncrement = 14;
+  repeated float drawVerticalChoicesIncrement = 15;
+  bool doSaveSettings = 16;
+}
+message Bridge.PBCommonBridge {  // encode @ line 18944
+  Bridge.PBInteractionHandle handle = 2;
+  int32 interaction = 3;
+  string matId = 5;
+  int32 status = 6;
+  int32 bridgeError = 7;
+  string exception = 8;
+  Bridge.PBCricutDeviceSerialized device = 9;
+  repeated Bridge.PBCricutDeviceSerialized deviceList = 10;
+  int32 dialPosition = 11;
+  Bridge.PBBridgeSelectedTools toolInfo = 14;
+  bool abortCut = 15;
+  Bridge.PBProgress progress = 16;
+  PBUserSettings authData = 17;
+  bool restart = 18;
+  repeated string path = 21;
+  Bridge.PBMatPathData matPathData = 22;
+  int32 result = 25;
+  string message = 26;
+  int32 bluetoothReadSize = 29;
+  bytes bluetoothReadData = 30;
+  Bridge.PBAccessory accessory = 32;
+  Bridge.PBFirmwareUpdateOption selectedOption = 33;
+  bool forceBtUpdate = 34;
+  Bridge.PBWebRequest webRequest = 35;
+  repeated Bridge.PBLog logs = 36;
+  Bridge.PBMachineInterface interfaceField = 37;
+  PBCartridgeInformation cartridgeData = 38;
+  double firmwareVersion = 39;
+  string pluginVersion = 40;
+  int32 analyticMachineId = 41;
+  bool entitleResult = 42;
+  Bridge.PBFiducialOffset offset = 43;
+  Bridge.PBMatFiducialData fiducial = 44;
+  Bridge.PBTestCutPath testCutPath = 45;
+  Bridge.PBTestCutResult testCutResult = 46;
+  Bridge.PBCalibrationCutPath calibrationCutPath = 47;
+  Bridge.PBCalibrationCutResult calibrationCutResult = 48;
+  Bridge.PBConfirmationCutPath confirmationCutPath = 49;
+  Bridge.PBConfirmationCutResult confirmationCutResult = 50;
+  Bridge.PBCalibrationCommit commit = 51;
+  Bridge.PBFiducialOffetsReport offsets = 52;
+  bool success = 53;
+  double messageProgress = 55;
+  string matPathError = 56;
+  string name = 58;
+  Bridge.PBNotificationBridge notification = 59;
+  int32 methodAction = 60;
+  Bridge.PBMachineStatus machineStatus = 64;
+  int32 toolDetectedV2 = 65;
+  int32 detectingPathType = 66;
+  bool reprogramDevice = 67;
+  int32 toolExpectedV2 = 68;
+  string logId = 69;
+  bytes firmwareFile = 71;
+  Bridge.PBSpeedSettingsZTS speedSettingsZts = 72;
+  Bridge.PBToolSettingsZTS toolSettingsZts = 73;
+  int32 processId = 75;
+  double requiredFirmwareVersion = 77;
+  Bridge.PBFirmwareUpdateConfig firmwareUpdateConfig = 78;
+  PBAnalyticMachineSummary deviceAnalyticMachineSummary = 79;
+  int32 forceAccessoryType = 81;
+  int32 matType = 83;
+  Bridge.PBForceGaugeSettings forceGaugeSettings = 84;
+  int32 lastKnownRssi = 86;
+  string base64DevicesHelloKeyResponse = 87;
+  string base64DevicesKeyResponse = 88;
+  PBDevicesHelloRequest devicesHelloRequest = 89;
+  PBDevicesResponseRequest devicesResponseRequest = 90;
+  Bridge.PBForceGaugeHistoryItem forceGaugeHistoryItem = 91;
+  repeated Bridge.PBForceExecutionPlan executionPlans = 92;
+  Bridge.PBForceGaugeHistories forceGaugeHistories = 93;
+  Bridge.PBDrawVectors drawVectors = 96;
+  PBMachineDefaultStates machineDefaultStates = 97;
+  Bridge.PBCommand command = 98;
+  PBMachineMode machineMode = 99;
+  Bridge.PBBacklashExecution backlashExecution = 100;
+  PBDataRepo recordingRepo = 101;
+  int32 unitDevicesState = 102;
+  Bridge.PBMatCutExecutionPlan matcutExecutionPlan = 103;
+  repeated PBMachineMode machineModes = 104;
+  string cartridgeImageSetGroupJson = 106;
+  Bridge.PBCartridgeData cartridgeImageSetGroupEncrypted = 107;
+  Bridge.PBCricutToolZTS athenaHomeThetaResult = 108;
+  string thisComputerMacAddress = 109;
+  string thisComputerBluetoothVersion = 110;
+  Bridge.PBMaterialSelected materialSelectedPayload = 111;
+  Bridge.PBForceCurve forceCurve = 112;
+  Bridge.PBGearRatio gearRatio = 113;
+  Bridge.PBCDTTestPatternsModel cdtTestPatterns = 115;
+  Bridge.PBReadEdgeSensorCommand readEdgeSensor = 117;
+  Bridge.PBPenToBlade penToBlade = 118;
+  int32 reportedBridgeError = 119;
+  int32 bluetoothTimeout = 120;
+  Bridge.PBThetaBias thetaBias = 121;
+  Bridge.PBThetaHomeOffset thetaHomeOffset = 122;
+  Bridge.PBDevicePath devicePathPayload = 123;
+  int32 autoTuneSensorType = 124;
+  Bridge.PBProductionLineParallelOffset prodLineParallelOffset = 125;
+  Bridge.PBRawCommandRequestResponse rawCustomCommand = 126;
+  Bridge.PBAccessoryV2 accessoryV2 = 127;
+  Bridge.PBCutSquaresToAdjustPressure cutSquaresToAdjustPressure = 128;
+  Bridge.PBMatLoadDeviceState matLoadDeviceState = 129;
+  repeated Bridge.PBFiducialScanNotification fiducialScanNotification = 130;
+  Bridge.PBCustomerTheta customerTheta = 131;
+  repeated int32 featureFlags = 132;
+  Bridge.PBDriveRollerCleaningConfig driverRollerCleaningConfig = 133;
+  Bridge.PBPtcTestsInputData ptcTestsData = 134;
+  Bridge.PBBTAutoPairingConfig btAutoPairConfig = 135;
+  Bridge.PBConnectionDiagnosticInfo connectionDiagnosticInfo = 136;
+  int32 logLevel = 137;
+  Bridge.PBConnectionSelfHealInfo connectionSelfHealInfo = 138;
+  Bridge.PBCPRAvailable cprAvailable = 139;
+  Bridge.PBCPREngage cprEngage = 140;
+  Bridge.PBCPRResult cprResult = 141;
+}
+message Bridge.PBSortingDistanceNode {  // encode @ line 29178
+  int32 arrayPosition = 1;
+  int32 gramPressure = 2;
+  int32 encoderCounts = 3;
+  double mmPosition = 4;
+  bool isCurrentMachineDefault = 5;
+}
+message Bridge.PBSortingDistanceNode {  // encode @ line 29364
+  double progress = 1;
+  repeated Bridge.PBCutSquaresToAdjustPressureItem positionToPressureForPath = 2;
+  Bridge.PBCutSquaresToAdjustPressureItem selectedItem = 3;
+  int32 defaultGrams = 4;
+  int32 defaultEncoderCounts = 5;
+  double defaultMmPosition = 6;
+  int32 forceAccessoryType = 7;
+}
+message Bridge.PBSortingDistanceNode {  // encode @ line 29723
+  PBPoint fromPoint = 1;
+  PBPoint toPoint = 2;
+  double moveDistancePt = 3;
+  double moveDistanceInch = 5;
+}
+message Bridge.PBSortingDistances {  // encode @ line 29927
+  double totalMoveDistancePt = 1;
+  double totalMoveDistanceInch = 3;
+  repeated Bridge.PBSortingDistanceNode moveDistances = 5;
+  double cumulativeCutWidthPt = 8;
+  double cumulativeCutHeightPt = 9;
+  double cumulativeCutAreaPt = 10;
+  double cumulativeCutLengthPt = 11;
+  double cumulativeCutXPt = 12;
+  double cumulativeCutYPt = 13;
+}
+message Bridge.PBCartridgeData {  // encode @ line 30246
+  string EncData = 1;
+  int32 Size = 2;
+}
+message Bridge.PBDevicePath {  // encode @ line 30375
+  PBPoint scanPoint = 1;
+  PBPoint scanResult = 2;
+  int32 attemptNumber = 3;
+  int32 scanNumber = 4;
+  bool isBackwards = 5;
+  int32 scanStatus = 6;
+  PBPoint scanPointFromOriginal = 7;
+  PBPoint scanPointToOriginal = 8;
+  float cornerOffset = 9;
+  PBRect matClippingBox = 10;
+  bool isHorizontal = 11;
+  PBPoint scanPointFromActual = 12;
+  PBPoint scanPointToActual = 13;
+}
+message Bridge.PBDevicePath {  // encode @ line 32460
+  string path = 1;
+  int32 algorithm = 2;
+  double bladeOffset = 3;
+  string outPath = 4;
+  Bridge.PBDrawVectors drawVectors = 5;
+}
+message Bridge.PBMaterialSelected {  // encode @ line 32743
+  bool selected = 1;
+  double matHeight = 2;
+  bool matless = 3;
+  bool skipMatMeasure = 4;
+  int32 extraMatMeasurementTimesToRun = 5;
+  int32 matMode = 6;
+  bool forceFakeMatMeasurement = 7;
+  float customMeasureVelocity = 8;
+  float customMeasureAcceleration = 9;
+  int32 measureMode = 10;
+  float justInTimeMeasureIncrement = 11;
+  double matWidth = 12;
+  Bridge.PBMaterialSelected.Diagnostic diagnostic = 13;
+  Bridge.PBMachineMargins machineMargins = 14;
+  double prescribedMatHeightInches = 15;
+  float ptcMaterialWidth = 16;
+  float ptcMaterialHeight = 17;
+}
+message Bridge.PBMarginPadding {  // encode @ line 33311
+  bool skipLoadSensorsValidation = 1;
+}
+message Bridge.PBMarginPadding {  // encode @ line 33434
+  float top = 1;
+  float bottom = 2;
+  float left = 3;
+  float right = 4;
+}
+message Bridge.PBMachineMargins {  // encode @ line 33592
+  bool useThisInfo = 1;
+  Bridge.PBMarginPadding matMargin = 2;
+  Bridge.PBMarginPadding matPadding = 3;
+  Bridge.PBMarginPadding matlessMargin = 4;
+  Bridge.PBMarginPadding matlessPadding = 5;
+}
+message Bridge.PBToolLocation {  // encode @ line 33882
+  int32 tool = 1;
+  int32 artType = 2;
+  int32 headType = 3;
+}
+message Bridge.PBSpeedSettingsZTS {  // encode @ line 34252
+  Bridge.PBSpeedGroup currentSpeedGroup = 1;
+  repeated Bridge.PBSpeedGroup knownSpeedGroups = 2;
+}
+message Bridge.PBToolInfo {  // encode @ line 34447
+  int32 tool = 1;
+  int32 line = 2;
+  PBTool toolFromApi = 4;
+  int32 pathToPointsAlgorithm = 6;
+  double customOffset = 8;
+  bool useCustomOffset = 9;
+}
+message Bridge.PBCricutToolZTS {  // encode @ line 34926
+  int32 inTool = 1;
+  repeated int32 flats = 2;
+  int32 inTolerance = 3;
+  repeated uint32 getThetaHomingDataPoints = 4;
+  uint32 totalDataPoints = 5;
+  uint32 totalDataPeaks = 6;
+  bool useHighRes = 7;
+  bool startAtWell = 8;
+  bool infiniteSpin = 9;
+  bool shouldStop = 10;
+  Bridge.PBScanDiagnostics scanDiagnostics = 11;
+  int32 digiPotAddress = 12;
+  int32 digiPotValue = 13;
+}
+message Bridge.PBScanDiagnostics {  // encode @ line 35534
+  bool useXDirection = 1;
+  double scanLength = 2;
+  int32 expectedEdges = 3;
+  double fromXPosition = 4;
+  double fromYPosition = 5;
+  bool useCurrentPosition = 6;
+  int32 detectedEdges = 7;
+  bool useRawColorData = 8;
+  bool doContinuous = 9;
+  bool randomizeStart = 10;
+  repeated Bridge.PBColorDrawSensorData sensorData = 11;
+  repeated Bridge.PBScanDiagnosticsScanResultItem scanResults = 12;
+}
+message Bridge.PBColorDrawSensorData {  // encode @ line 35941
+  uint32 monochrome = 1;
+  uint32 red = 2;
+  uint32 green = 3;
+  uint32 blue = 4;
+  float xCoordinate = 5;
+  float yCoordinate = 6;
+  uint32 sampleNumber = 7;
+}
+message Bridge.PBToolSettingsZTS {  // encode @ line 36154
+  int32 scanIndex = 1;
+  PBPoint edgeLocation = 2;
+  int32 edgesFound = 3;
+  string dateTime = 4;
+  PBPoint currentLocation = 5;
+  PBPoint moveToLocation = 6;
+  PBPoint randomPoint = 7;
+}
+message Bridge.PBToolSettingsZTS {  // encode @ line 36460
+  repeated Bridge.PBToolSetting knownSettings = 1;
+  Bridge.PBToolSetting currentSetting = 2;
+  int32 loadedTool = 3;
+}
+message Bridge.PBBridgeSelectedTools {  // encode @ line 36808
+  string firstPen = 1;
+  repeated Bridge.PBToolInfo tools = 4;
+  bool isMatless = 5;
+  bool ignoreDetection = 6;
+  bool useCustomToolSettings = 9;
+  int32 spinToolSecondsOverride = 10;
+  int32 vectorSortingMethod = 11;
+  int32 spinToolRevolutionsOverride = 12;
+  bool forceKbMultiPass = 15;
+  int32 bladeAngleResetConfiguration = 16;
+  int32 bladeAngleToForceAfterEveryPath = 17;
+  bool useWalkAwayCutting = 18;
+  int32 matMode = 19;
+  bool performAutoCutoff = 20;
+  Bridge.PBBridgeSelectedTools.PBAutoCutoffOptions autoCutoffOptions = 22;
+  bool doThetaBacklashBeforeCut = 23;
+  int32 bladeAlignOptions = 24;
+  int32 bladeAlignExtraTimes = 25;
+  int32 bladeDetectOptions = 26;
+  uint32 customMaxCommandsOver_56 = 27;
+  double customBezierTolerance = 28;
+  Bridge.PBMachineMargins machineMargins = 29;
+  Bridge.PBPathSortingConfig pathSortingConfig = 30;
+}
+message Bridge.PBMachineStatus {  // encode @ line 37725
+  bool useCustomPositions = 1;
+  float positionXMaxMm = 2;
+  float positionXMinMm = 3;
+}
+message Bridge.PBMachineStatus {  // encode @ line 37913
+  int32 bridgeError = 1;
+  string serial = 2;
+  int32 programmingInProgress = 3;
+  int32 bootloaderVariableStorageCorrupt = 4;
+  int32 userRomCrcInvalid = 5;
+  int32 crcMismatch = 6;
+  int32 rollbackFailure = 7;
+  int32 hardwarePlatformFailure = 8;
+  int32 tries = 9;
+  int32 bridgeErrorEnum = 10;
+  int32 bridgeErrorSeverity = 11;
+}
+message Bridge.PBWebRequest {  // encode @ line 39386
+  string action = 1;
+  string parameters = 2;
+  string method = 3;
+  string body = 4;
+  int32 methodEnum = 5;
+}
+message Bridge.PBPathSplitData {  // encode @ line 39602
+  uint32 id = 1;
+  string path = 2;
+  bool sent = 3;
+  Bridge.PBDrawVectors vectors = 5;
+  int64 cutId = 6;
+}
+message Bridge.PBMatPathData {  // encode @ line 39883
+  int32 fiducialId = 1;
+  string pathData = 2;
+  string pathColor = 4;
+  string pathId = 5;
+  string imageId = 6;
+  string imageName = 7;
+  string imageType = 8;
+  string importType = 9;
+  repeated Bridge.PBMatPathData imageData = 10;
+  PBSize materialSize = 11;
+  repeated Bridge.PBMatFiducialData fiducialData = 12;
+  int32 actualPathType = 14;
+  bool pathEncrypted = 19;
+  PBMatrix transform = 20;
+  repeated uint32 contourActiveFlags = 21;
+  int32 artTool = 25;
+  bool scanOffsetApplied = 27;
+  uint32 totalNumPasses = 30;
+  int32 distinguishingFeature = 35;
+  repeated Bridge.PBPathSplitData pathSplitData = 36;
+  double pathWidthPt = 37;
+  double pathHeightPt = 38;
+  double pathLengthPt = 39;
+  double pathAreaPt = 40;
+  int32 currentPassV2 = 44;
+  bool useCustomPressure = 45;
+  int32 customPressure = 46;
+  uint64 totalV3 = 47;
+  uint64 totalThisPassV3 = 48;
+  int64 sentV3 = 49;
+  int64 sentThisPassV3 = 50;
+  PBPoint inPoint = 51;
+  PBPoint outPoint = 52;
+  PBRect boundingBox = 53;
+  double pathXLengthPt = 54;
+  double pathYLengthPt = 55;
+  int32 quadrant = 56;
+  int64 lastCutPathIndex = 57;
+}
+message Bridge.PBMatFiducialData {  // encode @ line 41362
+  int32 fiducialId = 1;
+  PBPoint location = 2;
+  PBSize imageSize = 3;
+  PBSize fiducialSize = 4;
+  double lineWidth = 5;
+  double fiducialPadding = 6;
+  PBMatrix scanResult = 7;
+  PBSize materialSize = 8;
+  double searchRange = 9;
+  int32 scanPointNeeded = 10;
+  bool ptccResetStoredValues = 11;
+  PBMatrix24 transformMat = 12;
+}
+message Bridge.PBProgress {  // encode @ line 41864
+  Bridge.PBCommonToolCut cut = 1;
+  Bridge.PBCommonTool draw = 2;
+  Bridge.PBCommonTool mat = 3;
+  Bridge.PBCommonTool scan = 4;
+  Bridge.PBCommonTool score = 5;
+  int32 currentOperation = 6;
+  double totalBytesToWrite = 7;
+  double currentPercentage = 9;
+  double averageLastFiveSeconds = 10;
+  double estimatedSecondsLeft = 11;
+  double elapsedSeconds = 12;
+  string estimatedTimeLeftDisplay = 13;
+  Bridge.PBMatPathData finishedPath = 14;
+  Bridge.PBMatPathData nextPath = 15;
+  repeated Bridge.PBCommonTool lineProgress = 16;
+  Bridge.PBCommonTool currentProgress = 17;
+  double totalWidthPt = 18;
+  double totalHeightPt = 19;
+  double totalAreaPt = 20;
+  double totalLengthPt = 21;
+  double cumulativeWidthPt = 22;
+  double cumulativeHeightPt = 23;
+  double cumulativeAreaPt = 24;
+  double cumulativeLengthPt = 25;
+  double totalSecondsPaused = 26;
+  string executionPlanGuid = 27;
+  int32 currentHead = 28;
+  int32 currentPressureGrams = 29;
+  double currentPressureMm = 30;
+  int32 currentPressureEncoder = 31;
+  int32 currentForceAccessoryType = 32;
+  int32 currentTool = 33;
+  int32 currentLineType = 34;
+  string currentColor = 35;
+  int32 currentDistinguishingFeature = 36;
+  double cumulativeXPt = 37;
+  double cumulativeYPt = 38;
+  int64 totalBytesSentSinceOpen = 39;
+  int64 totalBytesReceivedSinceOpen = 40;
+  int64 totalBytesSentSinceOpenEncrypted = 41;
+  int64 totalBytesReceivedSinceOpenEncrypted = 42;
+  double deltaWidthPt = 43;
+  double deltaHeightPt = 44;
+  double deltaAreaPt = 45;
+  double deltaLengthPt = 46;
+  double deltaXPt = 47;
+  double deltaYPt = 48;
+  int64 bufferCurrentCount = 49;
+  int32 currentMatMode = 50;
+  Bridge.PBSpeedGroup currentSpeed = 51;
+  Bridge.PBToolSetting currentToolSettings = 52;
+  int32 maxPackedCommands = 53;
+  Bridge.PBProgress.RecoveryData recoveryData = 54;
+}
+message Bridge.PBCommonTool {  // encode @ line 44012
+  int32 knifebladeMultipassIndex = 1;
+  int64 pathIndex = 2;
+  int32 multipassIndex = 3;
+  int64 vectorIndex = 4;
+}
+message Bridge.PBCommonTool {  // encode @ line 44263
+  double pct = 3;
+  int32 totalNumPasses = 4;
+  int32 currentPass = 5;
+  int32 totalMinsRemaining = 6;
+  int32 totalHoursRemaining = 7;
+  int32 lineType = 8;
+  int64 sentV3 = 9;
+  int64 totalV3 = 10;
+}
+message Bridge.PBCommonToolCut {  // encode @ line 44672
+  double pct = 3;
+  int32 totalNumPasses = 4;
+  int32 currentPass = 5;
+  int32 totalMinsRemaining = 6;
+  int32 totalHoursRemaining = 7;
+  int64 sentV3 = 8;
+  int64 totalV3 = 9;
+}
+message Bridge.PBCricutDeviceSerialized {  // encode @ line 45031
+  bool bootloader = 3;
+  string deviceType = 5;
+  int32 port = 8;
+  Bridge.PBFirmwareBridge firmware = 9;
+  string serial = 10;
+  Bridge.PBMachineInterface interfaceField = 14;
+  Bridge.PBMachineInformationBridge machine = 15;
+  PBCartridgeInformation cartridge = 16;
+  int32 connectionType = 21;
+  Bridge.PBMachineStatus machineStatus = 24;
+  int32 deviceTypeEnum = 25;
+  int32 deviceTypeBt = 26;
+  string key = 27;
+  int32 rssi = 28;
+  repeated Bridge.PBToolLocation availableTools = 29;
+  int32 availableHeadTypes = 30;
+  PBMachineFirmwareValuesApi firmwareValuesV2 = 31;
+  PBAnalyticMachineSummary analyticMachineSummary = 32;
+  Bridge.PBSpeedSettingsZTS speedSettingsZts = 33;
+  Bridge.PBToolSettingsZTS toolSettingsZts = 34;
+  bool allowsVirtualButtons = 35;
+  bool isSimplePause = 37;
+  bool supportsMatlessCutting = 39;
+  bool hasDial = 41;
+  bool supportsFastMode = 43;
+  bool supportsResumeFromBeginning = 44;
+  bool knifeBladeHasBeenCalibrated = 45;
+  repeated Bridge.PBPressureTableRow storedPressures = 46;
+  string macAddress = 47;
+  string bluetoothVersion = 48;
+  int32 pid = 49;
+  string pidHex = 50;
+  int32 vid = 51;
+  string vidHex = 52;
+  int32 machineClass = 53;
+  PBMachineMode machineMode = 54;
+  double firmwareVersionSimple = 55;
+  string libUsbSerial = 56;
+  string libUsbPortStr = 57;
+  int32 libUsbPort = 58;
+  int32 libUsbAddress = 59;
+  int32 libUsbBusNumber = 60;
+  PBPoint lastKnownPosition = 61;
+  int64 totalCommandsSentV2 = 64;
+  int64 totalCutCommandsSentV2 = 66;
+  Bridge.PBHeatingPressInfo heatPressInfo = 67;
+  int32 refreshType = 68;
+  float gearRatioA = 69;
+  float gearRatioB = 70;
+  bool rollingBladeHasBeenCalibrated = 71;
+  bool fiducialSensorShouldBeRecalibrated = 72;
+  float xBladeOffsetRamValue = 73;
+  float yBladeOffsetRamValue = 74;
+  float xBladeOffsetPersistentValue = 75;
+  float yBladeOffsetPersistentValue = 76;
+  int32 presence = 77;
+  bool bluetoothPaired = 78;
+  string bluetoothName = 79;
+}
+message Bridge.PBHeatingPressInfo {  // encode @ line 47658
+  string modelInformation = 1;
+  string voltageVersion = 2;
+  string isRegisteredStr = 3;
+  bool isRegistered = 4;
+  string currentTemp = 5;
+  string bottomTemp = 6;
+  string errorCode = 7;
+  string timeCountDown = 8;
+}
+message Bridge.PBFirmwareBridge {  // encode @ line 47880
+  Bridge.PBFirmwareVersion version = 1;
+  repeated Bridge.PBFirmwareUpdateOption updateOptions = 2;
+}
+message Bridge.PBFirmwareUpdateOption {  // encode @ line 48066
+  string type = 1;
+  PBFirmwareUpdateOptionValue value = 2;
+}
+message Bridge.PBFirmwareUpdateConfig {  // encode @ line 48220
+  int32 interChunkDelayMs = 1;
+  int32 commandsPerChunk = 2;
+}
+message Bridge.PBFirmwareVersion {  // encode @ line 48378
+  int32 firmwareHi = 2;
+  int32 firmwareLo = 3;
+  int32 hardware = 4;
+  int32 hidStatus = 6;
+  int32 btVendor = 7;
+  int32 processor = 8;
+  int32 ptc = 9;
+  int32 digipot = 10;
+  int32 motorController = 11;
+  int32 reserved_1 = 12;
+  int32 reserved_2 = 13;
+  int32 machine = 14;
+  int32 hardwareV2 = 15;
+}
+message Bridge.PBInteractionHandle {  // encode @ line 48779
+  int32 currentInteraction = 4;
+}
+message Bridge.PBAccessory {  // encode @ line 50485
+  string color = 2;
+  int32 detectedTypeV2 = 3;
+  int32 expectedTypeV2 = 4;
+  int32 detectingPathType = 5;
+  int32 distinguishingFeature = 6;
+}
+message Bridge.PBAccessoryV2 {  // encode @ line 50987
+  Bridge.PBAccessoryV2.PBAccessoryState current = 1;
+  Bridge.PBAccessoryV2.PBAccessoryState required = 2;
+  bool requiresToolChange = 3;
+  bool requiresPartialUnload = 4;
+}
+message Bridge.PBLog {  // encode @ line 51193
+  int32 toolType = 1;
+  int32 pathType = 2;
+  string color = 3;
+  int32 headType = 4;
+}
+message Bridge.PBLog {  // encode @ line 51599
+  string title = 1;
+  string message = 2;
+  int32 level = 3;
+  string command = 4;
+  bool sentToMachine = 5;
+  string unencryptedFull = 6;
+}
+message Bridge.PBFiducialOffset {  // encode @ line 51866
+  double angle = 1;
+  double verticalAngle = 2;
+  PBSize scale = 3;
+  PBPoint offset = 4;
+  PBRect fiducialReportedByClient = 5;
+  PBRect fiducialReportedBySensors = 6;
+  PBPoint sensorFoundPoint_1 = 7;
+  PBPoint sensorFoundPoint_1b = 8;
+  PBPoint sensorFoundPoint_2 = 9;
+  PBPoint sensorFoundPoint_2b = 10;
+  PBPoint sensorFoundPoint_3 = 11;
+  PBPoint sensorFoundPoint_4 = 12;
+  PBPoint sensorFoundPoint_5 = 13;
+  PBPoint sensorFoundPoint_6 = 14;
+  PBPoint sensorFoundPoint_7 = 15;
+  PBPoint sensorFoundPoint_8 = 16;
+  PBPoint idealPoint_1 = 17;
+  PBPoint idealPoint_1b = 18;
+  PBPoint idealPoint_2 = 19;
+  PBPoint idealPoint_2b = 20;
+  PBPoint idealPoint_3 = 21;
+  PBPoint idealPoint_4 = 22;
+  PBPoint idealPoint_5 = 23;
+  PBPoint idealPoint_6 = 24;
+  PBPoint idealPoint_7 = 25;
+  PBPoint idealPoint_8 = 26;
+  float xShim = 27;
+  float yShim = 28;
+  PBPoint transformCol_1 = 29;
+  PBPoint transformCol_2 = 30;
+  PBPoint transformCol_3 = 31;
+  PBPoint transformCol_4 = 32;
+  int32 fiducialVerification = 33;
+  repeated int32 fiducialVerificationList = 34;
+}
+message Bridge.PBCalibrationImage {  // encode @ line 53412
+  Bridge.PBMatFiducialData fiducial = 1;
+  Bridge.PBTestCutPath testCutPath = 2;
+  Bridge.PBTestCutResult testCutResult = 3;
+  Bridge.PBCalibrationCutPath calibrationCutPath = 4;
+  Bridge.PBCalibrationCutResult calibrationCutResult = 5;
+  Bridge.PBConfirmationCutPath confirmationCutPath = 6;
+  Bridge.PBConfirmationCutResult confirmationCutResult = 7;
+  Bridge.PBFiducialOffset offset = 8;
+}
+message Bridge.PBTestCutResult {  // encode @ line 53843
+  bool cutOk = 1;
+}
+message Bridge.PBCalibrationCutResult {  // encode @ line 53945
+  string selectedY = 1;
+  int32 selectedX = 2;
+  double offsetX = 3;
+  double offsetY = 4;
+}
+message Bridge.PBTestCutPath {  // encode @ line 54103
+  repeated string paths = 1;
+}
+message Bridge.PBCalibrationCutPath {  // encode @ line 54212
+  repeated string paths = 1;
+}
+message Bridge.PBConfirmationCutPath {  // encode @ line 54322
+  repeated string paths = 1;
+}
+message Bridge.PBConfirmationCutResult {  // encode @ line 54433
+  bool cutOk = 1;
+  bool unloadBeforeClosing = 2;
+}
+message Bridge.PBCalibrationCommit {  // encode @ line 54552
+  bool doCommit = 1;
+}
+message Bridge.PBFiducialOffetsReport {  // encode @ line 54657
+  float bladeToSensorXOld = 1;
+  float bladeToSensorXNew = 2;
+  float bladeToSensorYOld = 3;
+  float bladeToSensorYNew = 4;
+  float bladeToSensorXRam = 5;
+  float bladeToSensorYRam = 6;
+}
+message Bridge.PBNotificationBridge {  // encode @ line 54880
+  string matId = 1;
+  double matWidthIn = 2;
+  double matHeightIn = 3;
+  int32 dialPosition = 4;
+  Bridge.PBCricutDeviceSerialized machineInfo = 5;
+  double cutWidthPt = 6;
+  double cutHeightPt = 7;
+  double cutAreaPt = 8;
+  double cutLengthPt = 9;
+  double itemWidthPt = 10;
+  double itemHeightPt = 11;
+  double itemAreaPt = 12;
+  double itemLengthPt = 13;
+  string imageId = 14;
+  string pathIndex = 15;
+  string itemArtType = 16;
+}
+message Bridge.PBMatCutExecutionPlan {  // encode @ line 55301
+  string id = 1;
+  Bridge.PBBridgeSelectedTools toolInfo = 4;
+  Bridge.PBMatPathData matPathData = 5;
+  repeated Bridge.PBMatCutGroupExecution groupedExecutions = 6;
+  Bridge.PBSortingDistances sortingDistances = 7;
+}
+message Bridge.PBCPRAvailable {  // encode @ line 55596
+  int32 bridgeError = 1;
+  int32 machineError = 2;
+}
+message Bridge.PBCPREngage {  // encode @ line 57091
+  bool startCpr = 1;
+}
+message Bridge.PBCPRResult {  // encode @ line 57190
+  bool success = 1;
+}
+message Bridge.PBMatCutGroupExecution {  // encode @ line 57299
+  int32 id = 1;
+  int32 toolType = 2;
+  int32 lineType = 3;
+  int32 distinguishingFeature = 4;
+  string pathColor = 5;
+  int32 previousToolType = 8;
+  int32 previousLineType = 9;
+  int32 previousDistinguishingFeature = 10;
+  string previousPathColor = 11;
+  bool requiresToolChange = 12;
+  repeated Bridge.PBMatPathData paths = 13;
+}
+message Bridge.PBCDTTestPatternsModel {  // encode @ line 58051
+  float scaleX = 1;
+  float scaleY = 2;
+  float offsetX = 3;
+  float offsetY = 4;
+  bool autofill = 5;
+  int32 patternIndex = 6;
+  bool repeat = 7;
+  int32 repeatSeconds = 8;
+}
+message Bridge.PBMatLoadDeviceState {  // encode @ line 58418
+  repeated Bridge.PBMatLoadDeviceState.PBState states = 1;
+  bool loadAttempted = 2;
+}
+message Bridge.PBPtcTestsInputData {  // encode @ line 58582
+  string name = 1;
+  bool isCorrect = 2;
+  string currentValue = 3;
+  string requiredValue = 4;
+}
+message Bridge.PBPtcTestsInputData {  // encode @ line 58792
+  int32 rollDurationSec = 1;
+  int32 fwKeepAliveFrequencySec = 2;
+  float rollVelocityIps = 3;
+}
+message Bridge.PBPtcTestsInputData {  // encode @ line 58948
+  float penSize = 1;
+  float lineSize = 2;
+  repeated int32 successes = 3;
+  repeated PBPoint lines = 4;
+  repeated PBPoint fidPosition = 5;
+  int32 scanCount = 6;
+}
+message Bridge.PBBTAutoPairingConfig {  // encode @ line 59244
+  int32 limitMode = 1;
+  int32 limitThreshold = 2;
+  bool ignoreAlreadyPaired = 3;
+  int32 discoveryScans = 4;
+  bool pairUnnamedDevices = 5;
+  bool postPairDelay = 6;
+}
+message Bridge.PBConnectionSelfHealInfo {  // encode @ line 59468
+  int32 bluetoothState = 1;
+  int32 bluetoothAuthorization = 2;
+}
+message Bridge.PBConnectionSelfHealInfo {  // encode @ line 59678
+  int32 attemptCount = 1;
+}
+message Bridge.PBPathSortingConfig {  // encode @ line 59790
+  Bridge.PBPathSortingConfig.NearestNeigborConfig nearestNeighbor = 1;
+  Bridge.PBPathSortingConfig.RecursiveMSTTSPConfig recursiveMstTsp = 2;
+}
+message Bridge.PBAck {  // encode @ line 59985
+  double searchRegionStepInches = 1;
+  double yDistanceWeight = 2;
+}
+message Bridge.PBAck {  // encode @ line 60163
+  int32 subdivisionGlyphThreshold = 1;
+  float minimumRegionLengthInches = 2;
+  bool groupByImageId = 3;
+  float optimizationBudgetSeconds = 4;
+}
+message Bridge.PBAck {  // encode @ line 61010
+  bool ackReceived = 1;
+  bool commandDropped = 2;
+  bool motorError = 3;
+  bytes statusByte1 = 4;
+  bytes statusByte2 = 5;
+  bytes errorCode = 6;
+  bytes fifoCount = 7;
+  bool pausePressed = 8;
+  bool matloadUnloadPressed = 9;
+  int32 bytesReceived = 10;
+  int32 bridgeErrorEnum = 11;
+  int32 bridgeErrorSeverity = 12;
+}
+message Bridge.PBDrawVectors {  // encode @ line 62590
+  repeated Bridge.PBDrawVector vectors = 1;
+  double inBladeAngle = 7;
+  double outBladeAngle = 8;
+  double machineBladeAngle = 9;
+  bool isClosedPath = 10;
+}
+message Bridge.PBDrawVector {  // encode @ line 62815
+  int32 cutType = 1;
+  PBPoint point = 2;
+  bool completed = 3;
+  bool attemptingToSend = 4;
+  int32 commandNumber = 5;
+}
+message Bridge.PBSpeedValues {  // encode @ line 63081
+  int32 paused = 1;
+  int32 cutInProgress = 2;
+  int32 motorFifoEmpty = 3;
+  int32 status_1 = 4;
+  int32 status_2 = 5;
+  int32 error = 6;
+  int32 timpError = 7;
+  int32 initialized = 8;
+  int32 drawFifoFull = 9;
+  int32 drawFifoEmpty = 10;
+  int32 motorFifoFull = 11;
+  bool matLoaded = 12;
+  int32 matInMotion = 13;
+  int32 homingCariage = 14;
+  int32 bladeDown = 15;
+  int32 cutPressed = 16;
+  uint32 matLength = 17;
+  int32 bridgeErrorEnum = 18;
+  int32 bridgeErrorSeverity = 19;
+  int32 inCutSession = 20;
+}
+message Bridge.PBSpeedValues {  // encode @ line 64715
+  float cutVel = 1;
+  float moveVel = 2;
+  float cutAccel = 3;
+  float moveAccel = 4;
+}
+message Bridge.PBMachineInterface {  // encode @ line 64882
+  Bridge.PBMachineInterfaceState led = 1;
+  Bridge.PBMachineInterfaceState button = 2;
+  int32 commandsInBuffer = 3;
+  int32 dialPosition = 4;
+  int32 headState = 5;
+}
+message Bridge.PBMachineInterfaceState {  // encode @ line 65106
+  int32 power = 1;
+  int32 mat = 2;
+  bool go = 3;
+  int32 pause = 4;
+}
+message Bridge.PBReadEdgeSensorCommand {  // encode @ line 65257
+  bool frontLeftSensorFlag = 1;
+  int32 frontLeftSensorResult = 2;
+  bool frontRightSensorFlag = 3;
+  int32 frontRightSensorResult = 4;
+  bool rearSensorFlag = 5;
+  int32 rearSensorResult = 6;
+  repeated Bridge.PBSensorResult results = 7;
+}
+message Bridge.PBSensorResult {  // encode @ line 65517
+  bool isDigitalOrAnalog = 1;
+  int32 result = 2;
+  int32 orderNumber = 3;
+  int32 sensorType = 4;
+}
+message Bridge.PBReadErrorSeverity {  // encode @ line 65775
+  int32 severity = 1;
+}
+message Bridge.PBSimulateButton {  // encode @ line 65910
+  int32 button = 1;
+}
+message Bridge.PBSpeedGroup {  // encode @ line 66068
+  Bridge.PBSpeedValues xAxis = 2;
+  Bridge.PBSpeedValues yAxis = 3;
+  Bridge.PBSpeedValues zaAxis = 4;
+  Bridge.PBSpeedValues zbAxis = 5;
+  Bridge.PBSpeedValues tAxis = 6;
+  bool draftMode = 7;
+  int32 toolType = 8;
+  int32 defaultPressureGram = 9;
+  int32 matMode = 10;
+}
+message Bridge.PBToolSetting {  // encode @ line 66578
+  int32 tool = 1;
+  bool pBiasEnabled = 2;
+  bool rocThresholdEnabled = 3;
+  bool tBiasEnabled = 4;
+  bool useCalcOffsets = 5;
+  bool centeredBl = 6;
+  bool tanTheta = 7;
+  float parallelOffset = 8;
+  float laggingOffset = 9;
+  float liftThreshold = 10;
+  int32 node_1 = 11;
+  int32 node_2 = 12;
+  int32 node_3 = 13;
+  int32 node_4 = 14;
+  int32 node_5 = 15;
+}
+message Bridge.PBSetMachineState {  // encode @ line 67039
+  int32 head = 1;
+  int32 pressureTable = 2;
+  int32 pressureSelect = 3;
+  double materialLength = 4;
+  double materialWidth = 5;
+  double maxSpeed = 6;
+  uint32 penMotorSpeed = 7;
+  uint32 bladeMotorSpeed = 8;
+  bool cutBezier = 9;
+  bool tangentialTheta = 10;
+  bool doOverride = 13;
+  int32 encoderCounts = 15;
+  Bridge.PBAck ack = 16;
+}
+message Bridge.PBSerialNumber {  // encode @ line 67510
+  string serial = 1;
+}
+message Bridge.PBGetFullStatus {  // encode @ line 67620
+  int32 lastZaXySpeed = 1;
+  int32 lastZbXySpeed = 2;
+  int32 lastZaEncoderOrHalfStep = 3;
+  int32 lastZbEncoderOrHalfStep = 4;
+  float lastZaPosMm = 5;
+  float lastZbPosMm = 6;
+  int32 lastRoughGramsA = 7;
+  int32 lastRoughGramsB = 8;
+  string serial = 9;
+  double firmwareVersion = 10;
+  float gearRatioA = 11;
+  float gearRatioB = 12;
+}
+message Bridge.PBZorroOriginCommand {  // encode @ line 67942
+  Bridge.PBSetMachineState setMachineState = 6;
+  Bridge.PBSerialNumber setSerial = 39;
+  Bridge.PBSerialNumber getSerial = 40;
+  Bridge.PBGetFullStatus getFullStatus = 42;
+}
+message Bridge.PBWritePressTemp {  // encode @ line 68213
+  bool shouldActivate = 1;
+  string response = 2;
+}
+message Bridge.PBWritePressTemp {  // encode @ line 68335
+  int32 temp = 1;
+  string response = 2;
+}
+message Bridge.PBSetFanSettings {  // encode @ line 68461
+  Bridge.PBActivateDeactivateCommand activateDeactivate = 1;
+  Bridge.PBWritePressTemp writePressTemp = 2;
+}
+message Bridge.PBSetFanSettings {  // encode @ line 68654
+  bool setFanSpeed = 1;
+  float fanSpeed = 2;
+  bool setMaterialAbsentTimeout = 3;
+  int32 materialAbsentTimeoutSeconds = 4;
+  bool setInactivityTimeout = 5;
+  int32 inactivityTimeoutSeconds = 6;
+}
+message Bridge.PBGetFanSettings {  // encode @ line 68857
+  float fanSpeed = 1;
+  int32 materialAbsentTimeoutSeconds = 2;
+  int32 inactivityTimeoutSeconds = 3;
+}
+message Bridge.PBMorphOriginCommand {  // encode @ line 69010
+  Bridge.PBSetFanSettings setFanSettings = 1;
+  Bridge.PBGetFanSettings getFanSettings = 2;
+}
+message Bridge.PBSetPlatformSequence {  // encode @ line 69201
+  int32 iValue_0 = 1;
+  int32 iValue_1 = 2;
+  int32 iValue_2 = 3;
+  int32 iValue_3 = 4;
+  int32 iValue_4 = 5;
+  int32 iValue_5 = 6;
+  int32 iValue_6 = 7;
+  int32 iValue_7 = 8;
+  int32 convertedValue = 9;
+  string serial = 10;
+}
+message Bridge.PBCommand {  // encode @ line 69463
+  Bridge.PBZorroOriginCommand zorro = 3;
+  bool success = 5;
+  string errorMessage = 6;
+  bool expectResponse = 7;
+  Bridge.PBEEasyPressClassOriginCommand ezClass = 9;
+  Bridge.PBSetPlatformSequence setPlatformSequence = 11;
+  Bridge.PBMorphOriginCommand morph = 12;
+}
+message Bridge.PBCommandLog {  // encode @ line 70041
+  int64 timestamp = 1;
+  bool isRequest = 2;
+  bool isEncrypted = 4;
+  int32 size = 5;
+  string hexBytes = 8;
+  string details = 9;
+  string timestampStr = 10;
+  bytes rawBytes = 11;
+  int32 commandTypeNew = 12;
+}
+message Bridge.PBCommandLogs {  // encode @ line 70337
+  repeated Bridge.PBCommandLog logs = 1;
+}
+message Bridge.PBCustomerTheta {  // encode @ line 70476
+  int32 requestCommand = 1;
+  int32 responseCommand = 3;
+  int32 responseTotalSize = 5;
+  int32 timeout = 6;
+  bytes requestCommandBytes = 7;
+  bytes responseCommandBytes = 8;
+}
+message Bridge.PBCustomerTheta {  // encode @ line 70742
+  int32 plungesPerRow = 1;
+  int32 numberOfRows = 2;
+  float offsetStartDegree = 3;
+  float offsetEndDegree = 4;
+  float startPositionInchX = 5;
+  float startPositionInchY = 6;
+  float spaceBetweenRows = 7;
+  float currentDegreeValueInMemory = 8;
+  float newDegreeValueToSaveToMemory = 9;
+  float refLineInch = 10;
+  float thetaBacklashValue = 11;
+  float progressPercentage = 12;
+  float progressCurrentThetaDegree = 13;
+  int32 thetaBacklashRevolutions = 14;
+  float spaceBetweenPlunges = 15;
+  bool homeAfterEveryPlunge = 16;
+  bool useDragKnifeForReference = 17;
+  bool useStraightLinesInsteadOfPlunges = 18;
+}
+message Bridge.PBForceGaugeDevice {  // encode @ line 71247
+  int32 comPort = 1;
+  string serial = 2;
+  int32 accessoryType = 3;
+  int32 timesMeasured = 4;
+  int32 lastReadPressure = 5;
+  int32 vendorType = 6;
+  string comPortString = 7;
+}
+message Bridge.PBForceExecutionPlan {  // encode @ line 71576
+  string id = 1;
+  repeated Bridge.PBForceExecution executions = 2;
+}
+message Bridge.PBForceExecution {  // encode @ line 71732
+  string id = 1;
+  int32 accessoryType = 2;
+  int32 matType = 3;
+  Bridge.PBForceGaugeDevice forceDevice = 5;
+}
+message Bridge.PBForceTarget {  // encode @ line 71999
+  double startPosition = 1;
+  double targetGram = 2;
+  double minPosition = 3;
+  double maxPosition = 4;
+  string id = 5;
+}
+message Bridge.PBForceGaugeSettings {  // encode @ line 72196
+  string id = 1;
+  uint32 lowCutPort = 2;
+  uint32 lowAccessoryPort = 3;
+  uint32 highCutPort = 4;
+  repeated Bridge.PBForceTarget bladeLowTargets = 5;
+  repeated Bridge.PBForceTarget accessoryLowTargets = 6;
+  repeated Bridge.PBForceTarget bladeHighTargets = 7;
+  double gearRatioA = 8;
+  double gearRatioB = 9;
+  bool forceUseMockGaugeDevice = 10;
+  repeated Bridge.PBForceGaugeDevice foundForceDevices = 11;
+  string message = 12;
+}
+message Bridge.PBForceGaugeInitialRead {  // encode @ line 72695
+  string id = 1;
+  double posMm = 2;
+  double grams = 3;
+  double posErrorEncoderCnts = 4;
+  double incrChangeX = 5;
+  double incrChangeY = 6;
+}
+message Bridge.PBForceGaugeHistoryItem {  // encode @ line 72901
+  string id = 1;
+  int32 index = 2;
+  double targetGrams = 3;
+  double lowLimit = 4;
+  double highLimit = 5;
+  double startZPosition = 6;
+  double startIncrementPosition = 7;
+  Bridge.PBForceGaugeInitialRead initialRead = 8;
+  repeated Bridge.PBForceGaugeInitialRead measureRead = 9;
+  Bridge.PBForceGaugeInitialRead finalRead = 10;
+  Bridge.PBForceExecution execution = 11;
+}
+message Bridge.PBForceGaugeHistory {  // encode @ line 73324
+  string id = 1;
+  string version = 2;
+  bool result = 3;
+  string time = 4;
+  repeated Bridge.PBForceGaugeHistoryItem items = 5;
+  string serial = 6;
+  int32 matType = 8;
+  int32 deviceType = 9;
+  int32 machineType = 10;
+}
+message Bridge.PBForceGaugeHistories {  // encode @ line 74071
+  string id = 1;
+  string version = 2;
+  bool result = 3;
+  string time = 4;
+  string serial = 5;
+  Bridge.PBForceGaugeHistory lowCutHistory = 6;
+  Bridge.PBForceGaugeHistory lowAccHistory = 7;
+  Bridge.PBForceGaugeHistory highCutHistory = 8;
+  int32 currentMatType = 9;
+  int32 currentDeviceType = 10;
+}
+message Bridge.PBPressureTableRow {  // encode @ line 74515
+  int32 forceAccessoryType = 1;
+  int32 memoryPosition = 2;
+  uint32 grams = 3;
+  uint32 encoderPosMm = 4;
+  double convertedMmPosition = 5;
+  uint32 encoderPosMmMatLess = 6;
+  uint32 encoderPosMmCardMat = 7;
+  double convertedMmPositionMatLess = 8;
+  double convertedMmPositionCardMat = 9;
+}
+message Bridge.PBForceCurve {  // encode @ line 74845
+  double startDepthEncoderCounts = 1;
+  double endDepthEncoderCounts = 2;
+  double incrementEncoderCounts = 3;
+  double gearRatioA = 5;
+  double gearRatioB = 6;
+  int32 accessoryType = 7;
+  repeated Bridge.PBForceCurveItem items = 8;
+  int32 matType = 9;
+  int32 maxGramsBeforeExit = 10;
+  int32 measureTwice = 11;
+  Bridge.PBForceGaugeDevice device = 12;
+  bool shouldPlungeHead = 14;
+  int32 dwellTime = 15;
+  int32 curveActionType = 16;
+  repeated double measurePressureAtPositions = 17;
+}
+message Bridge.PBForceCurveItem {  // encode @ line 75502
+  double encoderCounts = 1;
+  double pressure = 2;
+  bool gearRatioASelected = 3;
+  double gearRatio = 4;
+  double posMm = 5;
+  int32 verifyReferenceMemoryPosition = 6;
+}
+message Bridge.PBGearRatio {  // encode @ line 75723
+  double xGearRatio = 1;
+  double yGearRatio = 2;
+  PBSize squareSize = 3;
+  double x1 = 4;
+  double x2 = 5;
+  double x3 = 6;
+  double y1 = 7;
+  double y2 = 8;
+  double y3 = 9;
+  double adjustedXGearRatio = 10;
+  double yGearRatioMatless = 12;
+  double adjustedYGearRatio = 13;
+  double adjustedYGearRatioMatless = 14;
+  bool isMatless = 15;
+  double xOffset = 16;
+  double yOffset = 17;
+}
+message Bridge.PBPenToBlade {  // encode @ line 76141
+  bool doNotApplyOffsets = 1;
+  bool saveAsFactoryDefaults = 2;
+  int32 horizontal = 3;
+  int32 vertical = 4;
+  float currentPenToBladeX = 5;
+  float currentPenToBladeY = 6;
+  uint32 currentPenToBladeXInt = 7;
+  uint32 currentPenToBladeYInt = 8;
+  float currentPenToBladeXFlash = 9;
+  float currentPenToBladeYFlash = 10;
+  uint32 currentPenToBladeXIntFlash = 11;
+  uint32 currentPenToBladeYIntFlash = 12;
+  float penToBladeNewX = 13;
+  float penToBladeNewY = 14;
+}
+message Bridge.PBThetaBias {  // encode @ line 76553
+  int32 mode = 1;
+  float xSpacing = 2;
+  float ySpacing = 3;
+  float xPosition = 4;
+  float yPosition = 5;
+  float beginValue = 6;
+  float endValue = 7;
+  int32 xSteps = 8;
+  int32 ySteps = 9;
+  float startAngleRadians = 10;
+  float selectedValueRadians = 11;
+  float currentValueTheta1 = 12;
+  float currentValueTheta2 = 13;
+  float currentValueTheta3 = 14;
+  float currentValueCcw = 15;
+  float diameterTheta1 = 16;
+  float diameterTheta2 = 17;
+  float diameterTheta3 = 18;
+  float diameterCcw = 19;
+  bool forcePackCommands = 20;
+  int32 rotateSettings = 22;
+}
+message Bridge.PBThetaHomeOffset {  // encode @ line 77168
+  float testLocationX = 1;
+  float testLocationY = 2;
+  float refLineInch = 3;
+  float rollingBladeSpacing = 4;
+  int32 numRows = 5;
+  float saveValuesDegrees = 6;
+  int32 numColumns = 7;
+  float rollingBladeVerticalSpacing = 8;
+  bool useIxVerificationMethod = 9;
+}
+message PBDevicesHelloRequest {  // encode @ line 77445
+  float startXInch = 1;
+  float startYInch = 2;
+  float spacingInch = 3;
+  float beginValueInch = 4;
+  float endValueInch = 5;
+  uint32 numberOfSteps = 6;
+  float valueInFlash = 7;
+  float bestValue = 8;
+  float newValue = 9;
+  uint32 cutsPerRow = 10;
+}
+message PBDevicesHelloRequest {  // encode @ line 77729
+  int32 type = 1;
+  int32 id = 2;
+}
+message PBDevicesResponseRequest {  // encode @ line 77842
+  int32 type = 1;
+  string response = 3;
+  string hello = 4;
+}
+message PBUserSettings {  // encode @ line 77982
+  string setting1 = 1;
+  string setting2 = 2;
+  string settings1 = 3;
+  string settings2 = 4;
+  string settings3 = 5;
+  string settings4 = 6;
+  string settings5 = 7;
+  string settings6 = 8;
+  string settings7 = 9;
+  string settings8 = 10;
+  string settings9 = 11;
+  string settings10 = 12;
+  string settings11 = 13;
+}
+message PBFirmwareUpdateOptionValue {  // encode @ line 78276
+  string File = 1;
+  string Version = 2;
+}
+message PBUserSettings7Type {  // encode @ line 78391
+  PBFirmwareUpdateOptionValue Available = 1;
+  PBFirmwareUpdateOptionValue Required = 2;
+}
+message PBUserSettings7 {  // encode @ line 78575
+  PBUserSettings7Type Mini = 1;
+  PBUserSettings7Type Zorro = 2;
+  PBUserSettings7Type Helium = 3;
+  PBUserSettings7Type Warro = 4;
+  PBUserSettings7Type Helium2 = 5;
+  PBUserSettings7Type Athena = 6;
+  PBUserSettings7Type Cupid = 7;
+  PBUserSettings7Type Morpheus = 8;
+  PBUserSettings7Type EasyPress_6_120 = 9;
+  PBUserSettings7Type EasyPress_9_120 = 10;
+  PBUserSettings7Type EasyPress_12_120 = 11;
+  PBUserSettings7Type EasyPress_6_230 = 12;
+  PBUserSettings7Type EasyPress_9_230 = 13;
+  PBUserSettings7Type EasyPress_12_230 = 14;
+  PBUserSettings7Type Scamander = 15;
+  PBUserSettings7Type Voldemort = 16;
+  PBUserSettings7Type RootBeer_230 = 19;
+  PBUserSettings7Type Vulcan_230 = 20;
+  PBUserSettings7Type RootBeer_120 = 21;
+  PBUserSettings7Type Vulcan_120 = 22;
+  PBUserSettings7Type Athena_1_1 = 23;
+  PBUserSettings7Type Athena_1_2 = 24;
+  PBUserSettings7Type Newt = 25;
+  PBUserSettings7Type Riddle = 26;
+}
+message PBMatrix {  // encode @ line 79593
+  double a = 1;
+  double b = 2;
+  double c = 3;
+  double d = 4;
+  double e = 5;
+  double f = 6;
+}
+message PBMatrix24 {  // encode @ line 79781
+  double m00 = 1;
+  double m01 = 2;
+  double m02 = 3;
+  double m03 = 4;
+  double m10 = 5;
+  double m11 = 6;
+  double m12 = 7;
+  double m13 = 8;
+}
+message PBSize {  // encode @ line 79995
+  double height = 1;
+  double width = 2;
+}
+message PBPoint {  // encode @ line 80113
+  double x = 1;
+  double y = 2;
+}
+message PBSizeInt {  // encode @ line 80229
+  int32 width = 1;
+  int32 height = 2;
+}
+message PBRect {  // encode @ line 80345
+  PBPoint point = 1;
+  PBSize size = 2;
+}
+message PBCartridgeInformation {  // encode @ line 80492
+  int32 linkId = 1;
+  bool entitleable = 2;
+  bool inserted = 3;
+  string name = 4;
+  int32 imageSetsCount = 6;
+  int32 keplerImageSetsCount = 7;
+  int32 ccrImageSetsCount = 8;
+  int32 entitlementXID = 9;
+  int32 previewImageId = 10;
+  string description = 11;
+  int32 imageSetGroupID = 12;
+  string imageSetGroupName = 13;
+  string previewURL = 14;
+}
+message PBTransmission {  // encode @ line 80811
+  string id = 1;
+  int32 gramType = 2;
+  bytes gram = 3;
+  string emissionId = 4;
+  double logProbability = 5;
+}
+message PBEmission {  // encode @ line 81046
+  string id = 1;
+  bytes value = 2;
+}
+message PBDataRepo {  // encode @ line 81180
+  string id = 1;
+  repeated PBTransmission transmissions = 2;
+  repeated PBEmission emissions = 3;
+  string semanticTag = 4;
+}
+message ? {  // encode @ line 82731
+  int32 logLevel = 1;
+  string message = 2;
+}
+message ? {  // encode @ line 82889
+  int32 logLevel = 1;
+}
+message ? {  // encode @ line 83031
+  string description = 1;
+}
+message ? {  // encode @ line 83125
+  uint32 id = 1;
+}
+message ? {  // encode @ line 83215
+}
+message ? {  // encode @ line 83285
+}
+message ? {  // encode @ line 83398
+}
+message ? {  // encode @ line 83468
+}
+message ? {  // encode @ line 83581
+}
+message ? {  // encode @ line 83651
+}
+message ? {  // encode @ line 83764
+}
+message ? {  // encode @ line 83834
+  bool isScanning = 1;
+}
+message ? {  // encode @ line 83933
+}
+message ? {  // encode @ line 84004
+  uint32 id = 1;
+}
+message ? {  // encode @ line 84094
+}
+message ? {  // encode @ line 84175
+}
+message ? {  // encode @ line 84246
+  int32 result = 1;
+}
+message ? {  // encode @ line 84416
+}
+message ? {  // encode @ line 84487
+  int32 result = 1;
+}
+message ? {  // encode @ line 84671
+}
+message ? {  // encode @ line 84748
+  int32 state = 2;
+}
+message ? {  // encode @ line 84926
+  int32 state = 1;
+}
+message ? {  // encode @ line 85067
+  bytes data = 1;
+  string userId = 2;
+}
+message ? {  // encode @ line 85206
+  int32 result = 1;
+  string userId = 3;
+}
+message ? {  // encode @ line 85396
+  uint32 high = 1;
+  uint32 low = 2;
+}
+message ? {  // encode @ line 85511
+}
+message ? {  // encode @ line 85636
+  string userId = 1;
+}
+message ? {  // encode @ line 85783
+  bytes data = 1;
+  int32 result = 2;
+}
+message ? {  // encode @ line 85996
+}
+message ? {  // encode @ line 86066
+}
+message ? {  // encode @ line 86141
+}
+message ? {  // encode @ line 86302
+  string key = 1;
+  string value = 2;
+}
+message ? {  // encode @ line 86433
+  string type = 1;
+  string serialNumber = 2;
+  string address = 3;
+  string port = 4;
+  string name = 5;
+  string ipv4Address = 6;
+  string ipv6Address = 7;
+  uint32 portNumber = 8;
+}
+message ? {  // encode @ line 86724
+}
+message ? {  // encode @ line 86864
+}
+message ? {  // encode @ line 86936
+}
+message ? {  // encode @ line 87076
+}
+message ? {  // encode @ line 87146
+}
+message ? {  // encode @ line 87291
+  string address = 1;
+  string port = 2;
+  string userData = 3;
+}
+message ? {  // encode @ line 87423
+}
+message ? {  // encode @ line 87550
+}
+message ? {  // encode @ line 87717
+}
+message ? {  // encode @ line 87872
+}
+message ? {  // encode @ line 87944
+}
+message ? {  // encode @ line 88090
+  string sessionId = 1;
+}
+message ? {  // encode @ line 88198
+}
+message ? {  // encode @ line 88373
+  uint32 deviceIdHigh = 1;
+  uint32 deviceIdLow = 2;
+  string localName = 3;
+  bytes manufacturerData = 4;
+  repeated bytes serviceUuids = 5;
+}
+message ? {  // encode @ line 88620
+}
+message ? {  // encode @ line 88761
+}
+message ? {  // encode @ line 88834
+}
+message ? {  // encode @ line 88975
+}
+message ? {  // encode @ line 89048
+  bool isReady = 1;
+}
+message ? {  // encode @ line 89148
+}
+message ? {  // encode @ line 89220
+}
+message ? {  // encode @ line 89408
+  uint32 deviceIdHigh = 1;
+  uint32 deviceIdLow = 2;
+  bytes txCharacteristicUuid = 3;
+  bytes rxCharacteristicUuid = 4;
+  uint32 connectionTimeout = 5;
+  uint32 connectionIntervalHint = 6;
+  uint32 supervisionTimeoutHint = 7;
+  bool forceUnpaired = 8;
+  bool forceWriteWithoutResponse = 9;
+  string userData = 10;
+}
+message ? {  // encode @ line 89773
+}
+message ? {  // encode @ line 89901
+}
+message ? {  // encode @ line 90085
+  int32 state = 1;
+}
+message ? {  // encode @ line 90234
+}
+message ? {  // encode @ line 90306
+  int32 state = 1;
+}
+message ? {  // encode @ line 90456
+}
+message ? {  // encode @ line 90617
+}
+message ? {  // encode @ line 90690
+}
+message ? {  // encode @ line 90830
+}
+message ? {  // encode @ line 90906
+}
+message ? {  // encode @ line 91071
+  uint32 vendorId = 1;
+  uint32 productId = 2;
+  uint32 revision = 3;
+  string serialNumber = 4;
+  string osId = 5;
+}
+message ? {  // encode @ line 91238
+}
+message ? {  // encode @ line 91378
+}
+message ? {  // encode @ line 91450
+}
+message ? {  // encode @ line 91590
+}
+message ? {  // encode @ line 91661
+}
+message ? {  // encode @ line 91810
+  string serialNumber = 1;
+  uint32 vid = 2;
+  uint32 pid = 3;
+  uint32 interfaceNumber = 4;
+  bool composite = 5;
+  string userData = 6;
+}
+message ? {  // encode @ line 91995
+}
+message ? {  // encode @ line 92122
+}
+message ? {  // encode @ line 92290
+}
+message ? {  // encode @ line 92447
+}
+message ? {  // encode @ line 92519
+}
+message ? {  // encode @ line 92659
+}
+message ? {  // encode @ line 92736
+}
+message ? {  // encode @ line 92908
+  string address = 1;
+  string name = 2;
+  double timestampMs = 3;
+  bool paired = 4;
+  bool likelyPresent = 5;
+  uint32 rssi = 6;
+}
+message ? {  // encode @ line 93095
+}
+message ? {  // encode @ line 93236
+}
+message ? {  // encode @ line 93309
+}
+message ? {  // encode @ line 93449
+}
+message ? {  // encode @ line 93521
+}
+message ? {  // encode @ line 93678
+  string address = 1;
+  string name = 2;
+  string userData = 3;
+  string sppName = 4;
+  string pinCode = 5;
+}
+message ? {  // encode @ line 93843
+}
+message ? {  // encode @ line 93971
+}
+message ? {  // encode @ line 94139
+}
+message ? {  // encode @ line 94300
+}
+message ? {  // encode @ line 94373
+}
+message ? {  // encode @ line 94552
+}
+message ? {  // encode @ line 95561
+}
+message ? {  // encode @ line 98230
+  uint32 id = 1;
+}
+message ? {  // encode @ line 98328
+  string sessionId = 1;
+}
+message ? {  // encode @ line 98435
+}
+message ? {  // encode @ line 98599
+}
+message ? {  // encode @ line 98670
+}
+message ? {  // encode @ line 98822
+  string deviceId = 1;
+  string localName = 2;
+  bytes manufacturerData = 3;
+  repeated bytes serviceUuids = 4;
+}
+message ? {  // encode @ line 99050
+  string deviceId = 1;
+  string id = 2;
+  bytes uuid = 3;
+}
+message ? {  // encode @ line 99251
+  string deviceId = 1;
+  string serviceId = 2;
+  string id = 3;
+  bytes uuid = 4;
+  uint32 properties = 5;
+}
+message ? {  // encode @ line 99439
+}
+message ? {  // encode @ line 99510
+}
+message ? {  // encode @ line 99581
+}
+message ? {  // encode @ line 99654
+  int32 result = 1;
+}
+message ? {  // encode @ line 99826
+}
+message ? {  // encode @ line 99899
+  int32 result = 1;
+}
+message ? {  // encode @ line 100072
+}
+message ? {  // encode @ line 100150
+  int32 state = 1;
+}
+message ? {  // encode @ line 100328
+  int32 state = 1;
+}
+message ? {  // encode @ line 100467
+}
+message ? {  // encode @ line 100539
+  bool canPair = 1;
+}
+message ? {  // encode @ line 100639
+}
+message ? {  // encode @ line 100711
+  bool isPaired = 1;
+}
+message ? {  // encode @ line 100811
+}
+message ? {  // encode @ line 100883
+  int32 result = 1;
+}
+message ? {  // encode @ line 101055
+}
+message ? {  // encode @ line 101128
+  int32 result = 1;
+}
+message ? {  // encode @ line 101301
+}
+message ? {  // encode @ line 101375
+  int32 result = 1;
+}
+message ? {  // encode @ line 101550
+}
+message ? {  // encode @ line 101624
+}
+message ? {  // encode @ line 101805
+}
+message ? {  // encode @ line 101932
+}
+message ? {  // encode @ line 102115
+}
+message ? {  // encode @ line 102186
+}
+message ? {  // encode @ line 102258
+  uint32 attMtu = 1;
+}
+message ? {  // encode @ line 102360
+  uint32 attMtu = 1;
+}
+message ? {  // encode @ line 102462
+}
+message ? {  // encode @ line 102591
+  int32 result = 2;
+  bytes value = 4;
+}
+message ? {  // encode @ line 102850
+  bytes value = 2;
+  bool response = 3;
+}
+message ? {  // encode @ line 103034
+  int32 result = 2;
+}
+message ? {  // encode @ line 103253
+  bool enable = 2;
+}
+message ? {  // encode @ line 103399
+  int32 result = 2;
+}
+message ? {  // encode @ line 103618
+  bytes value = 2;
+}
+message ? {  // encode @ line 103869
+  string deviceId = 1;
+}
+message ? {  // encode @ line 105927
+}
+message ? {  // encode @ line 105999
+}
+message ? {  // encode @ line 106116
+  repeated bytes serviceUuids = 1;
+  bool allowDuplicates = 2;
+}
+message ? {  // encode @ line 106280
+}
+message ? {  // encode @ line 106395
+}
+message ? {  // encode @ line 106467
+}
+message ? {  // encode @ line 106582
+}
+message ? {  // encode @ line 106654
+  bool isScanning = 1;
+}
+message ? {  // encode @ line 106755
+}
+message ? {  // encode @ line 106828
+}
+message ? {  // encode @ line 106968
+}
+message ? {  // encode @ line 107040
+}
+message ? {  // encode @ line 107181
+  int32 state = 1;
+}
+message ? {  // encode @ line 107329
+}
+message ? {  // encode @ line 107401
+  int32 state = 1;
+}
+message ? {  // encode @ line 107557
+  string deviceId = 1;
+  bool forceWriteWithoutResponse = 2;
+  string userData = 3;
+}
+message ? {  // encode @ line 107698
+}
+message ? {  // encode @ line 107826
+}
+message ? {  // encode @ line 107995
+  string deviceId = 1;
+}
+message ? {  // encode @ line 108134
+}
+message ? {  // encode @ line 108206
+}
+message ? {  // encode @ line 108348
+  repeated string restoredDevices = 1;
+}
+message ? {  // encode @ line 108518
+}
+message ? {  // encode @ line 109738
+}
+message ? {  // encode @ line 111998
+  string name = 1;
+  string serialNumber = 2;
+  string path = 3;
+}
+message ? {  // encode @ line 112129
+  float timeoutSeconds = 2;
+  int32 connectionType = 3;
+}
+message ? {  // encode @ line 112315
+  int32 sentBytes = 1;
+  int32 totalBytes = 2;
+}
+message ? {  // encode @ line 112417
+  repeated int32 connectionTypes = 1;
+}
+message ? {  // encode @ line 112563
+}
+message ? {  // encode @ line 112693
+  int32 connectionType = 2;
+}
+message ? {  // encode @ line 112862
+}
+message ? {  // encode @ line 112979
+  int32 result = 2;
+}
+message ? {  // encode @ line 113191
+  string serialNumber = 1;
+  uint32 firmwareVersion = 2;
+  uint32 hardwareVersion = 3;
+  uint32 mainUnitFirmwareVersion = 4;
+  string mainUnitSerialNumber = 5;
+  bool activated = 6;
+}
+message ? {  // encode @ line 113398
+  string firmwarePath = 2;
+  bytes firmwareData = 3;
+}
+message ? {  // encode @ line 113587
+  int32 result = 2;
+}
+message ? {  // encode @ line 113816
+  string firmwarePath = 2;
+  bytes firmwareData = 3;
+  uint32 firmwareVersion = 4;
+}
+message ? {  // encode @ line 114022
+  int32 result = 2;
+}
+message ? {  // encode @ line 114251
+  int32 action = 2;
+}
+message ? {  // encode @ line 114409
+  int32 result = 2;
+}
+message ? {  // encode @ line 114577
+}
+message ? {  // encode @ line 114703
+  int32 result = 2;
+  repeated uint32 podErrors = 3;
+  repeated uint32 mainUnitErrors = 4;
+}
+message ? {  // encode @ line 115089
+  uint32 error = 1;
+  uint32 count = 2;
+}
+message ? {  // encode @ line 115199
+  string serialNumber = 2;
+}
+message ? {  // encode @ line 115333
+  int32 result = 2;
+}
+message ? {  // encode @ line 115507
+  string request = 1;
+}
+message ? {  // encode @ line 115619
+}
+message ? {  // encode @ line 116035
+}
+message ? {  // encode @ line 116492
+}
+message ? {  // encode @ line 116559
+}
+message ? {  // encode @ line 116626
+  repeated int32 BitmapFillImageLayerId = 1;
+  int32 BitmapFillSingleSetGroupId = 2;
+  bool FillBitmapMirrorHorizontal = 8;
+  bool FillBitmapMirrorVertical = 9;
+  int32 FillBitmapType = 10;
+  string ImageSourceUuid = 12;
+}
+message ? {  // encode @ line 117096
+  double BrightnessValue = 1;
+  double ContrastValue = 2;
+  double IntensityValue = 3;
+  bool IsInvert = 4;
+  string FilterName = 5;
+}
+message ? {  // encode @ line 117260
+  string FileName = 1;
+}
+message ? {  // encode @ line 117366
+  double Width = 1;
+  string Color = 2;
+}
+message ? {  // encode @ line 117463
+  double Radius = 1;
+}
+message ? {  // encode @ line 117564
+}
+message ? {  // encode @ line 117630
+}
+message ? {  // encode @ line 117716
+}
+message ? {  // encode @ line 117792
+}
+message ? {  // encode @ line 117857
+}
+message ? {  // encode @ line 117923
+}
+message ? {  // encode @ line 117979
+}
+message ? {  // encode @ line 118047
+  string Value = 1;
+  int32 YOffset = 2;
+}
+message ? {  // encode @ line 118159
+  bool Visible = 2;
+  int32 LockedType = 3;
+  string DisplayName = 4;
+  bool MirrorHorizontal = 5;
+  bool MirrorVertical = 6;
+  string GraphicId = 8;
+}
+message ? {  // encode @ line 118502
+}
+message ? {  // encode @ line 119038
+}
+message ? {  // encode @ line 119110
+  int32 ImageSourceId = 1;
+  repeated int32 ImageSourceLayerPathIndex = 2;
+  int32 ImageSourceGlyphPathId = 3;
+  string ImageSourceName = 4;
+  double ImageSourceHeightDefault = 5;
+  int32 ImageSourceSingleSetGroupId = 6;
+  int32 ImageSourceFontSetGroupId = 7;
+  int32 ImageSourceOriginalCartridgeId = 8;
+  int32 ImageSourceType = 9;
+  repeated int32 LayerOperationsUsedSet = 10;
+  string ImageSourceUuid = 11;
+  string UserUuid = 12;
+  int32 ImageSourceFontId = 13;
+}
+message ? {  // encode @ line 119592
+}
+message ? {  // encode @ line 119664
+}
+message ? {  // encode @ line 119755
+  repeated uint32 ContourOpenFlags = 1;
+  repeated uint32 ContourActiveFlags = 2;
+  int32 ContourCount = 3;
+  int32 ContourOpenCount = 4;
+  int32 ContourClosedCount = 5;
+}
+message ? {  // encode @ line 119961
+  int32 FillType = 1;
+  string FillSolidColor = 2;
+  string FillSolidColorOriginal = 3;
+  int32 FillRule = 5;
+}
+message ? {  // encode @ line 120183
+  double BearingLeft = 1;
+  double BearingRight = 2;
+  double Width = 3;
+  double CapHeight = 4;
+}
+message ? {  // encode @ line 120342
+  int32 LayerPolarity = 1;
+  int32 LayerOutputType = 2;
+  int32 OriginalOutputType = 3;
+  string LayerName = 10;
+  bytes LayerData = 11;
+  int32 LayerOutputTypeAdjustmentLevel = 13;
+  string MaterialId = 15;
+  int32 MaterialType = 16;
+  string GraphicId = 17;
+}
+message ? {  // encode @ line 121111
+}
+message ? {  // encode @ line 121201
+}
+message ? {  // encode @ line 121276
+}
+message ? {  // encode @ line 121366
+}
+message ? {  // encode @ line 121436
+  int32 StrokeType = 1;
+  string StrokeColor = 2;
+  double StrokeWidth = 3;
+  repeated double StrokeDash = 4;
+}
+message ? {  // encode @ line 121618
+}
+message ? {  // encode @ line 121689
+  double A = 1;
+  double B = 2;
+  double C = 3;
+  double D = 4;
+  double E = 5;
+  double F = 6;
+}
+message ? {  // encode @ line 121840
+  double X = 1;
+  double Y = 2;
+}
+message ? {  // encode @ line 121934
+}
+message ? {  // encode @ line 122037
+  double Width = 1;
+  double Height = 2;
+}
+message ? {  // encode @ line 122135
+}
+message ? {  // encode @ line 122192
+  string TemplateId = 1;
+  bool IsCustom = 2;
+}
+message ? {  // encode @ line 122296
+  int32 StickerType = 1;
+  bool CutInteriorShape = 3;
+  bool CutDieCutEdge = 4;
+}
+message ? {  // encode @ line 122487
+}
+message ? {  // encode @ line 122547
+}
+message ? {  // encode @ line 122618
+}
+message ? {  // encode @ line 122732
+  string FontFamilyName = 1;
+  bool IsSystemFont = 2;
+  double FontSize = 3;
+  string FontStyle = 4;
+  int32 FontType = 5;
+  double LetterSpacing = 6;
+  double LineSpacing = 7;
+  int32 Alignment = 8;
+  int32 Style = 9;
+  repeated string TextIsolatedLayerColors = 10;
+  repeated string TextDeletedLayerColors = 11;
+  string Value = 12;
+  int32 Height = 13;
+  double BaselineHeight = 15;
+  int32 FontId = 17;
+  int32 VerticalAlignment = 18;
+  int32 TextMode = 19;
+  bool IsPlaceholderText = 20;
+  string GraphicId = 21;
+  int32 TextRenderer = 22;
+}
+message ? {  // encode @ line 123464
+}
+message ? {  // encode @ line 123530
+}
+message ? {  // encode @ line 123597
+}
+message ? {  // encode @ line 123682
+}
+message ? {  // encode @ line 123753
+  string WarpId = 1;
+  double TValue = 2;
+}
+message ? {  // encode @ line 123875
+}
+message ? {  // encode @ line 123930
+}
+message ? {  // encode @ line 124007
+  int32 CanvasType = 1;
+  string CanvasName = 4;
+  string SourceCanvasUuid = 5;
+  bool IsCricutProjectCanvas = 6;
+  string ParentCanvasUuid = 7;
+  repeated string ProjectTypes = 8;
+  bool IsTemplate = 10;
+}
+message ? {  // encode @ line 124354
+  string Id = 1;
+  string Path = 2;
+  repeated string ProjectTypes = 3;
+  string TemplateCanvasUuid = 4;
+  string ParentArtboardId = 5;
+}
+message ? {  // encode @ line 124536
+}
+message ? {  // encode @ line 124605
+  repeated string FilterIds = 1;
+  repeated string CategoryIds = 2;
+  repeated string TagIds = 3;
+}
+message ? {  // encode @ line 124750
+  double value = 1;
+}
+message ? {  // encode @ line 124837
+  float value = 1;
+}
+message ? {  // encode @ line 124924
+  int64 value = 1;
+}
+message ? {  // encode @ line 125049
+  uint64 value = 1;
+}
+message ? {  // encode @ line 125174
+  int32 value = 1;
+}
+message ? {  // encode @ line 125260
+  uint32 value = 1;
+}
+message ? {  // encode @ line 125346
+  bool value = 1;
+}
+message ? {  // encode @ line 125432
+  string value = 1;
+}
+message ? {  // encode @ line 125518
+  bytes value = 1;
+}
+message ? {  // encode @ line 125633
+}
+message ? {  // encode @ line 125719
+}
+message ? {  // encode @ line 125829
+  int32 ImageId = 1;
+}
+message ? {  // encode @ line 125943
+  bytes RasterImage = 3;
+  int32 UploadType = 4;
+}
+message ? {  // encode @ line 126142
+  int32 ImageId = 1;
+  string ImageUuid = 2;
+  int32 ImageSetId = 3;
+  int32 SingleImageSetGroupId = 4;
+}
+message ? {  // encode @ line 126276
+}
+message ? {  // encode @ line 126343
+  repeated string UnsupportedList = 2;
+}
+message ? {  // encode @ line 126461
+}
+message ? {  // encode @ line 126561
+  string LayerUuid = 1;
+  bytes LayerData = 2;
+}
+message ? {  // encode @ line 126683
+}
+message ? {  // encode @ line 126795
+  string AdditionalNotes = 2;
+}
+message ? {  // encode @ line 126928
+  string FilterId = 1;
+  string FilterName = 2;
+}

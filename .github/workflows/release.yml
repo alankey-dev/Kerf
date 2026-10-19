@@ -1,0 +1,382 @@
+name: Release
+
+# A pushed tag `v*` builds every platform's artefacts, checks each one starts, and drafts a GitHub Release
+# for a maintainer to review and publish by hand. Run it by hand (workflow_dispatch) for a dry run: the
+# same builds and checks, with the artefacts, SHA256SUMS and notes kept as a workflow artifact instead of
+# a release.
+#
+# Everything runs on GitHub-hosted runners (free and unlimited for a public repository). See docs/ci.md.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Check this tag against Cargo.toml instead of the version Cargo.toml names (tests the version check)
+        required: false
+        default: ''
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: The tag matches Cargo.toml's version
+        id: version
+        env:
+          TAG: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+        run: |
+          if [ -z "$TAG" ]; then
+            TAG="v$(awk -F'"' '/^version = "/ { print $2; exit }' Cargo.toml)"
+          fi
+          version=$(tools/release/check-version.sh "$TAG")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: check
+    name: build (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macos-universal
+            runner: macos-latest
+          - name: windows-x64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+          - name: windows-arm64
+            runner: windows-latest
+            target: aarch64-pc-windows-msvc
+          # 22.04 rather than latest, so the binary links against a glibc old enough for current LTS
+          # distributions.
+          - name: linux-x86_64
+            runner: ubuntu-22.04
+          - name: linux-aarch64
+            runner: ubuntu-22.04-arm
+    runs-on: ${{ matrix.runner }}
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: release-${{ matrix.name }}
+
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        env:
+          MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          tools/release/package-macos.sh "$VERSION"
+
+      - name: Smoke test (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          dmg="target/dist/Kerf-$VERSION-macos-universal.dmg"
+          hdiutil attach "$dmg" -nobrowse -readonly -mountpoint "$RUNNER_TEMP/kerf"
+          binary="$RUNNER_TEMP/kerf/Kerf.app/Contents/MacOS/kerf"
+          lipo -archs "$binary" | tee /dev/stderr | grep -q 'x86_64 arm64'
+          out=$("$binary" --version)
+          echo "$out"
+          case "$out" in "kerf $VERSION ("*) ;; *) echo "expected kerf $VERSION" >&2; exit 1 ;; esac
+          hdiutil detach "$RUNNER_TEMP/kerf"
+
+      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+        if: runner.os == 'Windows'
+        with:
+          tool: cargo-wix@0.3.9
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        env:
+          WINDOWS_CERT_PFX: ${{ secrets.WINDOWS_CERT_PFX }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+          TARGET: ${{ matrix.target }}
+        shell: pwsh
+        run: |
+          rustup target add $env:TARGET
+          tools/release/package-windows.ps1 $env:VERSION -Target $env:TARGET
+
+      # The installer test needs a second .msi with a higher version, to check that it replaces the first.
+      # It is the same build under the next patch version, kept out of the release.
+      - name: Upgrade test installer (Windows x64)
+        if: matrix.name == 'windows-x64'
+        shell: pwsh
+        run: |
+          $v = [version]$env:VERSION
+          $next = "$($v.Major).$($v.Minor).$($v.Build + 1)"
+          New-Item -ItemType Directory -Force target\upgrade-test | Out-Null
+          cargo wix --no-build --nocapture --target x86_64-pc-windows-msvc --install-version $next --bin-path target\wix314 --output "target\upgrade-test\Kerf-$next-windows-x64.msi"
+
+      # An arm64 kerf.exe cannot run on this x64 runner; the smoke-windows-arm64 job runs it.
+      - name: Smoke test (Windows x64)
+        if: matrix.name == 'windows-x64'
+        shell: pwsh
+        run: |
+          Expand-Archive "target\dist\Kerf-$env:VERSION-windows-x64.zip" "$env:RUNNER_TEMP\kerf"
+          $out = & "$env:RUNNER_TEMP\kerf\Kerf-$env:VERSION-windows-x64\kerf.exe" --version | Out-String
+          Write-Output $out
+          if (-not $out.StartsWith("kerf $env:VERSION (")) { throw "expected kerf $env:VERSION" }
+
+      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+        if: runner.os == 'Linux'
+        with:
+          tool: cargo-deb@3.8.0
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          grep -v '^#' tools/release/linux-deps.txt | xargs sudo apt-get install -y --no-install-recommends
+          tools/release/package-linux.sh "$VERSION"
+
+      - name: Smoke test (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          arch=$(uname -m)
+          expect() { echo "$1"; case "$1" in "kerf $VERSION ("*) ;; *) echo "expected kerf $VERSION" >&2; exit 1 ;; esac; }
+          appimage="target/dist/Kerf-$VERSION-linux-$arch.AppImage"
+          chmod +x "$appimage"
+          expect "$("$appimage" --appimage-extract-and-run --version)"
+          mkdir -p "$RUNNER_TEMP/tar" "$RUNNER_TEMP/deb"
+          tar -xzf "target/dist/Kerf-$VERSION-linux-$arch.tar.gz" -C "$RUNNER_TEMP/tar"
+          expect "$("$RUNNER_TEMP/tar/Kerf-$VERSION-linux-$arch/kerf" --version)"
+          dpkg-deb -x "target/dist/Kerf-$VERSION-linux-$arch.deb" "$RUNNER_TEMP/deb"
+          expect "$("$RUNNER_TEMP/deb/usr/bin/kerf" --version)"
+
+      - name: Name the unsigned list after this leg
+        shell: bash
+        run: if [ -f target/dist/unsigned.txt ]; then mv target/dist/unsigned.txt "target/dist/unsigned-${{ matrix.name }}.txt"; fi
+
+      # Fail this leg rather than publish: a missing artefact should cost one runner, not the whole release.
+      - name: Count the artefacts
+        shell: bash
+        run: |
+          case '${{ matrix.name }}' in
+            macos-universal) expected=1 ;;
+            windows-*) expected=2 ;;
+            linux-*) expected=3 ;;
+          esac
+          count=$(find target/dist -maxdepth 1 -name 'Kerf-*' | wc -l)
+          echo "built $count, expected $expected"
+          [ "$count" -eq "$expected" ] || { echo "expected $expected artefacts on ${{ matrix.name }}, found $count" >&2; exit 1; }
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist-${{ matrix.name }}
+          path: |
+            target/dist/Kerf-*
+            target/dist/unsigned-*.txt
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: matrix.name == 'windows-x64'
+        with:
+          name: upgrade-test-windows-x64
+          path: target/upgrade-test/*.msi
+          if-no-files-found: error
+
+  smoke-windows-arm64:
+    needs: [check, build]
+    runs-on: windows-11-arm
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist-windows-arm64
+          path: dist
+
+      - name: Smoke test (Windows arm64)
+        shell: pwsh
+        run: |
+          Expand-Archive "dist\Kerf-$env:VERSION-windows-arm64.zip" "$env:RUNNER_TEMP\kerf"
+          $out = & "$env:RUNNER_TEMP\kerf\Kerf-$env:VERSION-windows-arm64\kerf.exe" --version | Out-String
+          Write-Output $out
+          if (-not $out.StartsWith("kerf $env:VERSION (")) { throw "expected kerf $env:VERSION" }
+
+  # Installs the .msi, checks the Start menu shortcut, then installs a higher version over it and checks
+  # that it replaced the first rather than installing alongside.
+  verify-msi:
+    needs: [check, build]
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist-windows-x64
+          path: dist
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: upgrade-test-windows-x64
+          path: upgrade
+
+      - name: Install, upgrade and uninstall
+        shell: pwsh
+        run: |
+          function Install-Msi([string]$msi, [string]$log) {
+            $p = Start-Process msiexec.exe -ArgumentList '/i', "`"$msi`"", '/qn', '/l*v', $log -Wait -PassThru
+            if ($p.ExitCode -ne 0) { Get-Content $log -Tail 60; throw "msiexec /i $msi exited with $($p.ExitCode)" }
+          }
+          # A per-user .msi registers under the Installer's per-user data, not the Uninstall key.
+          function Kerf-Entries {
+            @(Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\*\Products\*\InstallProperties' |
+              Get-ItemProperty | Where-Object DisplayName -eq 'Kerf')
+          }
+          $shortcut = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Kerf.lnk"
+          $exe = "$env:LOCALAPPDATA\Programs\Kerf\kerf.exe"
+
+          Install-Msi (Resolve-Path "dist\Kerf-$env:VERSION-windows-x64.msi") "$env:RUNNER_TEMP\install.log"
+          if (-not (Test-Path $shortcut)) { throw "no Start menu shortcut at $shortcut" }
+          $target = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut).TargetPath
+          Write-Output "Start menu: $shortcut -> $target"
+          $out = & $exe --version | Out-String
+          Write-Output $out
+          if (-not $out.StartsWith("kerf $env:VERSION (")) { throw "expected kerf $env:VERSION" }
+          $first = Kerf-Entries
+          if ($first.Count -ne 1) { throw "expected one installed Kerf, found $($first.Count)" }
+          Write-Output "Installed: $($first[0].DisplayName) $($first[0].DisplayVersion)"
+
+          $next = Get-ChildItem upgrade\*.msi | Select-Object -First 1
+          Install-Msi $next.FullName "$env:RUNNER_TEMP\upgrade.log"
+          $after = Kerf-Entries
+          Write-Output "After the upgrade: $($after | ForEach-Object { "$($_.DisplayName) $($_.DisplayVersion)" })"
+          if ($after.Count -ne 1) { throw "expected the upgrade to replace Kerf, found $($after.Count) installs" }
+          if ($after[0].DisplayVersion -eq $first[0].DisplayVersion) { throw "the version did not change" }
+          if (-not (Test-Path $shortcut)) { throw "the upgrade removed the Start menu shortcut" }
+
+          $code = [regex]::Match($after[0].UninstallString, '\{[0-9A-Fa-f-]+\}').Value
+          $p = Start-Process msiexec.exe -ArgumentList '/x', $code, '/qn' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "uninstall exited with $($p.ExitCode)" }
+          if ((Test-Path $shortcut) -or (Test-Path $exe)) { throw "uninstall left files behind" }
+          Write-Output "Uninstalled cleanly"
+
+  # Installs the .deb and runs the AppImage on the oldest and newest Ubuntu LTS, and checks each starts:
+  # still running after 20 seconds on a virtual display, rather than exiting with an error.
+  verify-linux:
+    needs: [check, build]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist-linux-x86_64
+          path: dist
+
+      - name: Display and OpenGL for the start test
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri libegl1 libfuse2 || \
+            sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri libegl1 libfuse2t64
+
+      - name: The .deb installs and starts
+        run: |
+          sudo apt-get install -y "./dist/Kerf-$VERSION-linux-x86_64.deb"
+          out=$(kerf --version); echo "$out"
+          case "$out" in "kerf $VERSION ("*) ;; *) echo "expected kerf $VERSION" >&2; exit 1 ;; esac
+          test -f /usr/share/applications/kerf.desktop
+          test -f /usr/share/icons/hicolor/256x256/apps/kerf.png
+          status=0; xvfb-run -a timeout 20 kerf > deb.log 2>&1 || status=$?
+          cat deb.log
+          [ "$status" -eq 124 ] || { echo "kerf exited with $status within 20 seconds" >&2; exit 1; }
+
+      - name: The AppImage starts
+        run: |
+          appimage="dist/Kerf-$VERSION-linux-x86_64.AppImage"
+          chmod +x "$appimage"
+          out=$("$appimage" --version); echo "$out"
+          case "$out" in "kerf $VERSION ("*) ;; *) echo "expected kerf $VERSION" >&2; exit 1 ;; esac
+          status=0; xvfb-run -a timeout 20 "$appimage" > appimage.log 2>&1 || status=$?
+          cat appimage.log
+          [ "$status" -eq 124 ] || { echo "the AppImage exited with $status within 20 seconds" >&2; exit 1; }
+
+  publish:
+    needs: [check, build, smoke-windows-arm64, verify-msi, verify-linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: dist-*
+          path: dist
+          merge-multiple: true
+
+      # Exit 3 from notes.sh means CHANGELOG.md has no section for this version: the notes stay a footer
+      # only, and the draft release adds the merged pull requests itself, so prose can never block a
+      # release. Any other failure still fails the job.
+      - name: Checksums and notes
+        id: notes
+        run: |
+          cd dist
+          ls -la
+          count=$(find . -maxdepth 1 -name 'Kerf-*' | wc -l)
+          [ "$count" -eq 11 ] || { echo "expected 11 artefacts, found $count" >&2; exit 1; }
+          sha256sum Kerf-* > SHA256SUMS
+          cat SHA256SUMS
+          cat unsigned-*.txt > unsigned.txt 2>/dev/null || true
+          set +e
+          ../tools/release/notes.sh "$VERSION" unsigned.txt > notes.md
+          status=$?
+          set -e
+          [ "$status" -eq 0 ] || [ "$status" -eq 3 ] || exit 1
+          if [ "$status" -eq 0 ]; then echo "notes=changelog"; else echo "notes=generated"; fi >> "$GITHUB_OUTPUT"
+          cat notes.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Draft the release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          MODE: ${{ steps.notes.outputs.notes }}
+        run: |
+          if [ "$MODE" = generated ]; then
+            gh release create "$TAG" --draft --verify-tag --title "Kerf $VERSION" --generate-notes dist/Kerf-* dist/SHA256SUMS
+          else
+            gh release create "$TAG" --draft --verify-tag --title "Kerf $VERSION" --notes-file dist/notes.md dist/Kerf-* dist/SHA256SUMS
+          fi
+
+      - name: Keep the dry run's output
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-dry-run
+          path: |
+            dist/Kerf-*
+            dist/SHA256SUMS
+            dist/notes.md
+          if-no-files-found: error

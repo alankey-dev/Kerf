@@ -1,0 +1,6 @@
+# The toolchain CI and local builds share, so a new rustc lint or future-incompatibility error
+# arrives on a deliberate bump rather than by surprise.
+[toolchain]
+channel = "1.99.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

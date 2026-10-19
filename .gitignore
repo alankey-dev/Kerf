@@ -1,0 +1,10 @@
+/target
+
+.claude/
+
+/bench-results
+
+# Python bytecode.
+__pycache__/
+.ori/
+.DS_Store
