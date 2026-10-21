@@ -881,11 +881,12 @@ impl Design {
     }
 
     /// One counter for shape, link and component ids, across the canvas and every master, so none collide.
+    /// `sanitise` keeps every loaded id below 2^63, so the sum never saturates.
     pub(crate) fn next_id(&self) -> u64 {
         let shapes = self.shapes.iter().chain(self.components.iter().flat_map(|c| &c.shapes));
         let shape_ids = shapes.flat_map(|s| [Some(s.id), s.link.map(|l| l.id)]).flatten();
         // A named link's id stays taken after the link goes, so a new link never inherits its name.
-        shape_ids.chain(self.components.iter().map(|c| c.id)).chain(self.link_names.keys().copied()).max().unwrap_or(0) + 1
+        shape_ids.chain(self.components.iter().map(|c| c.id)).chain(self.link_names.keys().copied()).max().map_or(1, |top| top.saturating_add(1))
     }
 
     /// Adds a text object at `(x_in, y_in)` with the Pen draw operation. Returns the new id.
