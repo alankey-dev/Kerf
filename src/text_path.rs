@@ -245,6 +245,8 @@ struct Sampler {
     segs: Vec<Walk>,
     total: f32,
     closed: bool,
+    /// Where a path with no segment answers, its first point.
+    origin: Pt,
 }
 
 enum Walk {
@@ -257,19 +259,22 @@ impl Sampler {
         let mut segs = Vec::new();
         let mut total = 0.0;
         let mut closed = !contours.is_empty();
+        let origin = contours.first().map_or((0.0, 0.0), |c| finite(c.start));
         for c in contours {
             closed &= c.closed;
-            let mut from = c.start;
+            let mut from = finite(c.start);
             for seg in &c.segs {
                 match *seg {
                     Seg::Line(to) => {
+                        let to = finite(to);
                         let len = (to.0 - from.0).hypot(to.1 - from.1);
                         segs.push(Walk::Line { a: from, b: to, start: total, len });
                         total += len;
                         from = to;
                     }
                     Seg::Cubic(c1, c2, to) => {
-                        let p = [from, c1, c2, to];
+                        let p = [from, finite(c1), finite(c2), finite(to)];
+                        let to = p[3];
                         let mut table = Vec::with_capacity(CUBIC_SAMPLES + 1);
                         let mut len = 0.0;
                         let mut prev = from;
@@ -288,12 +293,13 @@ impl Sampler {
                 }
             }
         }
-        Sampler { segs, total: total.max(1e-6), closed }
+        Sampler { segs, total: total.max(1e-6), closed, origin }
     }
 
     /// The point and tangent angle at arc length `s`, and whether `s` fell off an open path. A closed
     /// path wraps; an open one extrapolates along its end tangent.
     fn at(&self, s: f32) -> (Pt, f32, bool) {
+        let s = if s.is_finite() { s } else { 0.0 };
         if self.closed {
             return self.on_path(s.rem_euclid(self.total));
         }
@@ -309,7 +315,9 @@ impl Sampler {
     }
 
     fn on_path(&self, s: f32) -> (Pt, f32, bool) {
-        let seg = self.segs.iter().find(|w| s <= w.end()).or_else(|| self.segs.last()).expect("a path has at least one segment");
+        let Some(seg) = self.segs.iter().find(|w| s <= w.end()).or_else(|| self.segs.last()) else {
+            return (self.origin, 0.0, false);
+        };
         match seg {
             Walk::Line { a, b, start, len } => {
                 let t = if *len > 1e-9 { (s - start) / len } else { 0.0 };
@@ -330,6 +338,13 @@ impl Walk {
             Walk::Line { start, len, .. } | Walk::Cubic { start, len, .. } => start + len,
         }
     }
+}
+
+/// `p` with NaN taken as zero and every coordinate held to a million inches, so a hostile path cannot
+/// poison or overflow a length.
+fn finite((x, y): Pt) -> Pt {
+    let tame = |v: f32| if v.is_nan() { 0.0 } else { v.clamp(-1e6, 1e6) };
+    (tame(x), tame(y))
 }
 
 /// A point `d` beyond `p` along the tangent at angle `a` (d negative goes back before it).
@@ -372,6 +387,27 @@ mod tests {
     use super::*;
     use crate::text::{GlyphOutline, TextSpec, layout};
     use std::f32::consts::PI;
+
+    #[test]
+    fn a_sampler_with_nothing_to_walk_still_answers() {
+        for contours in [vec![], vec![Contour { start: (1.0, 2.0), segs: vec![], closed: false }]] {
+            let trace = TextPath { contours, view_box: (1.0, 1.0), offset_in: 0.0, side: Default::default(), align: Default::default() }.trace();
+            for s in [-1.0, 0.0, 0.5, 1e9, f32::NAN] {
+                let (p, a) = trace.point_at(s);
+                assert!(p.0.is_finite() && p.1.is_finite() && a.is_finite(), "{s}: {p:?} {a}");
+            }
+            let (s, side) = trace.project((3.0, 4.0));
+            assert!(s.is_finite() && side.is_finite());
+        }
+    }
+
+    #[test]
+    fn a_sampler_over_non_finite_points_stays_finite() {
+        let bad = Contour { start: (0.0, 0.0), segs: vec![Seg::Line((f32::INFINITY, 0.0)), Seg::Line((1.0, f32::NAN))], closed: false };
+        let trace = TextPath { contours: vec![bad], view_box: (1.0, 1.0), offset_in: 0.0, side: Default::default(), align: Default::default() }.trace();
+        let (s, side) = trace.project((0.5, 0.5));
+        assert!(s.is_finite() && side.is_finite(), "{s} {side}");
+    }
 
     /// A circular arc of `n` cubic sub-arcs, radius `r`, from angle `a0` to `a1` about `centre`, as an
     /// open contour. The same construction `TextPath::circle` uses, so a sampled point lies on the true

@@ -998,6 +998,69 @@ mod tests {
         assert_eq!(listed.design, project.design, "Home lists the same repaired design");
     }
 
+    fn open_fixture(id: &str, json: &str) -> (Project, Repairs) {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(json_path(dir.path(), id), json).unwrap();
+        open(dir.path(), id).expect("loads rather than failing")
+    }
+
+    /// Every shape in `design` evaluates its outline and the design hands out a fresh id, as the canvas does.
+    fn exercise(design: &mut Design) {
+        for s in &design.shapes {
+            let points: usize = s.world_rings(crate::geometry::FLATTEN_TOL_IN).iter().map(Vec::len).sum();
+            assert!(points < 1_000_000, "{points} points");
+        }
+        let next = design.next_id();
+        assert!(design.shapes.iter().all(|s| s.id < next));
+    }
+
+    #[test]
+    fn a_text_path_that_cannot_be_walked_is_dropped_so_layout_cannot_panic() {
+        let (mut project, repairs) = open_fixture("text-path", include_str!("../tests/fixtures/malformed/text-path.json"));
+        assert_eq!(repairs.clamped, [1, 2, 3, 4], "{repairs:?}");
+        let paths: Vec<bool> = project.design.shapes.iter().map(|s| matches!(&s.kind, ShapeKind::Text { path: Some(_), .. })).collect();
+        assert_eq!(paths, [false, false, false, false, true], "only the sound path stays");
+        exercise(&mut project.design);
+    }
+
+    #[test]
+    fn an_arc_sweep_far_past_a_turn_loads_clamped() {
+        let (mut project, repairs) = open_fixture("arc-sweep", include_str!("../tests/fixtures/malformed/arc-sweep.json"));
+        assert_eq!(repairs.clamped, [1]);
+        let ShapeKind::Parametric(crate::parametric::Params::Arc { start_deg, sweep_deg, inner, .. }) = project.design.shapes[0].kind else { panic!("arc") };
+        assert_eq!((start_deg, sweep_deg, inner), (360.0, 360.0, 1.0));
+        exercise(&mut project.design);
+    }
+
+    #[test]
+    fn every_parametric_field_loads_inside_the_range_the_inspector_allows() {
+        let (mut project, repairs) = open_fixture("params", include_str!("../tests/fixtures/malformed/params.json"));
+        assert_eq!(repairs.clamped, [1, 2, 3, 4, 5]);
+        exercise(&mut project.design);
+    }
+
+    #[test]
+    fn huge_and_repeated_ids_load_unique_and_below_the_overflow_point() {
+        let (mut project, repairs) = open_fixture("ids", include_str!("../tests/fixtures/malformed/ids.json"));
+        let kept: Vec<u64> = project.design.shapes.iter().map(|s| s.id).collect();
+        assert_eq!(kept, [7], "the repeat and both huge ids go");
+        assert_eq!(repairs.dropped.len(), 3);
+        exercise(&mut project.design);
+        assert_eq!(project.design.next_id(), 8);
+    }
+
+    #[test]
+    fn skew_and_pivot_load_within_the_limits() {
+        let (mut project, repairs) = open_fixture("skew-pivot", include_str!("../tests/fixtures/malformed/skew-pivot.json"));
+        assert_eq!(repairs.clamped, [1, 2]);
+        let max = crate::transform::MAX_SKEW_DEG;
+        assert_eq!(project.design.shapes[0].skew_deg, (max, -max));
+        assert_eq!(project.design.shapes[0].pivot, None, "an unusable pivot goes back to the centre");
+        assert_eq!(project.design.shapes[1].skew_deg, (45.0, 0.0));
+        assert_eq!(project.design.shapes[1].pivot, Some((crate::transform::MAX_SIZE_IN, -crate::transform::MAX_SIZE_IN)), "a far pivot stops at the canvas edge");
+        exercise(&mut project.design);
+    }
+
     #[test]
     fn the_file_name_not_the_json_id_decides_every_path() {
         let root = tempfile::tempdir().unwrap();

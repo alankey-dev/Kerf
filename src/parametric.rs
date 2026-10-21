@@ -255,6 +255,58 @@ impl Params {
         }
     }
 
+    /// Pulls every field into the range `set` would hold it to, a non-finite one to the low end, and
+    /// lengths to the canvas. For a design read from a file, where nothing has passed through `set`.
+    /// Returns whether anything changed.
+    pub(crate) fn clamp_fields(&mut self, max_len: f32) -> bool {
+        let fix = |v: &mut f32, lo: f32, hi: f32| {
+            let fixed = if v.is_finite() { v.clamp(lo, hi) } else { lo.max(0.0).min(hi) };
+            std::mem::replace(v, fixed) != fixed
+        };
+        let field = |f: ParamField| {
+            let range = f.range();
+            (*range.start(), if *range.end() == f32::MAX { max_len } else { *range.end() })
+        };
+        let mut changed = false;
+        match self {
+            Params::Rectangle { corners, .. } => {
+                for c in corners {
+                    changed |= fix(c, 0.0, max_len);
+                }
+            }
+            Params::Ellipse | Params::Line => {}
+            Params::Polygon { sides, corner, turn } => {
+                changed |= clamp_count(sides);
+                let (lo, hi) = field(ParamField::Fillet);
+                changed |= fix(corner, lo, hi);
+                changed |= fix(turn, f32::MIN, f32::MAX);
+            }
+            Params::Star { points, inner, corner, inner_corner, turn } => {
+                changed |= clamp_count(points);
+                for (v, f) in [(inner, ParamField::Inner), (corner, ParamField::Point), (inner_corner, ParamField::Valley)] {
+                    let (lo, hi) = field(f);
+                    changed |= fix(v, lo, hi);
+                }
+                changed |= fix(turn, f32::MIN, f32::MAX);
+            }
+            Params::Arc { start_deg, sweep_deg, inner, .. } => {
+                for (v, f) in [(start_deg, ParamField::ArcStart), (sweep_deg, ParamField::ArcSweep), (inner, ParamField::ArcInner)] {
+                    let (lo, hi) = field(f);
+                    changed |= fix(v, lo, hi);
+                }
+            }
+            Params::Ring { thickness } => {
+                let (lo, hi) = field(ParamField::Thickness);
+                changed |= fix(thickness, lo, hi);
+            }
+            Params::Plus { bar } => {
+                let (lo, hi) = field(ParamField::Bar);
+                changed |= fix(bar, lo, hi);
+            }
+        }
+        changed
+    }
+
     fn set(&mut self, field: ParamField, value: crate::expr::Typed) -> bool {
         let range = field.range();
         match (self, field) {
@@ -282,6 +334,11 @@ impl Params {
             _ => false,
         }
     }
+}
+
+fn clamp_count(n: &mut u32) -> bool {
+    let fixed = (*n).clamp(MIN_SIDES, MAX_SIDES);
+    std::mem::replace(n, fixed) != fixed
 }
 
 /// A corner radius can never grow past half the shorter of the two edges that meet at it, so adjacent
@@ -517,6 +574,11 @@ fn fillet_each(pts: &[Pt], radius: impl Fn(usize) -> f32) -> Contour {
         let half = (u.0 * v.0 + u.1 * v.1).clamp(-1.0, 1.0).acos() / 2.0;
         let (bx, by) = unit((0.0, 0.0), (u.0 + v.0, u.1 + v.1));
         let (along, out) = (r / half.tan(), r / half.sin());
+        // A corner so sharp its edges nearly overlap has no round to fit: keep it sharp.
+        if !(along.is_finite() && out.is_finite()) {
+            pen = pen.to(p);
+            continue;
+        }
         let c = (p.0 + bx * out, p.1 + by * out);
         let start = angle(c, (p.0 + u.0 * along, p.1 + u.1 * along));
         let end = (angle(c, (p.0 + v.0 * along, p.1 + v.1 * along)) - start + 540.0).rem_euclid(360.0) - 180.0;
@@ -674,6 +736,16 @@ pub fn default_size_in(kind: ParamKind) -> Pt {
 mod tests {
     use super::*;
     use crate::design::ShapeKind;
+
+    #[test]
+    fn a_filleted_polygon_squeezed_to_a_sliver_stays_finite() {
+        for (w, h) in [(0.001, 252.0), (252.0, 0.001), (0.001, 0.001)] {
+            let params = Params::Polygon { sides: 6, corner: 0.1, turn: 10.0 };
+            let contours = outline(&params, (w, h));
+            let finite = contours.iter().flat_map(|c| crate::geometry::flatten(c, 1e-3)).all(|p| p.0.is_finite() && p.1.is_finite());
+            assert!(finite, "{w} x {h}");
+        }
+    }
 
     fn flat(contours: &[Contour]) -> Vec<Pt> {
         contours.iter().flat_map(|c| crate::geometry::flatten(c, 1e-4)).collect()
