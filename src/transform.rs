@@ -239,7 +239,7 @@ impl Frame {
             width_in: self.width_in * sx,
             height_in: self.height_in * sy,
             rotation_deg: self.rotation_deg + (self.rotation_deg - from.rotation_deg),
-            skew_deg: (self.skew_deg.0 + (self.skew_deg.0 - from.skew_deg.0), self.skew_deg.1 + (self.skew_deg.1 - from.skew_deg.1)),
+            skew_deg: clamp_skew((self.skew_deg.0 + (self.skew_deg.0 - from.skew_deg.0), self.skew_deg.1 + (self.skew_deg.1 - from.skew_deg.1))),
             flip: (self.flip.0 ^ dflip.0, self.flip.1 ^ dflip.1),
         }
     }
@@ -327,6 +327,11 @@ pub fn flip_many(design: &Design, originals: &[Shape], axis: Axis) -> Vec<Shape>
         .collect()
 }
 
+/// Skew held to the app limit, so a repeat step cannot walk it toward `tan(90deg)`.
+pub(crate) fn clamp_skew((x, y): Pt) -> Pt {
+    (x.clamp(-MAX_SKEW_DEG, MAX_SKEW_DEG), y.clamp(-MAX_SKEW_DEG, MAX_SKEW_DEG))
+}
+
 /// Carries each shape from `from` to `to`: its centre keeps its place relative to the frame, its rotation
 /// turns with the frame, and its box stretches by the frame's stretch projected onto the shape's own axes.
 /// A member at an angle to a non-uniform stretch would need skew to stay exact; this keeps it rectangular.
@@ -353,7 +358,7 @@ fn remap(originals: &[Shape], from: &Frame, to: &Frame) -> Vec<Shape> {
                 width_in: w,
                 height_in: h,
                 rotation_deg,
-                skew_deg: (s.skew_deg.0 + dskew.0, s.skew_deg.1 + dskew.1),
+                skew_deg: clamp_skew((s.skew_deg.0 + dskew.0, s.skew_deg.1 + dskew.1)),
                 flip_x: s.flip_x ^ dflip.0,
                 flip_y: s.flip_y ^ dflip.1,
                 kind,
@@ -390,6 +395,18 @@ mod tests {
 
     fn at(x: f32, y: f32) -> Shape {
         Shape { x_in: x, y_in: y, width_in: 1.0, height_in: 1.0, ..square() }
+    }
+
+    #[test]
+    fn transform_again_cannot_shear_past_the_limit() {
+        let sheared = |deg: f32| Frame { skew_deg: (deg, -deg), ..frame(&square()) };
+        let (from, to) = (sheared(0.0), sheared(60.0));
+        let step = to.stepped_from(&from);
+        assert_eq!(step.skew_deg, (MAX_SKEW_DEG, -MAX_SKEW_DEG), "60 + 60 stops at the limit");
+        let carried = remap(&[square()], &from, &to);
+        assert_eq!(carried[0].skew_deg, (60.0, -60.0));
+        let again = remap(&carried, &from, &to);
+        assert_eq!(again[0].skew_deg, (MAX_SKEW_DEG, -MAX_SKEW_DEG), "a repeat clamps too");
     }
 
     #[test]
