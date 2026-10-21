@@ -1,7 +1,7 @@
 name: CI
 
 # Runs on every pull request, on GitHub-hosted runners (free and unlimited for a public repository). Format,
-# Clippy, the tests and cargo-deny on Linux, macOS and Windows, plus the heavy-design timing gates on macOS.
+# Clippy and the tests on Linux, macOS and Windows, cargo-deny on Linux, plus the heavy-design timing gates on macOS.
 # See docs/ci.md.
 on:
   pull_request:
@@ -83,11 +83,14 @@ jobs:
             tests/snapshots/*.new.png
           if-no-files-found: ignore
 
+      # Once, on Linux: deny.toml's targets cover all five release triples, so one run checks every platform's graph.
       - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+        if: runner.os == 'Linux'
         with:
           tool: cargo-deny
 
       - name: Advisories
+        if: runner.os == 'Linux'
         run: cargo deny check advisories
 
   timing:
