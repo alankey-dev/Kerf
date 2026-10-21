@@ -649,8 +649,8 @@ The places that differ by platform:
 
 Each platform has one script, which the release job runs and which works the same on a developer's machine. Each writes its artefacts to `target/dist/`.
 
-- `tools/release/package-macos.sh <version>` builds `Kerf.app` for both architectures, joined with `lipo`, and `Kerf-<version>-macos-universal.dmg`. `--app-only` builds just the app, for this Mac's architecture.
-- `tools/release/package-windows.ps1 <version> -Target <triple>` builds `Kerf-<version>-windows-<arch>.zip` (portable) and `.msi`, with `cargo wix` from `tools/release/wix/main.wxs`. The installer is per user, adds a Start menu shortcut, and has a fixed upgrade code, so a newer `.msi` replaces an older one.
+- `tools/release/package-macos.sh <version>` builds `Kerf.app` for both architectures, joined with `lipo`, and `Kerf-<version>-macos-universal.dmg`, signed ad hoc. `--app-only` builds just the app, for this Mac's architecture. `--sign` is the second phase, which signs, notarises and staples the built app (see `docs/ci.md`).
+- `tools/release/package-windows.ps1 <version> -Target <triple>` builds `Kerf-<version>-windows-<arch>.zip` (portable) and `.msi`, with `cargo wix` from `tools/release/wix/main.wxs`. The installer is per user, adds a Start menu shortcut, and has a fixed upgrade code, so a newer `.msi` replaces an older one. `-Sign` is the second phase, which signs `kerf.exe`, rebuilds the packages around it and signs the `.msi` (see `docs/ci.md`).
 - `tools/release/package-linux.sh <version>` builds `Kerf-<version>-linux-<arch>.deb` with `cargo deb` (metadata in `Cargo.toml`), `.AppImage` with linuxdeploy, and `.tar.gz`, for this machine's architecture.
 
 `tools/macos/bundle.sh` calls `package-macos.sh --app-only` and installs the result to `/Applications`, or to the folder given as its first argument.
