@@ -414,7 +414,7 @@ pub enum Blocked {
     NotText,
     /// The subject has no shape whose parameter this edit changes.
     NotParametric,
-    /// Text on path needs one text and one shape for it to follow.
+    /// Text on path needs one text, and either the shape for it to follow selected too or picked next.
     NeedTextAndPath,
     /// A path edit needs a text that is already on a path.
     NotOnPath,
@@ -496,7 +496,7 @@ impl Blocked {
             Self::ImageSticker => "Images can't be made into stickers.".into(),
             Self::NotText => "Select text first.".into(),
             Self::NotParametric => "Select a shape with parameters first.".into(),
-            Self::NeedTextAndPath => "Select one text and one shape for it to follow.".into(),
+            Self::NeedTextAndPath => "Select a text to put on a path, then click the shape for it to follow. Or select both at once.".into(),
             Self::NotOnPath => "Select text that is on a path.".into(),
             Self::NotPath => "Select a path or shape to round its corners.".into(),
             Self::SingleLineText => "Single-line text has no area to combine.".into(),
@@ -698,7 +698,7 @@ impl Design {
             }
             Edit::Curve(_) | Edit::Text(_) | Edit::ConvertToPaths => ok_if(chosen().any(|s| matches!(s.kind, ShapeKind::Text { .. })), Blocked::NotText),
             Edit::Params(op) => ok_if(chosen().any(|s| matches!(&s.kind, ShapeKind::Parametric(p) if p.accepts(*op))), Blocked::NotParametric),
-            Edit::TextPath(TextPathEdit::Attach) => ok_if(self.text_and_path(on).is_some(), Blocked::NeedTextAndPath),
+            Edit::TextPath(TextPathEdit::Attach) => ok_if(self.text_and_path(on).is_some() || self.lone_text(on).is_some(), Blocked::NeedTextAndPath),
             Edit::TextPath(_) => ok_if(chosen().any(|s| matches!(&s.kind, ShapeKind::Text { path: Some(_), .. })), Blocked::NotOnPath),
             Edit::Corners(_) => ok_if(chosen().any(crate::path_edit::editable), Blocked::NotPath),
             Edit::SetHidden(true) => ok_if(chosen().any(|s| !s.hidden), Blocked::AlreadyHidden),

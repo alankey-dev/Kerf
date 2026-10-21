@@ -162,7 +162,9 @@ fn edit_info(edit: &Edit) -> CommandInfo {
         Edit::Warp(Some(_)) => row("Warp", Some(Icon::Warp), "Bend the selection inside an envelope.", None),
         Edit::Warp(None) => row("Remove Warp", Some(Icon::Warp), "Restore the original outline and size.", None),
         Edit::Curve(_) => row("Curve", Some(Icon::Curve), "Bend a line of text around a circle.", None),
-        Edit::TextPath(TextPathEdit::Attach) => row("Text on path", Some(Icon::Curve), "Run the selected text along the selected shape's edge.", keys(CMD_ALT, Key::T)),
+        Edit::TextPath(TextPathEdit::Attach) => {
+            row("Text on path", Some(Icon::Curve), "Run the selected text along a shape's edge. With only text selected, click the shape to use.", keys(CMD_ALT, Key::T))
+        }
         Edit::TextPath(TextPathEdit::Remove) => row("Remove from path", Some(Icon::Curve), "Straighten the text, keeping its size and font.", None),
         Edit::TextPath(TextPathEdit::Side(_)) => row("Path side", None, "Flip the text to the other side of its path.", None),
         Edit::TextPath(TextPathEdit::Along(_)) => row("Path align", None, "Set where the text sits along its path.", None),
