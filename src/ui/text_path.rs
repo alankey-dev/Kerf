@@ -7,16 +7,16 @@
 //! of it works in the path's own frame, mapped to the world through [`Frame`], which undoes the shift
 //! and box scaling [`crate::text_path::place`] applied so the chrome lands exactly under the letters.
 
-use egui::{Color32, Key, KeyboardShortcut, Modifiers, Painter, Pos2, Response, Stroke, Ui, Vec2};
+use egui::{Color32, Key, KeyboardShortcut, Modifiers, Painter, Pos2, Response, Stroke, Ui, Vec2, vec2};
 
 use crate::design::{Design, Pt, Shape, ShapeKind};
-use crate::edit::{Edit, TextPathEdit};
+use crate::edit::{Edit, Subject, TextPathEdit};
 use crate::path_edit::{NodeAction, NodeContour, NodeId, NodePath, Selection};
 use crate::text_path::{Along, PathFrame, Side, TextPath};
 use crate::units::{FIELD_W, Units, length_field};
 
-use super::canvas::{Grid, View, paint_anchor};
-use super::tokens::{ACCENT_PRIMARY, BG_PANEL, ERROR_EDGE};
+use super::canvas::{Grid, SNAP_PX, View, paint_anchor};
+use super::tokens::{ACCENT_PRIMARY, BG_PANEL, BORDER_SUBTLE, ERROR_EDGE, TEXT_PRIMARY};
 
 /// How near the pointer must come to a handle or node to grab it, in screen pixels.
 const PICK_PX: f32 = 8.0;
@@ -382,6 +382,84 @@ fn seg_dist(p: Pt, a: Pt, b: Pt) -> f32 {
     let len2 = dx * dx + dy * dy;
     let t = if len2 > 1e-12 { (((p.0 - a.0) * dx + (p.1 - a.1) * dy) / len2).clamp(0.0, 1.0) } else { 0.0 };
     (p.0 - (a.0 + dx * t)).hypot(p.1 - (a.1 + dy * t))
+}
+
+/// Text on path over a lone text: there is no shape to follow yet, so the maker is asked to click one.
+/// Returns true when `edit` started that pick, in which case it must not run as an edit.
+pub(in crate::ui) fn begin_pick(design: &Design, selection: &[u64], view: &mut View, edit: &Edit) -> bool {
+    if !matches!(edit, Edit::TextPath(TextPathEdit::Attach)) {
+        return false;
+    }
+    match design.lone_text(selection) {
+        Some(text) => {
+            view.path_pick = Some(text);
+            true
+        }
+        None => false,
+    }
+}
+
+/// The shape a click at `at_in` picks as the path: one whose outline passes under the pointer, else the
+/// topmost one it is inside. Text is never a path.
+fn path_target(design: &Design, at_in: Pt, within_in: f32) -> Option<u64> {
+    edge_at(design, at_in, within_in).or_else(|| {
+        design
+            .shapes
+            .iter()
+            .rev()
+            .filter(|s| !s.hidden && !s.locked && !matches!(s.kind, ShapeKind::Text { .. }))
+            .find(|s| design.geometry(s).contains(at_in))
+            .map(|s| s.id)
+    })
+}
+
+/// While the maker is choosing a path for the lone selected text, a click on a shape attaches it, as one
+/// undo step; a click on nothing or Escape leaves the text as it was. Returns true while the pick runs.
+pub(in crate::ui) fn pick_input(ui: &Ui, response: &Response, design: &mut Design, selection: &mut Vec<u64>, view: &mut View, grid: &Grid) -> bool {
+    let Some(text) = view.path_pick else { return false };
+    if selection.as_slice() != [text] || design.lone_text(selection).is_none() {
+        view.path_pick = None;
+        return false;
+    }
+    if ui.input_mut(|i| i.consume_key(Modifiers::NONE, Key::Escape)) {
+        view.path_pick = None;
+        return true;
+    }
+    if response.hovered() {
+        ui.ctx().set_cursor_icon(egui::CursorIcon::Crosshair);
+    }
+    if response.clicked()
+        && let Some(p) = response.interact_pointer_pos()
+    {
+        view.path_pick = None;
+        if let Some(target) = path_target(design, grid.to_inches(p), SNAP_PX / grid.scale) {
+            *selection = vec![text, target];
+            _ = crate::edit::run(design, selection, &Edit::TextPath(TextPathEdit::Attach), Subject::Selection);
+        }
+    }
+    true
+}
+
+/// While picking, outlines the shape under the pointer and says what to do.
+pub(in crate::ui) fn pick_paint(painter: &Painter, rect: egui::Rect, grid: &Grid, design: &Design, view: &View, hover: Option<Pos2>) {
+    if view.path_pick.is_none() {
+        return;
+    }
+    if let Some(p) = hover.filter(|p| rect.contains(*p))
+        && let Some(shape) = path_target(design, grid.to_inches(p), SNAP_PX / grid.scale).and_then(|id| design.shapes.iter().find(|s| s.id == id))
+    {
+        for (pts, closed) in design.geometry(shape).lines() {
+            let mut line: Vec<Pos2> = pts.iter().map(|&p| grid.to_screen(p)).collect();
+            if *closed && let Some(&first) = line.first() {
+                line.push(first);
+            }
+            painter.add(egui::Shape::line(line, Stroke::new(2.0_f32, ACCENT_PRIMARY)));
+        }
+    }
+    let hint = painter.layout_no_wrap("Click the shape for the text to follow. Esc cancels.".into(), super::fonts::regular(13.0), TEXT_PRIMARY);
+    let pill = egui::Rect::from_center_size(egui::pos2(rect.center().x, rect.top() + 28.0), hint.size() + vec2(24.0, 12.0));
+    painter.rect(pill, 8.0, BG_PANEL, Stroke::new(1.0_f32, BORDER_SUBTLE), egui::StrokeKind::Inside);
+    painter.galley(pill.center() - hint.size() / 2.0, hint, TEXT_PRIMARY);
 }
 
 /// Puts a new text on `target`'s edge with the Text tool, its run starting at the clicked point. The
