@@ -650,6 +650,11 @@ impl Kerf {
             crate::transform::Frame::of(design, &shapes)
         };
         let doc = &mut self.doc;
+        // Text on path over a lone text waits for a click on the shape to follow instead of editing now.
+        if text_path::begin_pick(&doc.design, &doc.selection, &mut doc.view, &edit) {
+            doc.tool = canvas::Tool::Select;
+            return;
+        }
         // Cmd+D is Power Duplicate only while the copies of a prior Duplicate stay selected; a step a
         // bare gesture recorded leaves it a plain Duplicate (spec 52).
         let edit = match (&edit, &doc.duplicate_memory) {

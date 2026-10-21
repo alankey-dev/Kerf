@@ -222,6 +222,13 @@ impl Design {
         Some((text.id, path.id))
     }
 
+    /// The text that is the whole of `on`, which Text on path then asks the maker to pick a path for.
+    pub fn lone_text(&self, on: &[u64]) -> Option<u64> {
+        let mut chosen = self.shapes.iter().filter(|s| on.contains(&s.id));
+        let shape = chosen.next().filter(|_| chosen.next().is_none())?;
+        matches!(shape.kind, ShapeKind::Text { .. }).then_some(shape.id)
+    }
+
     /// Puts text `text_id` on the evaluated outline of shape `path_id`: the text takes its own copy of
     /// the path, the source stays (becoming a Guide unless it already cuts) and the text centres over
     /// the path's box. Keeps the text's scale over its new natural size.

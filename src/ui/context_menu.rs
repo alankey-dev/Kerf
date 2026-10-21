@@ -6,7 +6,7 @@ use egui::{Align2, Area, Context, Id, Modifiers, Order, Pos2, Rect, Response, Se
 
 use crate::containers::AlignTo;
 use crate::design::{Align, Arrange, Combine, Design, History};
-use crate::edit::{AppCommand, Edit};
+use crate::edit::{AppCommand, Edit, TextPathEdit};
 use crate::path_edit::{NodeAction, NodeKind, NodePath};
 use crate::select::Match;
 use crate::transform::Axis;
@@ -99,6 +99,7 @@ pub(super) const SHAPE_MENU: &[Row] = &[
     Row::Sub("Combine", &COMBINE),
     Row::Either(Edit::Flatten, Edit::Unflatten),
     Row::Item(Edit::Expand),
+    Row::Either(Edit::TextPath(TextPathEdit::Attach), Edit::TextPath(TextPathEdit::Remove)),
     Row::Separator,
     Row::App(AppCommand::StepRepeatPanel),
     Row::App(AppCommand::RotateCopiesPanel),

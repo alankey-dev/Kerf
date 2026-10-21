@@ -1,6 +1,6 @@
 # Asset provenance
 
-Where each bundled font came from, under which licence, and how any converted file was made.
+Where each bundled asset came from, under which licence, and how any converted file was made. Every directory under `assets/` is covered here.
 
 ## Hershey fonts (`fonts/hershey/`)
 
@@ -60,6 +60,20 @@ Bundled for the Monogram Maker's themes (spec 42), so Classic, Script, Sports an
 - **Oswald Bold** (`fonts/Oswald-Bold.ttf`). SIL Open Font License 1.1, in `fonts/OFL-Oswald.txt`. Fetched from the upstream repository https://github.com/googlefonts/OswaldFont at commit `89795261ac9eeb9aa8cd99f43982c4e4b0e53261`, the commit google/fonts pins. Only the Bold weight is bundled; it is registered as the family "Oswald", so every style of Oswald sets in Bold.
   - https://raw.githubusercontent.com/googlefonts/OswaldFont/89795261ac9eeb9aa8cd99f43982c4e4b0e53261/fonts/ttf/Oswald-Bold.ttf (SHA-256 `eb7d46f856dd57f18a8c03d033c57802692bf127f01dbd95ba8984338e6b5135`)
   - https://raw.githubusercontent.com/googlefonts/OswaldFont/89795261ac9eeb9aa8cd99f43982c4e4b0e53261/OFL.txt
+
+## UI icons (`icons/`)
+
+Twenty-four icons from Lucide (https://lucide.dev), under the ISC licence, in `icons/LICENSE-lucide.txt`. Some Lucide icons derive from Feather and carry its MIT licence, which the same file reproduces. Fetched unchanged from https://github.com/lucide-icons/lucide at release 1.61.0, commit `c29c276f16590cf017126671535ad8c792be64d8`, path `icons/<name>.svg`. The licence file is the repository's `LICENSE` at the same commit (SHA-256 `b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57`).
+
+Files: `chevron-down`, `chevron-left`, `chevron-right`, `shapes`, `upload`, `pen-tool`, `pencil`, `pencil-line`, `type`, `scissors`, `mirror-rectangular`, `layers`, `text-align-start`, `wand-sparkles`, `combine`, `square-dashed`, `printer`, `ruler`, `check`, `info`, `x`, `minus`, `plus`. `src/ui/icons.rs` compiles them in and recolours `currentColor` at load time. Every other icon in the app is drawn in code in that file and is original to Kerf.
+
+These replace an earlier set copied from a commercial product's web app, which is no longer in the tree (issue #42).
+
+## Shape library (`ds/shapes/`)
+
+Twenty hand-built SVG outlines of basic geometric forms: line, triangle, diamond, star, octagon, pentagon, hexagon, heart, plus, equals, circle, rectangle, square, pill, rounded square, oval, arch pennant and half circle. They are written as plain paths in points (72 per inch) and carry Kerf's licence. The proportions and default sizes were measured from the free shapes in Cricut Design Space so that familiar sizes match. No path data, file or thumbnail from that product is included. The header comment in each file names the Design Space image id it was sized against, which is a record of the measurement only.
+
+The 20 preview thumbnails once kept next to them were copied from that product's cache and have been removed.
 
 ## Monogram frames (`monogram/frames/`)
 
