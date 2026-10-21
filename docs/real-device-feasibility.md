@@ -7,8 +7,8 @@ Sources and citation scheme follow the existing evidence docs in this repo:
 
 - `evidence-native.md` is the static analysis of the native plugins under
   `/Applications/Cricut Design Space.app/Contents/Resources/plugins/` (arm64).
-- `native-supporting/report-devcommon.md` and `report-deviceio.md` are the per-binary
-  findings; `notes-main.md` is the working log.
+- The per-binary reports and working notes behind it are not kept in the repository, because they
+  quote extracted third-party material (see `assets/PROVENANCE.md`).
 - `evidence-handshake.md` traces the AES session and where the key material comes from.
 - Native addresses are arm64 virtual addresses (image base `0x100000000`).
 

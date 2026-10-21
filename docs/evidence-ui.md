@@ -1,5 +1,7 @@
 # Cricut Design Space canvas UI: evidence
 
+> **Note (issue #42).** The icons and shape thumbnails this document says were copied into `assets/ds/` have been removed from the repository. Kerf now uses Lucide icons in `assets/icons`; see `assets/PROVENANCE.md`. Statements below about `assets/ds/icons` and `assets/ds/shapes/previews` describe the removed files.
+
 Read-only investigation of the Design Space desktop app (Angular in Electron), for the egui clone. Sources are the extracted asar under `scratchpad/asar/` and the pretty-printed bundles under `scratchpad/pretty/` (session scratchpad: `/private/tmp/claude-501/-Users-alan-development-rea/805544e1-64f0-4326-b96a-e97af3bdac51/scratchpad/`). `main.js:N` and `chunk-JVMBAEXI.js:N` refer to the pretty-printed files; CSS lines refer to `scratchpad/css/styles.pretty.css` (prettier copy of `design-space-app/styles.css`). Reference screenshots: `images/1.png` (blank canvas) and `images/2.png` (Shapes panel, operation dropdown, Project Preview).
 
 Assets: `assets/ds/fonts/` (see `LICENCE-NOTE.txt`, commercial fonts, local reference only), `assets/ds/icons/` (extracted from the inline SVG registry in `chunk-GJSEQL7X.js`), `assets/ds/shapes/` (reconstructed geometry; Cricut's own path data is encrypted in the offline cache).

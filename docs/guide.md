@@ -669,4 +669,4 @@ Run the workflow by hand (Actions, Release, Run workflow) for a dry run: the sam
 
 ## Licence and provenance
 
-Kerf is for personal use and is not published; there is no `LICENSE`. `assets/PROVENANCE.md` records where each bundled font came from. The Design Space icons under `assets/ds/icons` and `assets/ds/shapes/previews`, and the reference screenshots, are for personal use only and are not covered there. They must be replaced (spec 22 item 6, `docs/specs/22-foundation.md`) before any publication.
+Kerf is released under the MIT licence (`LICENSE`). `assets/PROVENANCE.md` records the source and licence of every bundled asset: fonts, the Lucide icons in `assets/icons`, the shape library and the monogram frames. Reference screenshots and extracted material from third-party products are not kept in the repository.

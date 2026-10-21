@@ -1,6 +1,6 @@
 # cargo-deny checks the dependency graph against the RustSec advisory database. CI runs
-# `cargo deny check advisories`. Licence checks are off: Kerf is for personal use and is not
-# published (spec 22, item 6 dropped).
+# `cargo deny check advisories`. Licence checks of the dependency graph are off. Asset licences
+# are recorded in assets/PROVENANCE.md.
 #
 # Known, accepted: building the tests prints a rustc future-incompatibility warning for
 # `block v0.1.6`. It reaches the build only through the dev-only path
