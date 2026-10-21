@@ -2,7 +2,6 @@
 
 use std::sync::LazyLock;
 
-use usvg::TreeParsing;
 use usvg::tiny_skia_path::PathSegment;
 
 use crate::design::{Contour, Pt, Seg, ShapeKind};
@@ -15,7 +14,7 @@ pub struct Outline {
 }
 
 pub fn parse(svg: &[u8]) -> Outline {
-    let tree = usvg::Tree::from_data(svg, &usvg::Options::default()).expect("bundled shape SVG parses");
+    let tree = crate::svg_import::parse_tree(svg).expect("bundled shape SVG parses");
     let paths: Vec<_> = tree
         .root
         .descendants()
