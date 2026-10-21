@@ -230,6 +230,9 @@ pub fn show(ctx: &Context, design: &mut Design, selection: &mut Vec<u64>, contou
     });
 
     for edit in text_change.map(Edit::Text).into_iter().chain(picked) {
+        if super::text_path::begin_pick(design, selection, view, &edit) {
+            continue;
+        }
         if let Some(notice) = super::notice::run_edit(design, selection, &edit) {
             view.notice = Some(notice);
         }

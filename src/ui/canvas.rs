@@ -138,6 +138,8 @@ pub struct View {
     pub(super) path_grab: Option<super::text_path::Grab>,
     /// Node editing of a path text's own path copy, entered with A.
     pub(super) path_nodes: Option<super::text_path::PathNodeEdit>,
+    /// The text Text on path is waiting to be given a shape to follow: the next click on a shape picks it.
+    pub(super) path_pick: Option<u64>,
     /// The eyedropper's lifted style and the decoded pixels under the canvas (spec 56).
     pub(super) eyedropper: super::eyedropper::State,
 }
@@ -173,6 +175,7 @@ impl Default for View {
             path_handles: None,
             path_grab: None,
             path_nodes: None,
+            path_pick: None,
             eyedropper: Default::default(),
         }
     }
@@ -329,6 +332,7 @@ pub fn show(
         view.nodes = None;
         view.path_nodes = None;
         view.path_grab = None;
+        view.path_pick = None;
     }
     view.path_handles = super::text_path::compute_handles(design, selection, view, &grid);
     if *tool != Tool::Corner {
@@ -352,6 +356,7 @@ pub fn show(
     let guided = super::guides::input(ui, &response, design, selection, &grid, art, design.snapping(), select, *units);
     let placed = match *tool {
         _ if hand || guided => false,
+        Tool::Select if super::text_path::pick_input(ui, &response, design, selection, view, &grid) => false,
         Tool::Select if super::text_path::node_input(ui, &response, design, selection, view, &grid) => false,
         Tool::Select if super::node_edit::input(ui, &response, design, selection, &mut view.nodes, &grid) => false,
         Tool::Select if super::text_path::handle_input(ui, &response, design, view, &grid) => false,
@@ -588,6 +593,7 @@ pub fn show(
     super::shape_builder::paint(&painter, &grid, view, hover_in);
     super::knife_tool::paint(&painter, &grid, view);
     paint_draw(&painter, &grid, view, ui.input(|i| i.pointer.hover_pos()));
+    super::text_path::pick_paint(&painter, rect, &grid, design, view, ui.input(|i| i.pointer.hover_pos()));
     if *tool == Tool::Eyedropper
         && let Some(pos) = ui.input(|i| i.pointer.hover_pos()).filter(|p| art.contains(*p))
         && let Some(lift) = super::eyedropper::sample(design, &view.eyedropper.pixels, to_in(pos))
@@ -623,6 +629,7 @@ pub fn show(
                 super::node_edit::apply(design, edit, action);
             }
         }
+        Some(super::context_menu::Picked::Edit(edit)) if super::text_path::begin_pick(design, selection, view, &edit) => *tool = Tool::Select,
         Some(super::context_menu::Picked::Edit(edit)) => _ = crate::edit::run(design, selection, &edit, Subject::Selection),
         Some(super::context_menu::Picked::App(app)) => command = Some(Command::App(app)),
         Some(super::context_menu::Picked::Clipboard(action)) => command = Some(Command::Clipboard(action)),

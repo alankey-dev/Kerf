@@ -8,8 +8,7 @@ theirs and fill in a profile by hand. This spec gives Kerf plug-in recognition a
 transport layer. Kerf identifies a connected machine from its USB vendor and product id and
 acts on what it can honestly do with it.
 
-This is the interoperability layer documented in `docs/real-device-feasibility.md` and
-`docs/native-supporting/live-capture-2026-10-18.md`. It is detection and connection only. It
+This is the interoperability layer documented in `docs/real-device-feasibility.md`. It is detection and connection only. It
 is deliberately **not** an attempt to drive a Cricut machine: that machine's cut protocol is
 AES-encrypted with a key Cricut issues to its own authenticated client, so Kerf names a
 Cricut machine and explains the boundary rather than pretending to drive it. Kerf already
