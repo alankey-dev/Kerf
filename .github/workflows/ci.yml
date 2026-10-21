@@ -2,9 +2,10 @@ name: CI
 
 # Runs on every pull request, on GitHub-hosted runners (free and unlimited for a public repository). Format,
 # Clippy, the tests and cargo-deny on Linux, macOS and Windows, plus the heavy-design timing gates on macOS.
-# See docs/ci.md.
+# See docs/ci.md. release.yml also calls it (workflow_call) as the gate in front of a release build.
 on:
   pull_request:
+  workflow_call:
 
 concurrency:
   group: ci-${{ github.ref }}
