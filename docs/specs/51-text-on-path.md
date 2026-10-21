@@ -29,7 +29,7 @@
 
 - A selected path text shows its path as a faint accent line and three handles on it. The start handle slides `offset_in`; the centre handle drags across the path to flip Side; the end handle, on an open path, clips the run so the text centres between start and end when `Along` is Centre. Each drag is one undo step with the read-out showing the offset in the current units.
 - The Curve panel becomes **Path** when the text has a path. It shows Side, Align along, Offset (an expression field) and Remove from path. For a circle path it also shows Diameter, as today.
-- Node editing the text's path (press A with a path text selected) edits the copy inside the text and reflows the letters live. Editing the source shape does not move the text, by design, since the copy is the text's own; a **Refit to shape** row in the context menu copies the source's current outline again when the source still exists.
+- Node editing the text's path (press A with a path text selected) edits the copy inside the text and reflows the letters live. Editing the source shape does not move the text, by design, since the copy is the text's own. A Refit to shape row was specified here and dropped (issue 32): it was never built, and re-copying the source's outline would overwrite node edits made to the text's own copy.
 - Ungroup to letters places each letter at its tangent, as it does for curved text. Warp, Offset and Sticker apply to the laid-out glyphs as for any text.
 - Writing fonts follow a path too, and single-line text on a path draws once with the pen.
 

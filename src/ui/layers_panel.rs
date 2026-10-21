@@ -249,7 +249,16 @@ pub fn show(ui: &mut Ui, design: &mut Design, selection: &mut Vec<u64>, units: c
             }
             RowAction::Context(pos) => {
                 ui.data_mut(|d| d.insert_temp(anchor_id, rows[at].0));
-                super::context_menu::open_on(ui.ctx(), pos, &rows[at].1, selection);
+                let part = match (rows[at].0, &rows[at].1[..]) {
+                    (RowKey::Part(part), &[instance]) => {
+                        design.shapes.iter().find(|s| s.id == instance).and_then(|owner| crate::components::master_of_part(design, owner, part)).map(|m| (instance, m))
+                    }
+                    _ => None,
+                };
+                match part {
+                    Some((instance, master)) => super::context_menu::open_part(ui.ctx(), pos, instance, master, selection),
+                    None => super::context_menu::open_on(ui.ctx(), pos, &rows[at].1, selection),
+                }
             }
             RowAction::Edit(edit) => _ = crate::edit::run(design, selection, &edit, Subject::Ids(&rows[at].1)),
             RowAction::Effect(id, effects_list::Act::Toggle) => ui.data_mut(|d| {

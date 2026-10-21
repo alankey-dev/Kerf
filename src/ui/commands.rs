@@ -450,6 +450,8 @@ pub fn registry(board_in: (f32, f32)) -> Vec<Command> {
         A::ReplaceColour,
         A::SavePaletteToProject,
         A::CopyPaletteToSettings,
+        A::StepRepeatPanel,
+        A::RotateCopiesPanel,
     ])
     .chain(crate::snap::SnapClass::ALL.map(A::SnapClass));
     let to = AlignTo::Selection;
@@ -466,6 +468,7 @@ pub fn registry(board_in: (f32, f32)) -> Vec<Command> {
         Edit::SelectAll,
         Edit::SelectInverse,
         Edit::Deselect,
+        TRANSFORM_AGAIN,
         Edit::Group,
         Edit::Ungroup,
         Edit::Attach,
@@ -480,6 +483,7 @@ pub fn registry(board_in: (f32, f32)) -> Vec<Command> {
         Edit::Flip(Axis::Vertical),
     ]
     .into_iter()
+    .chain(crate::select::Match::MENU.map(Edit::SelectSame))
     .chain(combines)
     .chain(boolean_ops)
     .chain(aligns)
@@ -558,9 +562,8 @@ pub fn source(command: &Command) -> Source {
             | Edit::PasteStyle(_)
             | Edit::Insert(Insert::Generated { .. })
             | Edit::Pattern(Some(_))
-            | Edit::SelectSame(_)
             | Edit::SelectNext
-            | Edit::TransformAgain { .. }
+            | Edit::TransformAgain { copy: true, .. }
             | Edit::StepRepeat(_)
             | Edit::RotateCopies(_)
             | Edit::Pivot(_)
@@ -611,6 +614,8 @@ pub fn source(command: &Command) -> Source {
             | Edit::MakeComponent
             | Edit::DetachInstance
             | Edit::Nudge { .. }
+            | Edit::SelectSame(_)
+            | Edit::TransformAgain { copy: false, .. }
             | Edit::Colour(_) => Source::Registry,
         },
         Command::App(app) => match app {
@@ -679,6 +684,8 @@ pub fn aliases(command: &Command) -> &'static [&'static str] {
             Edit::Colour(_) => &["color", "fill"],
             Edit::Insert(Insert::Text(_)) | Edit::Text(TextChange::Font(_)) => &["typeface"],
             Edit::Guide(_) => &["ruler guides", "lines"],
+            Edit::SelectSame(_) => &["match", "similar", "alike"],
+            Edit::TransformAgain { copy: false, .. } => &["repeat", "again", "last transform"],
             _ => &[],
         },
         Command::App(app) => match app {
@@ -700,6 +707,8 @@ pub fn aliases(command: &Command) -> &'static [&'static str] {
             AppCommand::About => &["version", "help"],
             AppCommand::AiSettings => &["openai", "anthropic", "claude", "openrouter", "ollama", "api key", "model"],
             AppCommand::EditMonogram => &["initials", "monogram maker"],
+            AppCommand::StepRepeatPanel => &["array", "grid", "copies", "row"],
+            AppCommand::RotateCopiesPanel => &["ring", "radial", "circular", "copies"],
             _ => &[],
         },
         Command::Clipboard(action) => match action {
@@ -741,6 +750,7 @@ pub fn title(command: &Command) -> Cow<'static, str> {
         Command::Edit(Edit::Insert(Insert::Shape(kind))) => kind.label().into(),
         Command::Edit(Edit::Insert(Insert::Text(font)) | Edit::Text(TextChange::Font(font))) => font.label().into_owned().into(),
         Command::Edit(Edit::Colour(rgb)) => format!("Set colour to {}", colour_name(*rgb)).into(),
+        Command::Edit(Edit::SelectSame(m)) => format!("Select Same: {}", m.label()).into(),
         Command::App(AppCommand::Tutorial) => "Start tutorial".into(),
         Command::App(AppCommand::ZoomTo(pct)) => format!("Zoom to {pct}%").into(),
         _ => info(command).label.into(),
@@ -749,6 +759,20 @@ pub fn title(command: &Command) -> Cow<'static, str> {
 
 fn colour_name(rgb: Color32) -> String {
     crate::pens::PEN_COLOURS.iter().find(|(_, c)| *c == rgb).map_or_else(|| rgb.to_hex(), |(name, _)| (*name).to_owned())
+}
+
+/// Transform Again as a surface carries it. The step it repeats is the document's `DuplicateMemory`, which
+/// no const can hold, so `Ui::run_edit` swaps this placeholder frame for the remembered one.
+pub const TRANSFORM_AGAIN: Edit = Edit::TransformAgain {
+    from: crate::transform::Frame { centre: (0.0, 0.0), width_in: 0.0, height_in: 0.0, rotation_deg: 0.0, skew_deg: (0.0, 0.0), flip: (false, false) },
+    copy: false,
+};
+
+/// Select Same with Shift held adds its matches to the selection it started from (spec 50): puts the
+/// ids of `before` that the edit dropped back in `selection`.
+pub fn keep_selected(before: &[u64], selection: &mut Vec<u64>) {
+    let added: Vec<u64> = selection.iter().copied().filter(|id| !before.contains(id)).collect();
+    *selection = before.iter().copied().chain(added).collect();
 }
 
 /// The arrow keys nudge an eighth of an inch, or an inch with Shift.
@@ -909,34 +933,54 @@ mod tests {
         }
     }
 
-    /// One command of every variant.
+    /// Builds one sample per listed pattern and, from the same patterns, a `match` over the whole enum,
+    /// so a variant added to `Edit`, `AppCommand` or `Action` without a line here does not compile.
+    /// `skipped` lists variants whose payload a test cannot build; they stay out of the sample.
+    macro_rules! samples {
+        ($ty:ty; $($pat:pat => $sample:expr,)+ ; skipped: $($skip:pat),* $(,)?) => {{
+            fn exhaustive(v: &$ty) {
+                match v {
+                    $($pat => {})+
+                    $($skip => {})*
+                }
+            }
+            vec![$({
+                let sample: $ty = $sample;
+                exhaustive(&sample);
+                assert!(matches!(&sample, $pat), "{} sampled as {sample:?}", stringify!($pat));
+                sample
+            }),+]
+        }};
+    }
+
+    /// One command of every variant of `Edit`, `AppCommand` and `Action`, bar the few `skipped` below.
     fn every_variant() -> Vec<Command> {
         use crate::design::{Operation, ShapeKind};
         use crate::transform::Field;
         let board_in = (12.0, 12.0);
-        let edits = [
-            Edit::Delete,
-            Edit::Duplicate,
-            Edit::SelectAll,
-            Edit::SelectSame(crate::select::Match::Colour),
-            Edit::SelectInverse,
-            Edit::SelectNext,
-            Edit::SelectPrevious,
-            Edit::Deselect,
-            Edit::Group,
-            Edit::Ungroup,
-            Edit::Attach,
-            Edit::Detach,
-            Edit::Contain,
-            Edit::Uncontain,
-            Edit::Arrange(Arrange::ToFront),
-            Edit::Flip(Axis::Horizontal),
-            Edit::Align { op: Align::Left, to: AlignTo::Selection },
-            Edit::Combine(Combine::Weld),
-            Edit::BooleanOp(Combine::Subtract),
-            Edit::Flatten,
-            Edit::Unflatten,
-            Edit::AddEffect {
+        let edits = samples! { Edit;
+            Edit::Delete => Edit::Delete,
+            Edit::Duplicate => Edit::Duplicate,
+            Edit::SelectAll => Edit::SelectAll,
+            Edit::SelectSame(_) => Edit::SelectSame(crate::select::Match::Colour),
+            Edit::SelectInverse => Edit::SelectInverse,
+            Edit::SelectNext => Edit::SelectNext,
+            Edit::SelectPrevious => Edit::SelectPrevious,
+            Edit::Deselect => Edit::Deselect,
+            Edit::Group => Edit::Group,
+            Edit::Ungroup => Edit::Ungroup,
+            Edit::Attach => Edit::Attach,
+            Edit::Detach => Edit::Detach,
+            Edit::Contain => Edit::Contain,
+            Edit::Uncontain => Edit::Uncontain,
+            Edit::Arrange(_) => Edit::Arrange(Arrange::ToFront),
+            Edit::Flip(_) => Edit::Flip(Axis::Horizontal),
+            Edit::Align { .. } => Edit::Align { op: Align::Left, to: AlignTo::Selection },
+            Edit::Combine(_) => Edit::Combine(Combine::Weld),
+            Edit::BooleanOp(_) => Edit::BooleanOp(Combine::Subtract),
+            Edit::Flatten => Edit::Flatten,
+            Edit::Unflatten => Edit::Unflatten,
+            Edit::AddEffect { .. } => Edit::AddEffect {
                 effect: Effect::Offset(Offset {
                     distance_in: 0.1,
                     direction: Direction::Outset,
@@ -945,79 +989,107 @@ mod tests {
                 }),
                 reach: Reach::EachShape,
             },
-            Edit::AddEffect { effect: Effect::Sticker(Sticker { border_in: 0.1, corners: Corners::Sharp }), reach: Reach::Together },
-            Edit::Expand,
-            Edit::Effect { at: crate::effects::EntryRef { shape: 1, row: crate::effects::Row::Curve }, op: EffectEdit::Remove },
-            Edit::Warp(None),
-            Edit::Curve(4.0),
-            Edit::TextPath(TextPathEdit::Attach),
-            Edit::TextPath(TextPathEdit::Remove),
-            Edit::TextPath(TextPathEdit::Offset(0.5)),
-            Edit::Text(TextChange::SizePt(12.0)),
-            Edit::SetHidden(true),
-            Edit::Nudge { dx_in: 1.0, dy_in: 0.0, board_in },
-            Edit::Field { field: Field::X, value: crate::expr::Typed::To(1.0), board_in },
-            Edit::Operation(Operation::Pen),
-            Edit::Colour(Color32::RED),
-            Edit::Pen(crate::pens::PenPick::Colour(1)),
-            Edit::Insert(Insert::Shape(ShapeKind::Heart)),
-            Edit::Nesting(None),
-            Edit::Grid(crate::grid::GridSettings::for_units(Units::Imperial)),
-            Edit::Snap(crate::snap::SnapOptions::default()),
-            Edit::GrainLock(true),
-            Edit::Lock { lock: crate::edit::Lock::Layer, on: true },
-            Edit::Pattern(None),
-            Edit::PasteStyle(crate::clipboard::PasteStyle { operation: Operation::BasicCut, fill: Color32::BLACK, pen: Default::default(), pattern: None }),
-            Edit::MakeComponent,
-            Edit::DetachInstance,
-            Edit::PlaceInstance { component: 1, at: None },
-            Edit::ResetOverrides,
-            Edit::Guide(GuideEdit::Show),
-            Edit::Guide(GuideEdit::Delete(1)),
-        ];
-        let apps = [
-            AppCommand::New,
-            AppCommand::Home,
-            AppCommand::Save,
-            AppCommand::Export,
-            AppCommand::PrepareForDesignSpace,
-            AppCommand::Undo,
-            AppCommand::Redo,
-            AppCommand::Make,
-            AppCommand::Preview,
-            AppCommand::Open("p".into()),
-            AppCommand::Palette,
-            AppCommand::ZoomIn,
-            AppCommand::ZoomOut,
-            AppCommand::ResetZoom,
-            AppCommand::ZoomToFit,
-            AppCommand::ZoomToSelection,
-            AppCommand::ZoomToAll,
-            AppCommand::ZoomTo(200),
-            AppCommand::Units(Units::Metric),
-            AppCommand::Snapping,
-            AppCommand::SnapClass(crate::snap::SnapClass::Nodes),
-            AppCommand::SnapSettings,
-            AppCommand::PartialGrid,
-            AppCommand::GridSettings,
-            AppCommand::VersionHistory,
-            AppCommand::CloseTab(None),
-            AppCommand::NextTab,
-            AppCommand::PreviousTab,
-            AppCommand::Tab(0),
-            AppCommand::ReplaceColour,
-            AppCommand::SavePaletteToProject,
-            AppCommand::CopyPaletteToSettings,
-        ];
-        let clipboard = [
-            crate::ui::clipboard::Action::Cut,
-            crate::ui::clipboard::Action::Copy,
-            crate::ui::clipboard::Action::CopyAsImage,
-            crate::ui::clipboard::Action::Paste,
-            crate::ui::clipboard::Action::PasteInPlace,
-            crate::ui::clipboard::Action::PasteStyle,
-        ];
-        edits.into_iter().map(Command::Edit).chain(apps.into_iter().map(Command::App)).chain(clipboard.map(Command::Clipboard)).collect()
+            Edit::Effect { .. } => Edit::Effect { at: crate::effects::EntryRef { shape: 1, row: crate::effects::Row::Curve }, op: EffectEdit::Remove },
+            Edit::Expand => Edit::Expand,
+            Edit::Warp(_) => Edit::Warp(None),
+            Edit::Curve(_) => Edit::Curve(4.0),
+            Edit::TextPath(_) => Edit::TextPath(TextPathEdit::Attach),
+            Edit::Text(_) => Edit::Text(TextChange::SizePt(12.0)),
+            Edit::Params(_) => Edit::Params(crate::parametric::ParamOp::Corner { at: 0, value: crate::expr::Typed::To(0.1) }),
+            Edit::Corners(_) => Edit::Corners(crate::corners::CornerOp::RoundAll { radius_in: 0.1 }),
+            Edit::ConvertToPaths => Edit::ConvertToPaths,
+            Edit::SetHidden(_) => Edit::SetHidden(true),
+            Edit::Nudge { .. } => Edit::Nudge { dx_in: 1.0, dy_in: 0.0, board_in },
+            Edit::Field { .. } => Edit::Field { field: Field::X, value: crate::expr::Typed::To(1.0), board_in },
+            Edit::TransformAgain { .. } => TRANSFORM_AGAIN,
+            Edit::StepRepeat(_) => Edit::StepRepeat(crate::repeat::StepRepeat { copies: 2, offset_in: (1.0, 0.0), rotation_deg: 0.0, scale: 1.0, grid: None }),
+            Edit::RotateCopies(_) => Edit::RotateCopies(crate::repeat::RotateCopies { copies: 4, total_deg: 360.0 }),
+            Edit::Pivot(_) => Edit::Pivot(None),
+            Edit::Skew { .. } => Edit::Skew { axis: Axis::Horizontal, value: crate::expr::Typed::To(10.0) },
+            Edit::Operation(_) => Edit::Operation(Operation::Pen),
+            Edit::OutlineStrokes(_) => Edit::OutlineStrokes(Vec::new()),
+            Edit::Colour(_) => Edit::Colour(Color32::RED),
+            Edit::Pen(_) => Edit::Pen(crate::pens::PenPick::Colour(1)),
+            Edit::Insert(_) => Edit::Insert(Insert::Shape(ShapeKind::Heart)),
+            Edit::Nesting(_) => Edit::Nesting(None),
+            Edit::GrainLock(_) => Edit::GrainLock(true),
+            Edit::Lock { .. } => Edit::Lock { lock: crate::edit::Lock::Layer, on: true },
+            Edit::PasteStyle(_) => Edit::PasteStyle(crate::clipboard::PasteStyle { operation: Operation::BasicCut, fill: Color32::BLACK, pen: Default::default(), pattern: None }),
+            Edit::Pattern(_) => Edit::Pattern(None),
+            Edit::MakeComponent => Edit::MakeComponent,
+            Edit::DetachInstance => Edit::DetachInstance,
+            Edit::PlaceInstance { .. } => Edit::PlaceInstance { component: 1, at: None },
+            Edit::RenameComponent { .. } => Edit::RenameComponent { component: 1, name: "c".into() },
+            Edit::DuplicateComponent(_) => Edit::DuplicateComponent(1),
+            Edit::DeleteComponent(_) => Edit::DeleteComponent(1),
+            Edit::Override { .. } => Edit::Override { part: 1, change: crate::components::PartChange::Hidden(true) },
+            Edit::ResetOverrides => Edit::ResetOverrides,
+            Edit::ResetPart(_) => Edit::ResetPart(1),
+            Edit::Rename(_) => Edit::Rename(None),
+            Edit::Grid(_) => Edit::Grid(crate::grid::GridSettings::for_units(Units::Imperial)),
+            Edit::Guide(_) => Edit::Guide(GuideEdit::Show),
+            Edit::Snap(_) => Edit::Snap(crate::snap::SnapOptions::default()),
+            Edit::BuildShape { .. } => Edit::BuildShape { picks: Vec::new(), delete: false },
+            Edit::Knife { .. } => Edit::Knife { line: Vec::new() },
+            ; skipped: Edit::Place(_), Edit::Paste { .. }, Edit::Monogram { .. }
+        };
+        let apps = samples! { AppCommand;
+            AppCommand::New => AppCommand::New,
+            AppCommand::Home => AppCommand::Home,
+            AppCommand::Save => AppCommand::Save,
+            AppCommand::Export => AppCommand::Export,
+            AppCommand::PrepareForDesignSpace => AppCommand::PrepareForDesignSpace,
+            AppCommand::Undo => AppCommand::Undo,
+            AppCommand::Redo => AppCommand::Redo,
+            AppCommand::Make => AppCommand::Make,
+            AppCommand::Preview => AppCommand::Preview,
+            AppCommand::Open(_) => AppCommand::Open("p".into()),
+            AppCommand::Palette => AppCommand::Palette,
+            AppCommand::ZoomIn => AppCommand::ZoomIn,
+            AppCommand::ZoomOut => AppCommand::ZoomOut,
+            AppCommand::ResetZoom => AppCommand::ResetZoom,
+            AppCommand::ZoomToFit => AppCommand::ZoomToFit,
+            AppCommand::ZoomToSelection => AppCommand::ZoomToSelection,
+            AppCommand::ZoomToAll => AppCommand::ZoomToAll,
+            AppCommand::ZoomTo(_) => AppCommand::ZoomTo(200),
+            AppCommand::Units(_) => AppCommand::Units(Units::Metric),
+            AppCommand::Snapping => AppCommand::Snapping,
+            AppCommand::SnapClass(_) => AppCommand::SnapClass(crate::snap::SnapClass::Nodes),
+            AppCommand::SnapSettings => AppCommand::SnapSettings,
+            AppCommand::PartialGrid => AppCommand::PartialGrid,
+            AppCommand::GridSettings => AppCommand::GridSettings,
+            AppCommand::CutPreview => AppCommand::CutPreview,
+            AppCommand::VersionHistory => AppCommand::VersionHistory,
+            AppCommand::Upload => AppCommand::Upload,
+            AppCommand::EditMaster(_) => AppCommand::EditMaster(1),
+            AppCommand::LeaveMaster => AppCommand::LeaveMaster,
+            AppCommand::CloseTab(_) => AppCommand::CloseTab(None),
+            AppCommand::NextTab => AppCommand::NextTab,
+            AppCommand::PreviousTab => AppCommand::PreviousTab,
+            AppCommand::Tab(_) => AppCommand::Tab(0),
+            AppCommand::Tutorial => AppCommand::Tutorial,
+            AppCommand::Shortcuts => AppCommand::Shortcuts,
+            AppCommand::About => AppCommand::About,
+            AppCommand::AiSettings => AppCommand::AiSettings,
+            AppCommand::Rename => AppCommand::Rename,
+            AppCommand::EditMonogram => AppCommand::EditMonogram,
+            AppCommand::ReplaceColour => AppCommand::ReplaceColour,
+            AppCommand::StepRepeatPanel => AppCommand::StepRepeatPanel,
+            AppCommand::RotateCopiesPanel => AppCommand::RotateCopiesPanel,
+            AppCommand::SavePaletteToProject => AppCommand::SavePaletteToProject,
+            AppCommand::CopyPaletteToSettings => AppCommand::CopyPaletteToSettings,
+            ; skipped:
+        };
+        let clipboard = samples! { crate::ui::clipboard::Action;
+            crate::ui::clipboard::Action::Cut => crate::ui::clipboard::Action::Cut,
+            crate::ui::clipboard::Action::Copy => crate::ui::clipboard::Action::Copy,
+            crate::ui::clipboard::Action::CopyAsImage => crate::ui::clipboard::Action::CopyAsImage,
+            crate::ui::clipboard::Action::Paste => crate::ui::clipboard::Action::Paste,
+            crate::ui::clipboard::Action::PasteInPlace => crate::ui::clipboard::Action::PasteInPlace,
+            crate::ui::clipboard::Action::PasteStyle => crate::ui::clipboard::Action::PasteStyle,
+            ; skipped:
+        };
+        edits.into_iter().map(Command::Edit).chain(apps.into_iter().map(Command::App)).chain(clipboard.into_iter().map(Command::Clipboard)).collect()
     }
 
     type Kind = (Option<std::mem::Discriminant<Edit>>, Option<std::mem::Discriminant<AppCommand>>, Option<std::mem::Discriminant<crate::ui::clipboard::Action>>);

@@ -623,7 +623,14 @@ pub fn show(
                 super::node_edit::apply(design, edit, action);
             }
         }
-        Some(super::context_menu::Picked::Edit(edit)) => _ = crate::edit::run(design, selection, &edit, Subject::Selection),
+        Some(super::context_menu::Picked::Edit(edit)) => {
+            let before = selection.clone();
+            _ = crate::edit::run(design, selection, &edit, Subject::Selection);
+            if matches!(edit, crate::edit::Edit::SelectSame(_)) && ui.input(|i| i.modifiers.shift) {
+                super::commands::keep_selected(&before, selection);
+            }
+        }
+        Some(super::context_menu::Picked::EditEffect(at, from)) => super::effects_list::open(ui.ctx(), at, Rect::from_min_size(from, Vec2::ZERO)),
         Some(super::context_menu::Picked::App(app)) => command = Some(Command::App(app)),
         Some(super::context_menu::Picked::Clipboard(action)) => command = Some(Command::Clipboard(action)),
         None => {}
