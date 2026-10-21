@@ -8,7 +8,7 @@ Every pull request runs `ci.yml`, and nothing runs on a push: every change reach
 
 | Job | What it does |
 | --- | --- |
-| `check` | Format, Clippy, the tests (under `xvfb-run` on Linux, where the kittests render through Mesa's lavapipe) and `cargo deny check advisories`. Once each on Linux (`ubuntu-latest`), macOS (`macos-latest`) and Windows (`windows-latest`). |
+| `check` | Format, Clippy, the tests (under `xvfb-run` on Linux, where the kittests render through Mesa's lavapipe). Once each on Linux (`ubuntu-latest`), macOS (`macos-latest`) and Windows (`windows-latest`). The Linux leg also runs `cargo deny check advisories`; `deny.toml` lists all five release triples as `targets`, so that one run checks every platform's dependency graph. Check a single triple with `cargo deny -t <triple> check advisories`. |
 | `timing` | The heavy-design and 200-shape frame-time gates (`docs/specs/38-benchmark.md`), on `macos-latest`, where the ceilings were set. |
 
 The kittests render through wgpu: Metal on macOS, the WARP software adapter through DX12 on Windows, and Mesa's lavapipe Vulkan driver under `xvfb-run` on Linux. The Linux build needs the packages in `tools/release/linux-deps.txt`, which both `ci.yml` and the release job install from that file.
