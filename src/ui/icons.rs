@@ -80,7 +80,7 @@ pub enum Icon {
     Eyedropper,
 }
 
-/// The registry SVGs paint with `currentColor`. Rendering them white lets egui's tint set the colour.
+/// The bundled Lucide SVGs (`assets/icons`) paint with `currentColor`. Rendering them white lets egui's tint set the colour.
 fn whiten(svg: &[u8]) -> Arc<[u8]> {
     String::from_utf8_lossy(svg).replace("currentColor", "#ffffff").into_bytes().into()
 }
@@ -88,37 +88,37 @@ fn whiten(svg: &[u8]) -> Arc<[u8]> {
 macro_rules! svg {
     ($name:literal) => {{
         static WHITE: OnceLock<Arc<[u8]>> = OnceLock::new();
-        let bytes = WHITE.get_or_init(|| whiten(include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/ds/icons/", $name))));
+        let bytes = WHITE.get_or_init(|| whiten(include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/icons/", $name))));
         Some(($name, bytes.clone()))
     }};
 }
 
-/// Registry names for the icon table. `None` where there is no matching glyph.
+/// Bundled file names for the icon table. `None` where there is no matching glyph.
 fn svg(icon: Icon) -> Option<(&'static str, Arc<[u8]>)> {
     match icon {
-        Icon::Chevron => svg!("chevron-down-16.svg"),
-        Icon::Shapes => svg!("shapes-24.svg"),
-        Icon::Upload => svg!("upload-24.svg"),
-        Icon::Pen => svg!("draw-24.svg"),
-        Icon::Pencil => svg!("edit-24.svg"),
-        Icon::Text => svg!("text-24.svg"),
-        Icon::Cut => svg!("cut-24.svg"),
-        Icon::Draw => svg!("draw-24.svg"),
-        Icon::Flip => svg!("flip-horizontal-24.svg"),
-        Icon::Arrange => svg!("drag-multi-24.svg"),
-        Icon::Align => svg!("align-left-24.svg"),
-        Icon::Effects => svg!("wand-2-24.svg"),
-        Icon::Combine => svg!("shape-combine-24.svg"),
-        Icon::Contour => svg!("contour-24.svg"),
-        Icon::Print => svg!("print-24.svg"),
-        Icon::Guides => svg!("guides-24.svg"),
-        Icon::Tick => svg!("checkmark-24.svg"),
-        Icon::Info => svg!("info-16.svg"),
-        Icon::Close => svg!("x-24.svg"),
-        Icon::Minus => svg!("minus-16.svg"),
-        Icon::Plus => svg!("plus-16.svg"),
-        Icon::SubmenuArrow => svg!("arrow-right-8.svg"),
-        Icon::CollapseLeft => svg!("chevron-left-16.svg"),
+        Icon::Chevron => svg!("chevron-down.svg"),
+        Icon::Shapes => svg!("shapes.svg"),
+        Icon::Upload => svg!("upload.svg"),
+        Icon::Pen => svg!("pen-tool.svg"),
+        Icon::Pencil => svg!("pencil.svg"),
+        Icon::Text => svg!("type.svg"),
+        Icon::Cut => svg!("scissors.svg"),
+        Icon::Draw => svg!("pencil-line.svg"),
+        Icon::Flip => svg!("mirror-rectangular.svg"),
+        Icon::Arrange => svg!("layers.svg"),
+        Icon::Align => svg!("text-align-start.svg"),
+        Icon::Effects => svg!("wand-sparkles.svg"),
+        Icon::Combine => svg!("combine.svg"),
+        Icon::Contour => svg!("square-dashed.svg"),
+        Icon::Print => svg!("printer.svg"),
+        Icon::Guides => svg!("ruler.svg"),
+        Icon::Tick => svg!("check.svg"),
+        Icon::Info => svg!("info.svg"),
+        Icon::Close => svg!("x.svg"),
+        Icon::Minus => svg!("minus.svg"),
+        Icon::Plus => svg!("plus.svg"),
+        Icon::SubmenuArrow => svg!("chevron-right.svg"),
+        Icon::CollapseLeft => svg!("chevron-left.svg"),
         _ => None,
     }
 }
@@ -135,7 +135,7 @@ fn paint_svg(ui: &Ui, name: &str, bytes: Arc<[u8]>, rect: Rect, ink: Color32) {
     Image::new(source).tint(ink).paint_at(ui, rect);
 }
 
-/// Paints a registry icon rotated by `radians` about its centre (for up and down chevrons).
+/// Paints a bundled icon rotated by `radians` about its centre (for up and down chevrons).
 pub fn paint_icon_rotated(ui: &Ui, icon: Icon, rect: Rect, ink: Color32, radians: f32) {
     if let Some((name, bytes)) = svg(icon) {
         let source = ImageSource::Bytes { uri: format!("bytes://icons/{name}").into(), bytes: Bytes::Shared(bytes) };
@@ -319,7 +319,7 @@ fn paperclip() -> Vec<P> {
     path
 }
 
-/// Glyphs the icon registry does not contain: original 1.5 px line drawings in the unit square.
+/// Glyphs the bundled Lucide set does not contain: original 1.5 px line drawings in the unit square.
 fn paint_drawn(ui: &Ui, icon: Icon, rect: Rect, ink: Color32) {
     let pen = Pen { painter: ui.painter(), rect, stroke: Stroke::new(1.5_f32, ink) };
     let ghost = Pen { stroke: Stroke::new(1.0_f32, ink.gamma_multiply(0.4)), ..pen };
