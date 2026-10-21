@@ -5,6 +5,10 @@ name: Release
 # same builds and checks, with the artefacts, SHA256SUMS and notes kept as a workflow artifact instead of
 # a release.
 #
+# A release only builds from a commit that is on main and passes ci.yml. The build jobs hold no secrets: the
+# separate sign job, in the protected `release` environment, is the only one that receives them, and it
+# receives only the built artefacts. A dry run never signs.
+#
 # Everything runs on GitHub-hosted runners (free and unlimited for a public repository). See docs/ci.md.
 
 on:
@@ -34,6 +38,20 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Every change reaches main through a reviewed pull request, so a tag on a commit that is not on main
+      # is a tag on code nobody merged. Restrict who can push v* tags too (docs/ci.md).
+      - name: The tagged commit is on main
+        if: github.ref_type == 'tag'
+        run: |
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "$GITHUB_REF_NAME ($GITHUB_SHA) is not reachable from main. Merge it first, then tag the merge." >&2
+            exit 1
+          fi
 
       - name: The tag matches Cargo.toml's version
         id: version
@@ -46,8 +64,14 @@ jobs:
           version=$(tools/release/check-version.sh "$TAG")
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-  build:
+  # Format, Clippy, the tests and cargo-deny on all three platforms, on the tagged commit.
+  ci:
     needs: check
+    uses: ./.github/workflows/ci.yml
+
+  # Holds no secrets: dependency build scripts run here.
+  build:
+    needs: [check, ci]
     name: build (${{ matrix.name }})
     strategy:
       fail-fast: false
@@ -72,22 +96,21 @@ jobs:
       VERSION: ${{ needs.check.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install the pinned toolchain
         run: rustup toolchain install
 
+      # No cache on the legs that get signed: a restored cache could put someone else's compiled code into
+      # a binary that then carries our signature.
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        if: runner.os == 'Linux'
         with:
           key: release-${{ matrix.name }}
 
       - name: Package (macOS)
         if: runner.os == 'macOS'
-        env:
-          MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
-          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
         run: |
           rustup target add aarch64-apple-darwin x86_64-apple-darwin
           tools/release/package-macos.sh "$VERSION"
@@ -112,8 +135,6 @@ jobs:
       - name: Package (Windows)
         if: runner.os == 'Windows'
         env:
-          WINDOWS_CERT_PFX: ${{ secrets.WINDOWS_CERT_PFX }}
-          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
           TARGET: ${{ matrix.target }}
         shell: pwsh
         run: |
@@ -167,10 +188,6 @@ jobs:
           dpkg-deb -x "target/dist/Kerf-$VERSION-linux-$arch.deb" "$RUNNER_TEMP/deb"
           expect "$("$RUNNER_TEMP/deb/usr/bin/kerf" --version)"
 
-      - name: Name the unsigned list after this leg
-        shell: bash
-        run: if [ -f target/dist/unsigned.txt ]; then mv target/dist/unsigned.txt "target/dist/unsigned-${{ matrix.name }}.txt"; fi
-
       # Fail this leg rather than publish: a missing artefact should cost one runner, not the whole release.
       - name: Count the artefacts
         shell: bash
@@ -189,7 +206,15 @@ jobs:
           name: dist-${{ matrix.name }}
           path: |
             target/dist/Kerf-*
-            target/dist/unsigned-*.txt
+          if-no-files-found: error
+
+      # What the sign job starts from: the built app or kerf.exe, not the packages around them.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: runner.os != 'Linux'
+        with:
+          name: sign-input-${{ matrix.name }}
+          path: target/sign-input/*
+          retention-days: 1
           if-no-files-found: error
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -199,8 +224,105 @@ jobs:
           path: target/upgrade-test/*.msi
           if-no-files-found: error
 
-  smoke-windows-arm64:
+  # The only job that receives the signing secrets, and only the built artefacts: no cargo build runs here.
+  # A tag run only (a dry run keeps the unsigned build), in the protected `release` environment, whose
+  # deployment rules and required reviewers decide who can release. Without the secrets it keeps the
+  # unsigned build and lists it in the release notes.
+  sign:
     needs: [check, build]
+    if: github.ref_type == 'tag'
+    name: sign (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macos-universal
+            runner: macos-latest
+          - name: windows-x64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+          - name: windows-arm64
+            runner: windows-latest
+            target: aarch64-pc-windows-msvc
+    runs-on: ${{ matrix.runner }}
+    environment: release
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist-${{ matrix.name }}
+          path: target/dist
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: sign-input-${{ matrix.name }}
+          path: target/sign-input
+
+      - name: Sign, notarise and staple (macOS)
+        if: runner.os == 'macOS'
+        env:
+          MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: tools/release/package-macos.sh "$VERSION" --sign
+
+      # Rebuilding the .zip and .msi around the signed kerf.exe needs cargo-wix, which reads the manifest
+      # through cargo. It builds nothing, and the script takes the certificate out of the environment
+      # before it runs.
+      - name: Install the pinned toolchain (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          rustup toolchain install
+          rustup target add ${{ matrix.target }}
+
+      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+        if: runner.os == 'Windows'
+        with:
+          tool: cargo-wix@0.3.9
+
+      - name: Sign (Windows)
+        if: runner.os == 'Windows'
+        env:
+          WINDOWS_CERT_PFX: ${{ secrets.WINDOWS_CERT_PFX }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+          TARGET: ${{ matrix.target }}
+        shell: pwsh
+        run: tools/release/package-windows.ps1 $env:VERSION -Target $env:TARGET -Sign
+
+      - name: Name the unsigned list after this leg
+        shell: bash
+        run: if [ -f target/dist/unsigned.txt ]; then mv target/dist/unsigned.txt "target/dist/unsigned-${{ matrix.name }}.txt"; fi
+
+      - name: Count the artefacts
+        shell: bash
+        run: |
+          case '${{ matrix.name }}' in
+            macos-universal) expected=1 ;;
+            windows-*) expected=2 ;;
+          esac
+          count=$(find target/dist -maxdepth 1 -name 'Kerf-*' | wc -l)
+          [ "$count" -eq "$expected" ] || { echo "expected $expected artefacts on ${{ matrix.name }}, found $count" >&2; exit 1; }
+
+      # Replaces the unsigned set the build job uploaded under the same name.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist-${{ matrix.name }}
+          path: |
+            target/dist/Kerf-*
+            target/dist/unsigned-*.txt
+          overwrite: true
+          if-no-files-found: error
+
+  smoke-windows-arm64:
+    needs: [check, build, sign]
+    if: ${{ !failure() && !cancelled() }}
     runs-on: windows-11-arm
     env:
       VERSION: ${{ needs.check.outputs.version }}
@@ -221,7 +343,8 @@ jobs:
   # Installs the .msi, checks the Start menu shortcut, then installs a higher version over it and checks
   # that it replaced the first rather than installing alongside.
   verify-msi:
-    needs: [check, build]
+    needs: [check, build, sign]
+    if: ${{ !failure() && !cancelled() }}
     runs-on: windows-latest
     env:
       VERSION: ${{ needs.check.outputs.version }}
@@ -321,7 +444,8 @@ jobs:
           [ "$status" -eq 124 ] || { echo "the AppImage exited with $status within 20 seconds" >&2; exit 1; }
 
   publish:
-    needs: [check, build, smoke-windows-arm64, verify-msi, verify-linux]
+    needs: [check, build, sign, smoke-windows-arm64, verify-msi, verify-linux]
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -329,6 +453,8 @@ jobs:
       VERSION: ${{ needs.check.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -349,6 +475,8 @@ jobs:
           sha256sum Kerf-* > SHA256SUMS
           cat SHA256SUMS
           cat unsigned-*.txt > unsigned.txt 2>/dev/null || true
+          # A dry run never signs, so the macOS and Windows artefacts are all unsigned.
+          if [ "$GITHUB_REF_TYPE" != tag ]; then ls Kerf-*.dmg Kerf-*-windows-* >> unsigned.txt; fi
           set +e
           ../tools/release/notes.sh "$VERSION" unsigned.txt > notes.md
           status=$?
