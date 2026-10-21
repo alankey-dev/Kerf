@@ -4,8 +4,7 @@
 
 use super::link::PortInfo;
 
-/// Cricut Inc's USB vendor id, from the live capture in
-/// `docs/native-supporting/live-capture-2026-10-18.md`.
+/// Cricut Inc's USB vendor id, read from a live USB capture of a Cricut machine.
 const CRICUT_VID: u16 = 0x20D3;
 
 /// USB-serial-bridge vendor ids common on open cutters, each mapped to the preset to start from. FTDI,

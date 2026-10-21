@@ -3,7 +3,7 @@
 A plain-language walk through the stack, for understanding why a third-party app cannot
 drive a Maker without Cricut's server. It stays at the level the existing evidence docs
 already establish (`evidence-native.md`, `evidence-handshake.md`,
-`real-device-feasibility.md`, `native-supporting/live-capture-2026-10-18.md`). It does not
+`real-device-feasibility.md`). It does not
 reproduce any key-derivation, key-extraction or decryption procedure, because the project
 does not build those. Where a step is the encrypted part, this doc names it and stops.
 
