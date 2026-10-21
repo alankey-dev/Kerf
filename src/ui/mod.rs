@@ -185,6 +185,8 @@ mod tests_spec56b;
 mod tests_spec57;
 #[cfg(test)]
 mod tests_spec58;
+#[cfg(test)]
+mod tests_svg_hostile;
 mod text_edit;
 mod text_path;
 pub(crate) mod tokens;
@@ -275,6 +277,8 @@ pub struct Kerf {
     upload_file: Option<PathBuf>,
     /// The id of the document the image worker's latest job is for; its answer goes there.
     image_owner: Option<String>,
+    /// An uploaded SVG being read and parsed off the UI thread.
+    svg_import: Option<upload::SvgJob>,
     /// The tab whose running Make kept this tab's Make from starting, while the question shows.
     make_elsewhere: Option<String>,
     /// The interactive tutorial, while it runs (spec 39).
@@ -343,6 +347,7 @@ impl Kerf {
             _textures,
             upload_file: None,
             image_owner: None,
+            svg_import: None,
             make_elsewhere: None,
             tutorial: None,
             about: false,
@@ -752,7 +757,7 @@ impl Kerf {
             AppCommand::GridSettings => grid_panel::open(ctx),
             AppCommand::CutPreview => self.doc.cut_preview = Some(cut_preview::CutPreview::new(&self.make_flow())),
             AppCommand::VersionHistory => self.open_versions(),
-            AppCommand::Upload => self.upload(),
+            AppCommand::Upload => self.upload(ctx),
             AppCommand::EditMaster(component) => self.doc.edit_master(component),
             AppCommand::LeaveMaster => {}
             AppCommand::CloseTab(i) => self.close_tab(i.unwrap_or(self.active_index())),

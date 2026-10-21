@@ -138,11 +138,52 @@ impl Converted {
     }
 }
 
+/// The most SVG text Kerf parses, as given and once a compressed file is unpacked.
+pub const MAX_SVG_BYTES: usize = 64 * 1024 * 1024;
+
+/// The parser options every SVG boundary uses. usvg's default `<image href>` handling opens the href
+/// as a filesystem path (`/dev/zero` never ends, a FIFO blocks, a UNC path on Windows makes an SMB
+/// connection) and decodes data URLs, including nested SVG. Kerf draws no image nodes, so both
+/// resolvers decline every href and the image is dropped.
+pub fn safe_options() -> usvg::Options {
+    usvg::Options {
+        image_href_resolver: usvg::ImageHrefResolver { resolve_data: Box::new(|_, _, _| None), resolve_string: Box::new(|_, _| None) },
+        ..usvg::Options::default()
+    }
+}
+
+/// Parses SVG bytes, or a gzip-compressed SVG, with [`safe_options`] and the [`MAX_SVG_BYTES`] cap. The
+/// one place Kerf calls usvg's parser.
+pub fn parse_tree(bytes: &[u8]) -> Result<usvg::Tree, String> {
+    use std::io::Read;
+    if bytes.len() > MAX_SVG_BYTES {
+        return Err(too_large(bytes.len()));
+    }
+    let unpacked;
+    let bytes = if bytes.starts_with(&[0x1f, 0x8b]) {
+        let mut out = Vec::new();
+        flate2::read::GzDecoder::new(bytes).take(MAX_SVG_BYTES as u64 + 1).read_to_end(&mut out).map_err(|_| "the compressed SVG is damaged".to_owned())?;
+        if out.len() > MAX_SVG_BYTES {
+            return Err(too_large(out.len()));
+        }
+        unpacked = out;
+        &unpacked[..]
+    } else {
+        bytes
+    };
+    let text = std::str::from_utf8(bytes).map_err(|_| "the file is not SVG text".to_owned())?;
+    usvg::Tree::from_str(text, &safe_options()).map_err(|e| e.to_string())
+}
+
+fn too_large(bytes: usize) -> String {
+    format!("the SVG is over the {} MB limit ({} MB)", MAX_SVG_BYTES >> 20, bytes >> 20)
+}
+
 /// Parses an SVG into a tree of placed paths and groups, converting strokes to operations and
 /// reducing gradients, faded fills and invisible paths per the rules in the module docs. Each `<g>`
 /// becomes a group named by its SVG `id`, nested as the file nests.
 pub fn convert(bytes: &[u8]) -> Result<Converted, String> {
-    let tree = usvg::Tree::from_data(bytes, &usvg::Options::default()).map_err(|e| e.to_string())?;
+    let tree = parse_tree(bytes)?;
     // usvg keeps the viewBox out of `abs_transform`; without it a file whose viewBox is not in px
     // imports at the wrong scale.
     let view = usvg::utils::view_box_to_transform(tree.view_box.rect, tree.view_box.aspect, tree.size);
@@ -527,5 +568,67 @@ mod tests {
         let b = convert(&svg(body)).unwrap();
         assert_eq!(a.leaves(), b.leaves());
         assert_eq!(a.report, b.report);
+    }
+}
+
+#[cfg(test)]
+mod href_tests {
+    use super::*;
+
+    const DEV_ZERO: &[u8] = include_bytes!("../tests/fixtures/malformed/href-dev-zero.svg");
+    const UNC: &[u8] = include_bytes!("../tests/fixtures/malformed/href-unc.svg");
+    const RELATIVE: &[u8] = include_bytes!("../tests/fixtures/malformed/href-relative.svg");
+    const UNDECODABLE: &[u8] = include_bytes!("../tests/fixtures/malformed/undecodable.svg");
+    const COMPRESSED: &[u8] = include_bytes!("../tests/fixtures/malformed/compressed.svg");
+
+    /// Runs `convert` on a thread so a hang fails the test instead of stalling the run.
+    fn promptly(bytes: &'static [u8]) -> Result<Converted, String> {
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || drop(tx.send(convert(bytes))));
+        rx.recv_timeout(std::time::Duration::from_secs(10)).expect("convert finished promptly")
+    }
+
+    #[test]
+    fn image_hrefs_are_never_read_and_the_drawing_still_imports() {
+        for (name, bytes) in [("/dev/zero", DEV_ZERO), ("UNC", UNC), ("relative", RELATIVE)] {
+            let converted = promptly(bytes).unwrap_or_else(|e| panic!("{name} href: {e}"));
+            assert_eq!(converted.leaves().len(), 1, "{name} href: the square imports, the image is ignored");
+        }
+    }
+
+    #[test]
+    fn undecodable_bytes_are_an_error_not_a_hang() {
+        assert!(promptly(UNDECODABLE).is_err());
+    }
+
+    #[test]
+    fn data_url_images_are_declined_too() {
+        let svg = br#"<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M0 0H10V10H0Z"/><image href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=" width="1" height="1"/></svg>"#;
+        let tree = parse_tree(svg).unwrap();
+        assert!(!tree.root.descendants().any(|n| matches!(&*n.borrow(), usvg::NodeKind::Image(_))));
+    }
+
+    #[test]
+    fn input_over_the_cap_is_refused_before_parsing() {
+        let big = vec![b' '; MAX_SVG_BYTES + 1];
+        assert!(convert(&big).err().is_some_and(|e| e.contains("limit")));
+    }
+
+    #[test]
+    fn a_compressed_file_is_capped_once_unpacked() {
+        use std::io::Write;
+        let mut gz = flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::fast());
+        let chunk = vec![b' '; 1 << 20];
+        for _ in 0..=(MAX_SVG_BYTES >> 20) {
+            gz.write_all(&chunk).unwrap();
+        }
+        let packed = gz.finish().unwrap();
+        assert!(packed.len() < MAX_SVG_BYTES, "the bomb is small as given");
+        assert!(convert(&packed).err().is_some_and(|e| e.contains("limit")));
+    }
+
+    #[test]
+    fn a_compressed_svg_imports() {
+        assert_eq!(promptly(COMPRESSED).expect("svgz imports").leaves().len(), 1);
     }
 }

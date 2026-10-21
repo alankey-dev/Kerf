@@ -14,6 +14,8 @@ fn upload(fixture: &mut Fixture, file: &str) {
     fixture.state_mut().upload_file = Some(PathBuf::from(file));
     fixture.get_by_label("Upload").click();
     fixture.step();
+    fixture.state_mut().wait_svg_answered();
+    fixture.step();
 }
 
 fn op_counts(fixture: &Fixture) -> (usize, usize) {

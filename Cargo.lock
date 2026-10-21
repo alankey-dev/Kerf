@@ -2106,6 +2106,7 @@ dependencies = [
  "egui",
  "egui_extras",
  "egui_kittest",
+ "flate2",
  "fontdb",
  "i_overlay",
  "image",

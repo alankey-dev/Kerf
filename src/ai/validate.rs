@@ -189,8 +189,7 @@ impl<'a, 'input> Walk<'a, 'input> {
 
 /// How many paths have a stroke and no fill. A path with neither never reaches here: usvg drops it.
 fn stroked_paths(svg: &str) -> Result<usize, String> {
-    use usvg::TreeParsing;
-    let tree = usvg::Tree::from_data(svg.as_bytes(), &usvg::Options::default()).map_err(|_| "it is not valid SVG".to_owned())?;
+    let tree = crate::svg_import::parse_tree(svg.as_bytes()).map_err(|_| "it is not valid SVG".to_owned())?;
     let stroked = tree.root.descendants().filter(|node| matches!(&*node.borrow(), usvg::NodeKind::Path(p) if p.stroke.is_some() && p.fill.is_none())).count();
     Ok(stroked)
 }
