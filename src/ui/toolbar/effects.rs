@@ -8,7 +8,7 @@
 use egui::{Rect, Response, Sense, Stroke, StrokeKind, Ui, Vec2, WidgetInfo, WidgetType, pos2};
 
 use crate::design::{Shape, ShapeKind};
-use crate::edit::Edit;
+use crate::edit::{Edit, TextPathEdit};
 use crate::effects::{Corners, Direction, Effect, EffectEdit, EntryRef, Offset, Reach, Row, Sticker, TooThin};
 use crate::geometry::{DEFAULT_MITER_LIMIT, Join};
 use crate::ui::commands::Cx;
@@ -52,6 +52,7 @@ pub fn menu(ui: &Ui, anchor: &Response, units: Units, primary: &Shape, all_text:
     }
     let mut live = None;
     let mut convert = false;
+    let mut on_path = false;
     let applied = popover(ui, anchor, "effects", WIDTH, |ui| {
         let panel = ui.data(|d| d.get_temp(panel_id)).unwrap_or(Panel::Menu);
         let picked = match panel {
@@ -74,6 +75,9 @@ pub fn menu(ui: &Ui, anchor: &Response, units: Units, primary: &Shape, all_text:
                 if all_text && command_icon_row(ui, Icon::Pen, &cx.entry(Edit::ConvertToPaths)) {
                     convert = true;
                 }
+                if command_icon_row(ui, Icon::Curve, &cx.entry(Edit::TextPath(TextPathEdit::Attach))) {
+                    on_path = true;
+                }
                 picked
             }
             Panel::Offset => title_row(ui, "Offset"),
@@ -84,6 +88,9 @@ pub fn menu(ui: &Ui, anchor: &Response, units: Units, primary: &Shape, all_text:
         };
         if convert {
             return Some(Edit::ConvertToPaths);
+        }
+        if on_path {
+            return Some(Edit::TextPath(TextPathEdit::Attach));
         }
         if let Some(next) = picked {
             ui.data_mut(|d| {

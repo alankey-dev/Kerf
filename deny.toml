@@ -1,6 +1,6 @@
 # cargo-deny checks the dependency graph against the RustSec advisory database. CI runs
-# `cargo deny check advisories`. Licence checks are off: Kerf is for personal use and is not
-# published (spec 22, item 6 dropped).
+# `cargo deny check advisories`. Licence checks of the dependency graph are off. Asset licences
+# are recorded in assets/PROVENANCE.md.
 #
 # Known, accepted: building the tests prints a rustc future-incompatibility warning for
 # `block v0.1.6`. It reaches the build only through the dev-only path
@@ -8,14 +8,28 @@
 # (`cargo tree -e normal -i block` is empty). The pinned toolchain in rust-toolchain.toml means the
 # warning can only become an error on a deliberate toolchain upgrade. See AUDIT-025.
 
-# Kerf is a macOS app; Linux-only crates in the graph (atspi, wayland) never build here.
+# Kerf ships on macOS, Windows and Linux, so the graph covers all five release triples. Without
+# them, Linux-only crates (atspi, zbus, wayland) would never be checked. `cargo deny -t <triple>
+# check advisories` checks one at a time.
 [graph]
 all-features = false
-targets = ["aarch64-apple-darwin", "x86_64-apple-darwin"]
+targets = [
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "x86_64-pc-windows-msvc",
+    "aarch64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+]
 
 [advisories]
 # Unmaintained, not vulnerable. Each needs an upstream move to drop, tracked rather than blocking CI.
 ignore = [
     { id = "RUSTSEC-2024-0436", reason = "paste is a build-time proc macro reached only through wgpu -> metal; goes when egui moves off metal 0.31" },
     { id = "RUSTSEC-2026-0192", reason = "ttf-parser outlines the bundled and system fonts; replacing it (skrifa) is its own change" },
+    { id = "RUSTSEC-2026-0194", reason = "quick-xml 0.30 is pinned by zbus_xml 4 under accesskit_unix (Linux only); it parses D-Bus introspection XML from the session bus, never untrusted files. Fixed by an eframe/egui upgrade" },
+    { id = "RUSTSEC-2026-0195", reason = "same quick-xml 0.30 path as RUSTSEC-2026-0194; trusted D-Bus introspection input only. Goes with the eframe/egui upgrade" },
+    { id = "RUSTSEC-2026-0370", reason = "zvariant is unmaintained as a standalone crate; reached through zbus under accesskit_unix (eframe) and ashpd (rfd). No safe upgrade exists; goes when eframe and rfd move to the zbus monorepo crate" },
+    { id = "RUSTSEC-2026-0371", reason = "zbus_names is unmaintained as a standalone crate; same zbus path as RUSTSEC-2026-0370" },
+    { id = "RUSTSEC-2026-0372", reason = "zvariant_derive is unmaintained as a standalone crate; same zbus path as RUSTSEC-2026-0370" },
 ]

@@ -123,7 +123,7 @@ pub(super) const SHAPE_MENU: &[Row] = &[
     Row::Effect(EffectAct::Edit),
     Row::Effect(EffectAct::Toggle),
     Row::Effect(EffectAct::Remove),
-    Row::Item(Edit::TextPath(TextPathEdit::Remove)),
+    Row::Either(Edit::TextPath(TextPathEdit::Attach), Edit::TextPath(TextPathEdit::Remove)),
     Row::Separator,
     Row::App(AppCommand::StepRepeatPanel),
     Row::App(AppCommand::RotateCopiesPanel),
