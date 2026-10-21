@@ -234,9 +234,14 @@ pub(super) fn run(ctx: &Context, design: &mut Design, selection: &mut Vec<u64>, 
             *selection = vec![id];
             *contour_open = true;
         }
-        Act::Open(at, anchor) => ctx.data_mut(|d| d.insert_temp(editor_id(), Editing { at, anchor })),
+        Act::Open(at, anchor) => open(ctx, at, anchor),
         Act::Toggle => {}
     }
+}
+
+/// Opens the editor of `at` beside `anchor`, as the context menu's Edit effect does.
+pub(super) fn open(ctx: &Context, at: EntryRef, anchor: Rect) {
+    ctx.data_mut(|d| d.insert_temp(editor_id(), Editing { at, anchor }));
 }
 
 #[derive(Clone, Copy)]

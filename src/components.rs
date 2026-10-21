@@ -183,6 +183,12 @@ pub fn part_ids(design: &Design, instance: &Shape) -> Vec<u64> {
     master_shapes(design, component).unwrap_or_default().iter().map(|m| part_id(instance.id, m.id)).collect()
 }
 
+/// The master shape that `part` (a derived id from `part_id`) stands for in `instance`.
+pub fn master_of_part(design: &Design, instance: &Shape, part: u64) -> Option<u64> {
+    let component = instance.instance_of()?;
+    master_shapes(design, component)?.iter().map(|m| m.id).find(|&m| part_id(instance.id, m) == part)
+}
+
 /// `instance`'s parts with the master's frame mapped onto `frame`'s box, rotation and flips. Evaluation
 /// passes the instance's box at the origin, unturned, so moving or turning an instance leaves its parts
 /// as they were.

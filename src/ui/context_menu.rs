@@ -7,9 +7,11 @@ use egui::{Align2, Area, Context, Id, Modifiers, Order, Pos2, Rect, Response, Se
 use crate::containers::AlignTo;
 use crate::design::{Align, Arrange, Combine, Design, History};
 use crate::edit::{AppCommand, Edit, TextPathEdit};
+use crate::effects::{EffectEdit, EntryRef, Row as EffectRow, rows as effect_rows};
 use crate::path_edit::{NodeAction, NodeKind, NodePath};
 use crate::select::Match;
 use crate::transform::Axis;
+use crate::units::Units;
 
 use super::chrome::text;
 use super::commands::{Command, Cx, Entry};
@@ -29,6 +31,8 @@ pub enum Picked {
     App(AppCommand),
     Clipboard(super::clipboard::Action),
     Node(NodeAction),
+    /// Edit effect: open the effect's panel beside the menu, at the point it was opened.
+    EditEffect(EntryRef, Pos2),
 }
 
 pub(super) enum Row {
@@ -39,7 +43,24 @@ pub(super) enum Row {
     /// The second edit when it can run, otherwise the first: Group or Ungroup, Flatten or Unflatten.
     Either(Edit, Edit),
     Sub(&'static str, &'static [Edit]),
+    /// One of the effect rows, built from the selection's own effects when the menu opens.
+    Effect(EffectAct),
     Separator,
+}
+
+/// What an effect row does to the effect it names.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum EffectAct {
+    Edit,
+    Toggle,
+    Remove,
+}
+
+/// One pick of a submenu, or of a row built from the selection.
+struct Pick {
+    label: String,
+    enabled: bool,
+    picked: Picked,
 }
 
 const COMBINE: [Edit; 6] = [
@@ -99,6 +120,9 @@ pub(super) const SHAPE_MENU: &[Row] = &[
     Row::Sub("Combine", &COMBINE),
     Row::Either(Edit::Flatten, Edit::Unflatten),
     Row::Item(Edit::Expand),
+    Row::Effect(EffectAct::Edit),
+    Row::Effect(EffectAct::Toggle),
+    Row::Effect(EffectAct::Remove),
     Row::Either(Edit::TextPath(TextPathEdit::Attach), Edit::TextPath(TextPathEdit::Remove)),
     Row::Separator,
     Row::App(AppCommand::StepRepeatPanel),
@@ -144,7 +168,68 @@ pub(super) fn shown(row: &Row, cx: &Cx) -> Option<Entry> {
         Row::Either(a, b) => Some(cx.either(a.clone(), b.clone())),
         Row::App(app) => Some(cx.app(app.clone(), &History::default())),
         Row::Clipboard(action) => Some(cx.clipboard(*action)),
-        Row::Sub(..) | Row::Separator => None,
+        Row::Sub(..) | Row::Effect(_) | Row::Separator => None,
+    }
+}
+
+/// What an effect row offers for the selection: the row's own label, and one pick per effect row of the
+/// selected shapes (Contour stays in Layers, whose panel it opens). One pick runs from the row itself;
+/// several fold into a submenu; none greys the row.
+fn effect_picks(cx: &Cx, act: EffectAct) -> (&'static str, Vec<Pick>) {
+    let shapes: Vec<_> = cx.design.shapes.iter().filter(|s| cx.on.contains(&s.id)).collect();
+    let several = shapes.len() > 1;
+    let mut label = match act {
+        EffectAct::Edit => "Edit effect",
+        EffectAct::Toggle => "Disable effect",
+        EffectAct::Remove => "Remove effect",
+    };
+    let mut picks = Vec::new();
+    let mut any_on = false;
+    let mut any_off = false;
+    for shape in shapes {
+        for row in effect_rows(shape, &cx.design.geometry(shape), Units::Imperial) {
+            let at = EntryRef { shape: shape.id, row: row.key };
+            let name = if several { format!("{}: {}", cx.design.layer_name(shape), row.kind.name()) } else { row.kind.name().to_owned() };
+            let (edit, picked, name) = match act {
+                EffectAct::Edit if row.key == EffectRow::Contour => continue,
+                EffectAct::Edit => (None, Picked::EditEffect(at, Pos2::ZERO), name),
+                EffectAct::Toggle => {
+                    let (on, off) = if row.enabled { (&mut any_on, "Turn off") } else { (&mut any_off, "Turn on") };
+                    *on = true;
+                    let edit = Edit::Effect { at, op: EffectEdit::Enable(!row.enabled) };
+                    (Some(edit.clone()), Picked::Edit(edit), format!("{off} {name}"))
+                }
+                EffectAct::Remove => {
+                    let edit = Edit::Effect { at, op: EffectEdit::Remove };
+                    (Some(edit.clone()), Picked::Edit(edit), name)
+                }
+            };
+            let enabled = edit.is_none_or(|e| cx.design.check(&e, cx.on).is_ok());
+            picks.push(Pick { label: name, enabled, picked });
+        }
+    }
+    if act == EffectAct::Toggle {
+        label = match (any_on, any_off) {
+            (false, true) => "Enable effect",
+            (true, true) => "Disable or enable effect",
+            _ => label,
+        };
+    }
+    (label, picks)
+}
+
+/// The label and picks of a `Sub` row or an effect row, built for this frame.
+fn sub_picks(row: &Row, cx: &Cx) -> (&'static str, Vec<Pick>) {
+    match row {
+        Row::Sub(label, items) => {
+            let picks = items.iter().map(|edit| {
+                let e = resolve(cx, edit);
+                Pick { label: e.label.to_owned(), enabled: e.enabled(), picked: Picked::Edit(e.edit().clone()) }
+            });
+            (label, picks.collect())
+        }
+        Row::Effect(act) => effect_picks(cx, *act),
+        _ => unreachable!("only a Sub or an Effect row has picks"),
     }
 }
 
@@ -154,6 +239,8 @@ enum Target {
     Selection,
     Empty,
     Nodes,
+    /// An instance's part, by the master shape it stands for: Reset this part.
+    Part(u64),
 }
 
 #[derive(Clone, Copy)]
@@ -187,6 +274,13 @@ pub fn open_on(ctx: &Context, at: Pos2, ids: &[u64], selection: &mut Vec<u64>) {
         *selection = ids.to_vec();
     }
     open(ctx, at, Target::Selection);
+}
+
+/// A right-click on the part of an instance that stands for master shape `part`: selects the instance,
+/// then offers Reset this part.
+pub fn open_part(ctx: &Context, at: Pos2, instance: u64, part: u64, selection: &mut Vec<u64>) {
+    *selection = vec![instance];
+    open(ctx, at, Target::Part(part));
 }
 
 /// A right-click on a node while editing a path's nodes.
@@ -233,25 +327,45 @@ pub fn show(ctx: &Context, design: &Design, selection: &[u64], nodes: Option<&su
     let cx = Cx::new(design, selection, align_to);
     let mut picked = None;
     let mut sub_rect = None;
+    let mut sub: Vec<Pick> = Vec::new();
     let main = Area::new(state_id()).order(Order::Foreground).fixed_pos(st.at).show(ctx, |ui| {
         menu_frame().show(ui, |ui| {
             ui.set_width(WIDTH);
             ui.spacing_mut().item_spacing.y = 0.0;
             match st.target {
                 Target::Nodes => picked = node_rows(ui, design, nodes),
+                Target::Part(part) => {
+                    let e = cx.entry(Edit::ResetPart(part));
+                    if menu_row(ui, e.label, None, e.enabled(), false, false).clicked() && e.enabled() {
+                        picked = Some(Picked::Edit(e.edit().clone()));
+                    }
+                }
                 Target::Selection | Target::Empty => {
                     let rows = if st.target == Target::Selection { SHAPE_MENU } else { EMPTY_MENU };
                     for (i, row) in rows.iter().enumerate() {
                         match row {
                             Row::Separator => separator(ui),
-                            Row::Sub(label, items) => {
-                                let on = items.iter().any(|e| resolve(&cx, e).enabled());
+                            Row::Sub(..) | Row::Effect(_) => {
+                                let (label, picks) = sub_picks(row, &cx);
+                                let on = picks.iter().any(|p| p.enabled);
+                                // An effect row with one effect acts on it from the row itself.
+                                if matches!(row, Row::Effect(_)) && picks.len() <= 1 {
+                                    let resp = menu_row(ui, label, None, on, false, false);
+                                    if resp.hovered() {
+                                        st.sub = None;
+                                    }
+                                    if on && resp.clicked() {
+                                        picked = picks.into_iter().next().map(|p| p.picked);
+                                    }
+                                    continue;
+                                }
                                 let resp = menu_row(ui, label, None, on, true, st.sub == Some(i));
                                 if on && (resp.hovered() || resp.clicked()) {
                                     st.sub = Some(i);
                                 }
                                 if st.sub == Some(i) {
                                     sub_rect = Some(resp.rect);
+                                    sub = picks;
                                 }
                             }
                             Row::Item(_) | Row::Either(..) | Row::App(_) | Row::Clipboard(_) => {
@@ -275,21 +389,23 @@ pub fn show(ctx: &Context, design: &Design, selection: &[u64], nodes: Option<&su
         })
     });
     let mut keep = vec![main.response.rect];
-    if let (Some(Row::Sub(_, items)), Some(anchor)) = (st.sub.filter(|_| st.target == Target::Selection).map(|i| &SHAPE_MENU[i]), sub_rect) {
+    if let (false, Some(anchor)) = (sub.is_empty(), sub_rect) {
         let at = anchor.right_top() + vec2(8.0, -16.0);
-        let sub = Area::new(state_id().with("sub")).order(Order::Foreground).fixed_pos(at).show(ctx, |ui| {
+        let menu = Area::new(state_id().with("sub")).order(Order::Foreground).fixed_pos(at).show(ctx, |ui| {
             menu_frame().show(ui, |ui| {
                 ui.set_width(SUB_WIDTH);
                 ui.spacing_mut().item_spacing.y = 0.0;
-                for edit in items.iter() {
-                    let e = resolve(&cx, edit);
-                    if menu_row(ui, e.label, None, e.enabled(), false, false).clicked() && e.enabled() {
-                        picked = Some(Picked::Edit(e.edit().clone()));
+                for pick in sub {
+                    if menu_row(ui, &pick.label, None, pick.enabled, false, false).clicked() && pick.enabled {
+                        picked = Some(pick.picked);
                     }
                 }
             })
         });
-        keep.push(sub.response.rect);
+        keep.push(menu.response.rect);
+    }
+    if let Some(Picked::EditEffect(_, at)) = picked.as_mut() {
+        *at = st.at;
     }
     let dismissed = ctx.input(|i| i.key_pressed(egui::Key::Escape)) || (st.pass != ctx.cumulative_pass_nr() && clicked_outside(ctx, &keep));
     if picked.is_some() || dismissed {
@@ -343,6 +459,23 @@ fn menu_row(ui: &mut Ui, label: &str, keys: Option<&str>, enabled: bool, submenu
 fn separator(ui: &mut Ui) {
     let (rect, _) = ui.allocate_exact_size(vec2(ui.available_width(), 9.0), Sense::hover());
     ui.painter().hline(rect.x_range().expand(8.0), rect.center().y, Stroke::new(1.0_f32, BORDER_SUBTLE));
+}
+
+/// Every label `row` can show, for the spec surface test: an effect row's label follows the effect it acts on.
+#[cfg(test)]
+pub(super) fn labels(row: &Row) -> Vec<&'static str> {
+    let of = |e: &Edit| super::commands::info(&Command::Edit(e.clone())).label;
+    match row {
+        Row::Item(e) => vec![of(e)],
+        Row::Either(a, b) => vec![of(a), of(b)],
+        Row::App(a) => vec![super::commands::info(&Command::App(a.clone())).label],
+        Row::Clipboard(a) => vec![super::commands::info(&Command::Clipboard(*a)).label],
+        Row::Sub(label, _) => vec![label],
+        Row::Effect(EffectAct::Edit) => vec!["Edit effect"],
+        Row::Effect(EffectAct::Toggle) => vec!["Disable effect", "Enable effect"],
+        Row::Effect(EffectAct::Remove) => vec!["Remove effect"],
+        Row::Separator => Vec::new(),
+    }
 }
 
 #[cfg(test)]

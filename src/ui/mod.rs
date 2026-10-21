@@ -186,6 +186,8 @@ mod tests_spec57;
 #[cfg(test)]
 mod tests_spec58;
 #[cfg(test)]
+mod tests_surfaces;
+#[cfg(test)]
 mod tests_svg_hostile;
 mod text_edit;
 mod text_path;
@@ -649,7 +651,7 @@ impl Kerf {
     /// Runs an edit through `edit::run`, mapping Cmd+D to Power Duplicate while the last copies stay
     /// selected, and remembering each duplicate's step so Cmd+D repeats it and Transform Again applies it
     /// (spec 52).
-    fn run_edit(&mut self, edit: Edit) {
+    fn run_edit(&mut self, edit: Edit, shift: bool) {
         let frame_of = |design: &crate::design::Design, ids: &[u64]| {
             let shapes: Vec<crate::design::Shape> = design.shapes.iter().filter(|s| ids.contains(&s.id)).cloned().collect();
             crate::transform::Frame::of(design, &shapes)
@@ -664,6 +666,12 @@ impl Kerf {
         // bare gesture recorded leaves it a plain Duplicate (spec 52).
         let edit = match (&edit, &doc.duplicate_memory) {
             (Edit::Duplicate, Some(m)) if m.from_duplicate && m.ids == doc.selection => Edit::TransformAgain { from: m.from, copy: true },
+            // A menu or the palette sends Transform Again with a placeholder frame; the step is the remembered one.
+            (Edit::TransformAgain { copy: false, .. }, Some(m)) => Edit::TransformAgain { from: m.from, copy: false },
+            (Edit::TransformAgain { copy: false, .. }, None) => {
+                doc.view.notice = Some(notice::Notice::new("Nothing to repeat yet. Move, rotate or resize something first.", false));
+                return;
+            }
             _ => edit,
         };
         let sources = doc.selection.clone();
@@ -672,6 +680,9 @@ impl Kerf {
         let in_place_again = matches!(edit, Edit::TransformAgain { copy: false, .. });
         if let Some(notice) = notice::run_edit(&mut doc.design, &mut doc.selection, &edit) {
             doc.view.notice = Some(notice);
+        }
+        if shift && matches!(edit, Edit::SelectSame(_)) {
+            commands::keep_selected(&sources, &mut doc.selection);
         }
         // Each duplicate and each Transform Again advances the remembered step, so the next press keeps an
         // even pitch (spec 52). Transform Again in place keeps the Duplicate flag of the step it repeated.
@@ -702,7 +713,7 @@ impl Kerf {
         ctx.request_repaint();
         let app = match command {
             commands::Command::Edit(edit) => {
-                self.run_edit(edit);
+                self.run_edit(edit, ctx.input(|i| i.modifiers.shift));
                 return;
             }
             commands::Command::Clipboard(action) => {

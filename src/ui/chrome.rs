@@ -31,7 +31,7 @@ pub const FILE_MENU: [AppCommand; 6] =
     [AppCommand::New, AppCommand::Home, AppCommand::Save, AppCommand::VersionHistory, AppCommand::Export, AppCommand::PrepareForDesignSpace];
 
 /// The Edit menu, in groups split by a separator.
-pub const EDIT_MENU: [&[Command]; 2] = [
+pub const EDIT_MENU: [&[Command]; 3] = [
     &[
         Command::App(AppCommand::Undo),
         Command::App(AppCommand::Redo),
@@ -54,6 +54,7 @@ pub const EDIT_MENU: [&[Command]; 2] = [
         Command::Edit(Edit::MakeComponent),
         Command::Edit(Edit::DetachInstance),
     ],
+    &[Command::Edit(super::commands::TRANSFORM_AGAIN), Command::App(AppCommand::StepRepeatPanel), Command::App(AppCommand::RotateCopiesPanel)],
 ];
 
 /// What the top bar needs to render and edit: the document title, the view settings, and what its
