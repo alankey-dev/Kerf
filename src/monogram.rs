@@ -733,11 +733,11 @@ struct FrameArt {
 
 impl FrameArt {
     fn parse(svg: &[u8]) -> Result<FrameArt, String> {
-        use usvg::{NodeExt, TreeParsing};
+        use usvg::NodeExt;
         let text = std::str::from_utf8(svg).map_err(|e| e.to_string())?;
         let doc = roxmltree::Document::parse(text).map_err(|e| e.to_string())?;
         let content = Content::parse(doc.root_element().attribute("data-content").ok_or("no data-content on the root")?)?;
-        let tree = usvg::Tree::from_data(svg, &usvg::Options::default()).map_err(|e| e.to_string())?;
+        let tree = crate::svg_import::parse_tree(svg)?;
         let (mut bands, mut decorations) = (Vec::new(), Vec::new());
         for node in tree.root.descendants() {
             let usvg::NodeKind::Path(path) = &*node.borrow() else { continue };

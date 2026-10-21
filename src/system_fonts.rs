@@ -247,19 +247,17 @@ impl FontCatalogue {
         loaded
     }
 
-    /// Adds the SVG font at `source` to the user's writing fonts: copies it into `<projects_dir>/fonts`
-    /// and registers it. `Ok(None)` when the file is SVG artwork rather than a font.
-    pub fn install_svg_font(&self, projects_dir: &Path, source: &Path) -> Result<Option<WritingFont>, String> {
-        let text = std::fs::read_to_string(source).map_err(|e| e.to_string())?;
-        let Ok(font) = parse_svg_font(&text) else { return Ok(None) };
+    /// Adds the SVG font parsed from `text` (read from `source`) to the user's writing fonts: copies it
+    /// into `<projects_dir>/fonts` and registers it.
+    pub fn install_svg_font(&self, projects_dir: &Path, source: &Path, text: &str, font: StrokeFont) -> Result<WritingFont, String> {
         let stem = file_stem(source);
         let dir = projects_dir.join(USER_FONTS);
         std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
-        std::fs::write(dir.join(format!("{stem}.svg")), &text).map_err(|e| e.to_string())?;
+        std::fs::write(dir.join(format!("{stem}.svg")), text).map_err(|e| e.to_string())?;
         let added = WritingFont { id: svg_font_id(&stem), name: font.name.clone() };
         tracing::info!(target: "font", id = %added.id.0, name = %added.name, "writing font added");
         self.add_stroke_font(added.id.clone(), Arc::new(font));
-        Ok(Some(added))
+        Ok(added)
     }
 
     pub fn previews(&self) -> Previews {
@@ -357,7 +355,8 @@ impl FontCatalogue {
 const USER_FONTS: &str = "fonts";
 
 /// An SVG font with at least one glyph.
-fn parse_svg_font(text: &str) -> Result<StrokeFont, String> {
+/// The writing font in `text`, or why it is not one. SVG artwork is `Err` too.
+pub fn parse_svg_font(text: &str) -> Result<StrokeFont, String> {
     let font = StrokeFont::from_svg_font(text)?;
     if font.glyph_count() == 0 {
         return Err("the font has no glyphs".into());
@@ -762,6 +761,13 @@ mod tests {
         assert_eq!(refreshed.len(), 4, "H's three strokes and i's one");
     }
 
+    /// What Upload does: `None` when the file is artwork rather than a font.
+    fn install(fonts: &FontCatalogue, projects: &Path, source: &Path) -> Result<Option<WritingFont>, String> {
+        let text = std::fs::read_to_string(source).map_err(|e| e.to_string())?;
+        let Ok(font) = parse_svg_font(&text) else { return Ok(None) };
+        fonts.install_svg_font(projects, source, &text, font).map(Some)
+    }
+
     #[test]
     fn an_uploaded_svg_font_is_kept_and_registered_and_artwork_is_not() {
         let projects = tempfile::tempdir().unwrap();
@@ -770,7 +776,7 @@ mod tests {
         std::fs::write(&font_file, SVG_FONT).unwrap();
         let fonts = FontCatalogue::fixture();
 
-        let added = fonts.install_svg_font(projects.path(), &font_file).unwrap().expect("an SVG font");
+        let added = install(&fonts, projects.path(), &font_file).unwrap().expect("an SVG font");
         assert_eq!(added, WritingFont { id: StrokeFontId("svg-quill-hand".into()), name: "Quill Hand".into() });
         assert!(projects.path().join("fonts/Quill Hand.svg").is_file(), "copied into the projects directory");
         assert_eq!(fonts.writing().last(), Some(&added), "listed after the bundled writing fonts");
@@ -778,7 +784,7 @@ mod tests {
 
         let artwork = source.path().join("square.svg");
         std::fs::write(&artwork, r#"<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0 H10 V10 Z"/></svg>"#).unwrap();
-        assert_eq!(fonts.install_svg_font(projects.path(), &artwork), Ok(None), "artwork imports as shapes instead");
+        assert_eq!(install(&fonts, projects.path(), &artwork), Ok(None), "artwork imports as shapes instead");
 
         let next_launch = FontCatalogue::fixture();
         assert_eq!(next_launch.load_user_fonts(projects.path()), 1);
